@@ -1,6 +1,14 @@
 import React from 'react'
+import { useNavigate} from 'react-router-dom';
 
 function Register() {
+
+
+    const navigate = useNavigate();
+
+    const handleLogin = () => {
+      navigate('/login'); // Redirige a la página de inicio de sesión
+    };
   return (
     <div className="container mt-5">
     <h2>Registro</h2>
@@ -23,6 +31,11 @@ function Register() {
       </div>
       <button type="submit" className="btn btn-primary">Registrarse</button>
     </form>
+
+    <div className="mt-3">
+        
+        <button className="btn btn-secondary" onClick={handleLogin}>¿Ya tienes una cuenta?</button>
+      </div>
   </div>
   )
 }

@@ -1,12 +1,19 @@
 import React from 'react'
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 
 
 function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-  
+    const navigate = useNavigate(); // navegación
+
+    const handleRegister = () => {
+        navigate('/register'); // Redirige a la página de registro
+      };
+
     // Función para manejar el envío del formulario
     const handleSubmit = (e) => {
       e.preventDefault(); // Evita el comportamiento por defecto del formulario
@@ -50,6 +57,13 @@ function Login() {
             />
           </div>
           <button type="submit" className="btn btn-primary">Iniciar sesión</button>
+
+          <div className="mt-3">
+        
+        <button className="btn btn-secondary" onClick={handleRegister}>¿No tienes una cuenta?</button>
+      </div>
+
+        
         </form>
       </div>
     );
