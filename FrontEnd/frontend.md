@@ -1,0 +1,1 @@
+Información para el diseño del frontend de la aplicación web.
