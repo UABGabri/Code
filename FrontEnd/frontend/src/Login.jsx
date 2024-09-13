@@ -8,15 +8,14 @@ function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const navigate = useNavigate(); // navegación
+    const navigate = useNavigate(); 
 
     const handleRegister = () => {
         navigate('/register'); // Redirige a la página de registro
       };
 
-    // Función para manejar el envío del formulario
     const handleSubmit = (e) => {
-      e.preventDefault(); // Evita el comportamiento por defecto del formulario
+      e.preventDefault(); 
   
       if (username === '' || password === '') {
         setError('Por favor, rellena todos los campos.');
