@@ -16,9 +16,28 @@ const db = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "Ga21012002",
-    database: "web_examen"
+    database: "web_examen",
 })
 
+
+app.post('/register', (req, res) => {
+
+const SQL = "INSERT INTO users (`username`, `password`, `role`,`email`) VALUES";
+
+const values = [
+    req.body.name,
+    req.body.password,
+    req.body.role,
+    req.body.email,
+]
+
+db.query(SQL, [values], (err, result) => {
+
+    if(err) return res.json({Error: "Inserting data Error"});
+    return res.json({Status: "Succeded"});
+})
+
+})
 
 app.listen(8081, () => {
     console.log("Running Server...");
