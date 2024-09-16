@@ -6,8 +6,9 @@ function Register() {
 
 
   const [values, setValues] = useState({
+
     username: '',
-    email: '',
+    gmail: '',
     password: '',
     role: '' 
   });
@@ -17,31 +18,48 @@ function Register() {
 
 
   useEffect(() => {
-    const emailDomain = values.email.split('@')[1];
-    if (emailDomain === 'teacher.cat') { 
+    const gmailDomain = values.gmail.split('@')[1];
+    if (gmailDomain === 'teacher.cat') { 
       setValues(prevValues => ({ ...prevValues, role: 'Profesor' })); 
     } else {
       setValues(prevValues => ({ ...prevValues, role: 'Alumno' })); 
     }
-  }, [values.email]); 
+  }, [values.gmail]); 
 
-  const handleConfirmPassword = (e) => {
-    e.preventDefault();
+
+
+  const handleConfirmPassword = (event) => {
+
+    console.log(values);
+    event.preventDefault();
     if (values.password !== confirmPassword) {
       setError('Por favor, introduce contraseñas iguales');
       return;
     } else {
-      axios.post('http://localhost:8081', values)
-        .then(res => console.log(res))
-        .catch(err => console.log(err)); 
+
+      
+      axios.post('http://localhost:8081/register', values)  
+      .then(res => {console.log('Respuesta del servidor:', res.data);})
+      .catch(err => {console.error('Error en la solicitud:', err);});
       setError(''); 
-      handleLogin();
+      handleLogin(); 
+      
+
+      /*
+      axios.post('http://localhost:8081/test', values.username)  
+      .then(res => {console.log('Respuesta del servidor:', res.data);})
+      .catch(err => {console.error('Error en la solicitud:', err);});
+      setError(''); 
+      handleLogin(); */
+
+
     }
+
   };
 
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const handleLogin = () => {
-    navigate('/login'); // Navegar al login después de registrarse
+    //navigate('/login'); // Navegar al login después de registrarse
   };
 
   return (
@@ -62,13 +80,13 @@ function Register() {
           />
         </div>
         <div>
-          <label htmlFor="email" className="form-label">Correo electrónico</label>
+          <label htmlFor="gmail" className="form-label">Correo electrónico</label>
           <input
-            type="email"
-            name='email'
-            onChange={e => setValues({ ...values, email: e.target.value })}
+            type="gmail"
+            name='gmail'
+            onChange={e => setValues({ ...values, gmail: e.target.value })}
             className="form-control"
-            id="email"
+            id="gmail"
             placeholder="Ingresa tu correo"
           />
         </div>
