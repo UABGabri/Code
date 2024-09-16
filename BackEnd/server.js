@@ -12,13 +12,6 @@ app.use(cors());
 app.use(cookieParser());
 
 
-const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "Ga21012002",
-    database: "web_examen",
-})
-
 
 app.get('/', (req, res) => {
     res.send('Servidor funcionando correctamente');
@@ -39,7 +32,6 @@ app.post('/register', (req, res) => {
     if (!username || !password || !role || !gmail) {
         return res.status(400).json({ error: "Todos los campos son requeridos" });
     }
-
 
     const sql = "INSERT INTO users (username, password, role, gmail) VALUES (?, ?, ?, ?)";
 
@@ -64,6 +56,7 @@ app.post('/register', (req, res) => {
 })
 
 
+/*
 app.post('/test', (req, res) => {
 
     const {username} = req.body
@@ -83,6 +76,8 @@ app.post('/test', (req, res) => {
 
 
 })
+*/
+
 
 app.listen(8081, () => {
     console.log("Running Server...");
