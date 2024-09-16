@@ -26,6 +26,14 @@ app.get('/', (req, res) => {
 
 app.post('/register', (req, res) => {
 
+
+    const db = mysql.createConnection({
+        host: "localhost",
+        user: "root",
+        password: "Ga21012002",
+        database: "web_examen"
+    });
+
     const { username, password, role, gmail } = req.body;
 
     if (!username || !password || !role || !gmail) {
@@ -51,6 +59,8 @@ app.post('/register', (req, res) => {
     });
     
 
+
+    db.end();
 })
 
 
@@ -70,7 +80,6 @@ app.post('/test', (req, res) => {
         if (err) return res.json({ Error: "Inserting data Error" });
         return res.json({ Status: "Succeeded" });
     });
-
 
 
 })
