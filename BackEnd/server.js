@@ -4,7 +4,7 @@ import cors from "cors";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import cookieParser from "cookie-parser";
-
+const salt = 10
 
 const app = express ();
 app.use(express.json());
@@ -33,26 +33,28 @@ app.post('/register', (req, res) => {
         return res.status(400).json({ error: "Todos los campos son requeridos" });
     }
 
-    const sql = "INSERT INTO users (username, password, role, gmail) VALUES (?, ?, ?, ?)";
+    const sql = "INSERT INTO users (username, password, role, gmail) VALUES (?)";
+
+    bcrypt.hash(req.body.password.toString(), salt, ( (err, hash) => {
+
+        if(err) return res.json({Error:"Error hashing password"});
+
+        const values = [
+            req.body.username,
+            hash,
+            req.body.role,
+            req.body.gmail,
+        ]
 
 
-    const values = [
-        req.body.username,
-        req.body.password,
-        req.body.role,
-        req.body.gmail,
-    ]
+        db.query(sql, [values], (err, result) => {
+            if (err) return res.json({ Error: err.message });
+            return res.json({ Status: "Succeeded" });
+        });
 
+    }))
 
-
-    db.query(sql, values, (err, result) => {
-        if (err) return res.json({ Error: err.message });
-        return res.json({ Status: "Succeeded" });
-    });
-    
-
-
-    db.end();
+   
 })
 
 

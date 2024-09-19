@@ -51,15 +51,13 @@ function Register() {
       .catch(err => {console.error('Error en la solicitud:', err);});
       setError(''); 
       handleLogin(); */
-
-
     }
 
   };
 
-  //const navigate = useNavigate();
+  const navigate = useNavigate();
   const handleLogin = () => {
-    //navigate('/login'); // Navegar al login después de registrarse
+    navigate('/login'); // Navegar al login después de registrarse
   };
 
   return (
