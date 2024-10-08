@@ -33,13 +33,13 @@ function Register() {
     console.log(values);
     event.preventDefault();
     if (values.password !== confirmPassword) {
-      setError('Por favor, introduce contraseñas iguales');
+      setError('Sisplau, introdueix contrasenyes iguals');
       return;
     } else {
 
       
       axios.post('http://localhost:8081/register', values)  
-      .then(res => {console.log('Respuesta del servidor:', res.data);})
+      .then(res => {console.log('Resposta del servidor:', res.data);})
       .catch(err => {console.error('Error en la solicitud:', err);});
       setError(''); 
       handleLogin(); 
@@ -67,7 +67,7 @@ function Register() {
 
       <form className="form-label" onSubmit={handleConfirmPassword}>
         <div>
-          <label htmlFor="username" className="form-label">Nombre de usuario</label>
+          <label htmlFor="username" className="form-label">Nom de usuari</label>
           <input
             type="text"
             name='username'
@@ -78,7 +78,7 @@ function Register() {
           />
         </div>
         <div>
-          <label htmlFor="gmail" className="form-label">Correo electrónico</label>
+          <label htmlFor="gmail" className="form-label">Correu electrònic</label>
           <input
             type="gmail"
             name='gmail'
@@ -89,7 +89,7 @@ function Register() {
           />
         </div>
         <div>
-          <label htmlFor="password" className="form-label">Contraseña</label>
+          <label htmlFor="password" className="form-label">Contrasenya</label>
           <input
             type="password"
             name='password'

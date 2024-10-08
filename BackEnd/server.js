@@ -53,9 +53,20 @@ app.post('/register', (req, res) => {
         });
 
     }))
-
-   
 })
+
+
+
+app.post('/login', (req, res) => {
+
+
+    const sql = 'SELECT * from users'
+    db.query(sql, [values], (err, result) => {
+        if (err) return res.json({ Error: err.message });
+        return res.json({ Status: "Succeeded" });
+    });
+})
+
 
 
 /*
