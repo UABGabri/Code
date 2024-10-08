@@ -27,19 +27,21 @@ app.post('/register', (req, res) => {
         database: "web_examen"
     });
 
-    const { username, password, role, gmail } = req.body;
+    const { niu, username, password, role, gmail } = req.body;
 
-    if (!username || !password || !role || !gmail) {
+    if (!niu || !username || !password || !role || !gmail) {
         return res.status(400).json({ error: "Todos los campos son requeridos" });
     }
 
-    const sql = "INSERT INTO users (username, password, role, gmail) VALUES (?)";
+    const sql = "INSERT INTO users (niu, username, password, role, gmail) VALUES (?)";
 
     bcrypt.hash(req.body.password.toString(), salt, ( (err, hash) => {
 
         if(err) return res.json({Error:"Error hashing password"});
 
         const values = [
+
+            req.body.niu,
             req.body.username,
             hash,
             req.body.role,

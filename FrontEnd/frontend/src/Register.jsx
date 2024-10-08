@@ -7,10 +7,12 @@ function Register() {
 
   const [values, setValues] = useState({
 
+    niu: '',
     username: '',
     gmail: '',
     password: '',
-    role: '' 
+    role: ''
+
   });
 
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -57,7 +59,7 @@ function Register() {
 
   const navigate = useNavigate();
   const handleLogin = () => {
-    navigate('/login'); // Navegar al login después de registrarse
+    navigate('/login'); // Navegar al login després de registrarse
   };
 
   return (
@@ -65,7 +67,7 @@ function Register() {
       <h2>Registro</h2>
       {error && <div className="alert alert-danger">{error}</div>}
 
-      <form className="form-label" onSubmit={handleConfirmPassword}>
+      <form className="form-label-1" onSubmit={handleConfirmPassword}>
         <div>
           <label htmlFor="username" className="form-label">Nom de usuari</label>
           <input
@@ -74,8 +76,20 @@ function Register() {
             onChange={e => setValues({ ...values, username: e.target.value })}
             className="form-control"
             id="username"
-            placeholder="Ingresa tu nombre de usuario"
+            placeholder="Introdueix el teu nom de usuari"
           />
+        </div>
+
+        <div>
+        <label htmlFor="niu" className="form-label-2">NIU</label>
+          <input
+              type="text"
+              name='niu'
+              onChange={e => setValues({ ...values, niu: e.target.value })}
+              className="form-control"
+              id="niu"
+              placeholder="Introdueix el teu NIU"
+            />
         </div>
         <div>
           <label htmlFor="gmail" className="form-label">Correu electrònic</label>
@@ -85,7 +99,7 @@ function Register() {
             onChange={e => setValues({ ...values, gmail: e.target.value })}
             className="form-control"
             id="gmail"
-            placeholder="Ingresa tu correo"
+            placeholder="Introdueix el teu correu"
           />
         </div>
         <div>
@@ -96,7 +110,7 @@ function Register() {
             onChange={e => setValues({ ...values, password: e.target.value })}
             className="form-control"
             id="password"
-            placeholder="Ingresa tu contraseña"
+            placeholder="Introdueix la teva contrasenya"
           />
         </div>
         <div>
@@ -107,15 +121,18 @@ function Register() {
             onChange={e => setConfirmPassword(e.target.value)}
             className="form-control"
             id="confirmPassword"
-            placeholder="Confirma tu contraseña"
+            placeholder="Confirma la contrasenya"
           />
         </div>
 
-        <button type="submit" className="btn btn-primary">Registrarse</button>
+        <div>
+          <button type="submit" className="btn btn-primary">Registrar-se</button>
+        </div>
+        
       </form>
 
       <div>
-        <button className="btn btn-secondary" onClick={handleLogin}>¿Ya tienes una cuenta?</button>
+        <button className="btn btn-secondary" onClick={handleLogin}>¿Ja tens un compte?</button>
       </div>
     </div>
   );

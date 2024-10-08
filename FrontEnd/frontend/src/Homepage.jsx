@@ -1,4 +1,6 @@
 import { useNavigate } from 'react-router-dom';
+import styles from './Homepage.module.css'
+import logo from './assets/uab.png'
 
 function Homepage() {
   
@@ -13,12 +15,15 @@ function Homepage() {
     };
 
   return (
-    <div>
-      <div>
-        <h1>Bienvenido</h1>
-        <div>
-          <button className="btn btn-light " onClick={handleLogin}>Iniciar sesión</button>
-          <button className="btn btn-light" onClick={handleRegister}>Registrarse</button>
+    <div className= {styles.homecontainer}>
+      <div className={styles.green}>
+        <h1 className={styles.logos}>UAB</h1>
+      </div>
+      <div className={styles.white}>
+        <h1 className={styles.welcome}>BENVINGUT</h1>
+        <div className={styles.buttcontainer}>
+          <button className={styles.homebtn} onClick={handleLogin}>Crea el teu compte</button>
+          <button className={styles.homebtn} onClick={handleRegister}>Ja tens compte?</button>
         </div>
       </div>
     </div>
