@@ -60,7 +60,7 @@ function Register() {
 
   const navigate = useNavigate();
   const handleLogin = () => {
-    navigate('/login'); // Navegar al login després de registrarse
+    navigate('/login', )
   };
 
   return (
@@ -84,6 +84,8 @@ function Register() {
             className="form-control"
             id="username"
             placeholder="Introdueix el teu nom de usuari"
+            required pattern="^[A-Za-zÀ-ÿ\s]+$"
+             title="El nom no ha de contenir dígits"
           />
         </div>
 
@@ -96,6 +98,8 @@ function Register() {
               className="form-control"
               id="niu"
               placeholder="Introdueix el teu NIU"
+              required pattern="^\d{7}$"
+              title="El NIU ha de ser un nombre de 7 dígits"
             />
         </div>
         <div>
@@ -107,6 +111,8 @@ function Register() {
             className="form-control"
             id="gmail"
             placeholder="Introdueix el teu correu"
+            required
+            title="Introdueix un email vàlid"
           />
         </div>
         <div>
@@ -118,6 +124,8 @@ function Register() {
             className="form-control"
             id="password"
             placeholder="Introdueix la teva contrasenya"
+            required minLength={8}
+            title="La contrasenya ha de tenir 8 carácters min"
           />
         </div>
         <div>
