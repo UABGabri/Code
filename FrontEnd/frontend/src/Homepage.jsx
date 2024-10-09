@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import styles from './Homepage.module.css'
-import logo from './assets/uab.png'
+
 
 function Homepage() {
   

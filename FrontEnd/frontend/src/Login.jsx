@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import styles from './Homepage.module.css'
 
 
 function Login() {
@@ -38,7 +39,15 @@ function Login() {
     };
   
     return (
-      <div className="container mt-5">
+
+
+      <div className= {styles.homecontainer}>
+      <div className={styles.green}>
+        <h1 className={styles.logos}>UAB</h1>
+      </div>
+      <div className={styles.white}>
+      <div className="container">
+        <div className={styles.logincontainer}>
         <h2>Iniciar sessió</h2>
         {error && <div className="alert alert-danger">{error}</div>}
 
@@ -62,13 +71,19 @@ function Login() {
               onChange={(e) => setValues({...values, password: e.target.value}) }
             />
           </div>
-          <button type="submit" className="btn btn-primary">Iniciar sessió</button>
 
-          <div className="mt-3">
+
+          <div className={styles.registerbtncontainer}>
+          <button type="submit" className={styles.loginbtn}>Iniciar sessió</button>
+
+          
         
-        <button className="btn btn-secondary" onClick={handleRegister}>¿No tens compte?</button>
-      </div>
+            <button className={styles.loginbtn} onClick={handleRegister}>¿No tens compte?</button>
+          </div>
         </form>
+        </div>
+      </div>
+      </div>
       </div>
     );
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import styles from './Homepage.module.css';
 
 function Register() {
 
@@ -63,8 +64,14 @@ function Register() {
   };
 
   return (
+
+    <div className= {styles.homecontainer}>
+    <div className={styles.green}>
+      <h1 className={styles.logos}>UAB</h1>
+    </div>
+    <div className={styles.white}>
     <div>
-      <h2>Registro</h2>
+      <h2>Registre</h2>
       {error && <div className="alert alert-danger">{error}</div>}
 
       <form className="form-label-1" onSubmit={handleConfirmPassword}>
@@ -125,15 +132,19 @@ function Register() {
           />
         </div>
 
-        <div>
-          <button type="submit" className="btn btn-primary">Registrar-se</button>
+
+        <div className={styles.registerbtncontainer}>
+          <button type="submit" className={styles.registerbtn}>Registrar-se</button>
+          <button className={styles.registerbtn} onClick={handleLogin}>¿Ja tens un compte?</button>
         </div>
         
       </form>
 
-      <div>
-        <button className="btn btn-secondary" onClick={handleLogin}>¿Ja tens un compte?</button>
-      </div>
+      
+
+
+    </div>
+    </div>
     </div>
   );
 }

@@ -4,6 +4,17 @@
     margin: 0;
   }
 
+
+.logincontainer{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+
+
+}
+
   .welcome{
     color: green;
     
@@ -70,6 +81,51 @@
   }
 
   .homebtn:hover{
+    background-color: white;
+    color: black;
+  }
+
+  .loginbtn{
+
+    padding: 10px 20px;
+    cursor: pointer;
+    color: white;
+    background-color: green;
+    border: 0;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 1rem;
+
+    font-size: 15px;
+
+
+  }
+
+  .loginbtn:hover{
+    background-color: white;
+    color: black;
+  }
+
+
+  .registerbtncontainer{
+    display: flex;
+    gap: 10px; 
+  }
+  .registerbtn{
+    margin-top: 20px;
+    
+    padding: 10px 20px;
+    cursor: pointer;
+    color: white;
+    background-color: green;
+    border: 0;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 1rem;
+
+    font-size: 15px;
+
+  }
+
+  .registerbtn:hover{
     background-color: white;
     color: black;
   }
