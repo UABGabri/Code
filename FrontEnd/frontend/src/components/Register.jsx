@@ -21,6 +21,7 @@ function Register() {
 
 
   useEffect(() => {
+
     const gmailDomain = values.gmail.split('@')[1];
     if (gmailDomain === 'teacher.cat') { 
       setValues(prevValues => ({ ...prevValues, role: 'Profesor' })); 
@@ -35,15 +36,16 @@ function Register() {
 
     console.log(values);
     event.preventDefault();
-    if (values.password !== confirmPassword) {
+    
+    if (values.password !== confirmPassword) { //filtre per veure si les dues passwords son iguals
       setError('Sisplau, introdueix contrasenyes iguals');
       return;
-    } else {
+    } 
 
       
-      axios.post('http://localhost:8081/register', values)  
+      axios.post('http://localhost:8081/register', values)  //trucada post al servidor amb els valors introduits al obj values
       .then(res => {console.log('Resposta del servidor:', res.data);})
-      .catch(err => {console.error('Error en la solicitud:', err);});
+      .catch(err => {console.error('Error a la solicitud:', err);});
       setError(''); 
       handleLogin(); 
       
@@ -54,7 +56,7 @@ function Register() {
       .catch(err => {console.error('Error en la solicitud:', err);});
       setError(''); 
       handleLogin(); */
-    }
+    
 
   };
 
@@ -143,7 +145,7 @@ function Register() {
 
         <div className={styles.registerbtncontainer}>
           <button type="submit" className={styles.registerbtn}>Registrar-se</button>
-          <button className={styles.registerbtn} onClick={handleLogin}>¿Ja tens un compte?</button>
+          <button className={styles.registerbtn} onClick={handleLogin}>Ja tens un compte?</button>
         </div>
         
       </form>

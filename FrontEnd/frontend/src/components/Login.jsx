@@ -77,7 +77,6 @@ function Login() {
           <button type="submit" className={styles.loginbtn}>Iniciar sessió</button>
 
           
-        
             <button className={styles.loginbtn} onClick={handleRegister}>¿No tens compte?</button>
           </div>
         </form>

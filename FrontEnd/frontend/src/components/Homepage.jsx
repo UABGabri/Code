@@ -22,8 +22,8 @@ function Homepage() {
       <div className={styles.white}>
         <h1 className={styles.welcome}>BENVINGUT</h1>
         <div className={styles.buttcontainer}>
-          <button className={styles.homebtn} onClick={handleLogin}>Crea el teu compte</button>
-          <button className={styles.homebtn} onClick={handleRegister}>Ja tens compte?</button>
+          <button className={styles.homebtn} onClick={handleRegister}>Crea el teu compte</button>
+          <button className={styles.homebtn} onClick={handleLogin}>Ja tens compte?</button>
         </div>
       </div>
     </div>

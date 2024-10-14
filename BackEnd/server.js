@@ -17,23 +17,23 @@ app.get('/', (req, res) => {
     res.send('Servidor funcionando correctamente');
 });
 
-app.post('/register', (req, res) => {
+app.post('/register', (req, res) => { //lloc on rebem trucada post de register amb la informació necessaria
 
 
-    const db = mysql.createConnection({
+    const db = mysql.createConnection({ //crear connexio amb db.
         host: "localhost",
         user: "root",
         password: "Ga21012002",
         database: "web_examen"
     });
 
-    const { niu, username, password, role, gmail } = req.body;
+    const { niu, username, password, role, gmail } = req.body; 
 
     if (!niu || !username || !password || !role || !gmail) {
-        return res.status(400).json({ error: "Todos los campos son requeridos" });
+        return res.status(400).json({ error: "Tots els camps es requereixen" });
     }
 
-    const sql = "INSERT INTO users (niu, username, password, role, gmail) VALUES (?)";
+    const sql = "INSERT INTO users (niu, username, password, role, gmail) VALUES (?)"; 
 
     bcrypt.hash(req.body.password.toString(), salt, ( (err, hash) => {
 
