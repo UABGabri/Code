@@ -55,38 +55,43 @@ app.post('/register', (req, res) => { //lloc on rebem trucada post de register a
         });
 
     }))
+
+    db.end();
 })
 
 
 
 app.post('/login', (req, res) => {
 
-    const db = mysql.createConnection({ //crear connexio amb db.
+    const db = mysql.createConnection({
         host: "localhost",
         user: "root",
         password: "Ga21012002",
         database: "web_examen"
     });
-    
-    const sql = 'SELECT * from users WHERE niu = ?'
+
+    const sql = 'SELECT * FROM users WHERE niu = ?';
 
     db.query(sql, [req.body.niu], (err, data) => {
-        if (err) return res.json({ Error: "Error al Login" });
-        if(data.lenght > 0){
-
-            bcrypt.compare(req.body.password.toString(), data[0].password, (err, response) =>{ //funcio comparativa usuari contrasenya
-                if (err)res.json({ Error: "Usuari i contrasenya no coincidents"});
-                if (response) {res.json({ Status: "Success"});}
-                else{
-                    res.json({ Status: "Error"});
-                }
-
-            }); //comparativa entre la contrasenya rebuda al data 
-        }else{
-            return res.json({ Error: "NIU no existent a la base de dades"});
+        if (err) {
+            return res.status(500).json({ Error: "Error al iniciar sesión" });
         }
 
-        
+        if (data.length > 0) {
+            bcrypt.compare(req.body.password.toString(), data[0].password, (err, response) => {
+                if (err) {
+                    return res.status(500).json({ Error: "Error interno" });
+                }
+
+                if (response) {
+                    res.json({ Status: "Success" });
+                } else {
+                    res.status(401).json({ Status: "Contraseña incorrecta" });
+                }
+            });
+        } else {
+            return res.status(404).json({ Error: "NIU no existente" });
+        }
     });
 })
 
