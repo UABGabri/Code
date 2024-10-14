@@ -80,19 +80,21 @@ app.post('/login', (req, res) => {
         if (data.length > 0) {
             bcrypt.compare(req.body.password.toString(), data[0].password, (err, response) => {
                 if (err) {
-                    return res.status(500).json({ Error: "Error interno" });
+                    return res.status(500).json({ Error: "Error intern" });
                 }
 
                 if (response) {
                     res.json({ Status: "Success" });
                 } else {
-                    res.status(401).json({ Status: "Contraseña incorrecta" });
+                    res.status(401).json({ Status: "Contrasenya incorrecta" });
                 }
             });
         } else {
-            return res.status(404).json({ Error: "NIU no existente" });
+            return res.status(404).json({ Error: "NIU no existent" });
         }
     });
+
+    db.end();
 })
 
 

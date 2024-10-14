@@ -44,7 +44,7 @@ function Login() {
           if (res.data.Status === "Success") {
             navigate('/modules');
           } else {
-            alert("Error pibeeee");
+            alert("Error en post");
           }
         })
         .catch(err => {
