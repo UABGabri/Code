@@ -22,6 +22,10 @@ function Login() {
         navigate('/register'); 
       };
 
+
+
+      axios.defaults.withCredentials = true;
+
     const handleSubmit = (e) => {
 
       e.preventDefault(); 
@@ -48,7 +52,7 @@ function Login() {
           }
         })
         .catch(err => {
-          console.error("Error en la solicitud:", err);
+          console.error("Error a la solicitud:", err);
         });
 
 

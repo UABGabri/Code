@@ -8,7 +8,11 @@ const salt = 10
 
 const app = express ();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:5173', //origen específic
+    methods: ['GET', 'POST'],         // Metodes permesos
+    credentials: true                 // Credencials necessaris
+  }));
 app.use(cookieParser());
 
 
@@ -82,8 +86,12 @@ app.post('/login', (req, res) => {
                 if (err) {
                     return res.status(500).json({ Error: "Error intern" });
                 }
-
                 if (response) {
+
+                    const name = data[0].name; //revisar cookies bien hechas
+                    const token = jwt.sign({name}, "jwt-secret-key", {expiresIn: '1d'});
+
+                    res.cookie('token', token);
                     res.json({ Status: "Success" });
                 } else {
                     res.status(401).json({ Status: "Contrasenya incorrecta" });
