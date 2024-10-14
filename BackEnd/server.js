@@ -1,4 +1,4 @@
-import express from "express";
+import express, { response } from "express";
 import mysql, { createConnection } from "mysql";
 import cors from "cors";
 import jwt from "jsonwebtoken";
@@ -61,11 +61,32 @@ app.post('/register', (req, res) => { //lloc on rebem trucada post de register a
 
 app.post('/login', (req, res) => {
 
+    const db = mysql.createConnection({ //crear connexio amb db.
+        host: "localhost",
+        user: "root",
+        password: "Ga21012002",
+        database: "web_examen"
+    });
+    
+    const sql = 'SELECT * from users WHERE niu = ?'
 
-    const sql = 'SELECT * from users'
-    db.query(sql, [values], (err, result) => {
-        if (err) return res.json({ Error: err.message });
-        return res.json({ Status: "Succeeded" });
+    db.query(sql, [req.body.niu], (err, data) => {
+        if (err) return res.json({ Error: "Error al Login" });
+        if(data.lenght > 0){
+
+            bcrypt.compare(req.body.password.toString(), data[0].password, (err, response) =>{ //funcio comparativa usuari contrasenya
+                if (err)res.json({ Error: "Usuari i contrasenya no coincidents"});
+                if (response) {res.json({ Status: "Success"});}
+                else{
+                    res.json({ Status: "Error"});
+                }
+
+            }); //comparativa entre la contrasenya rebuda al data 
+        }else{
+            return res.json({ Error: "NIU no existent a la base de dades"});
+        }
+
+        
     });
 })
 

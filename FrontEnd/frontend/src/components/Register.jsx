@@ -36,11 +36,14 @@ function Register() {
 
     console.log(values);
     event.preventDefault();
-    
+
     if (values.password !== confirmPassword) { //filtre per veure si les dues passwords son iguals
       setError('Sisplau, introdueix contrasenyes iguals');
       return;
-    } 
+    } else{
+
+
+    
 
       
       axios.post('http://localhost:8081/register', values)  //trucada post al servidor amb els valors introduits al obj values
@@ -48,7 +51,7 @@ function Register() {
       .catch(err => {console.error('Error a la solicitud:', err);});
       setError(''); 
       handleLogin(); 
-      
+    }
 
       /*
       axios.post('http://localhost:8081/test', values.username)  

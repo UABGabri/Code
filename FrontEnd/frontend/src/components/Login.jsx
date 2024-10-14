@@ -8,7 +8,7 @@ function Login() {
   
   const [values, setValues] = useState({
 
-    username: '',
+    niu: '',
     password: '',
     
   });
@@ -23,18 +23,35 @@ function Login() {
       };
 
     const handleSubmit = (e) => {
+
       e.preventDefault(); 
-  
-      if (values.username === '' || values.password === '') {
+      console.log(values);
+
+      if (values.niu === '' || values.password === '') {
         setError('Sisplau, emplena tots els camps.');
         return;
       }else{
 
+        /*
         axios.post('http://localhost:8081/login', values)  
         .then(res => {console.log('Resposta  del servidor:', res.data);})
         .catch(err => {console.error('Error en la solicitud:', err);});
         setError(''); 
-        navigate('/')
+        navigate('/');*/
+
+        axios.post('http://localhost:8081/login', values)
+        .then(res => {
+          if (res.data.Status === "Success") {
+            navigate('/modules');
+          } else {
+            alert("Error");
+          }
+        })
+        .catch(err => {
+          console.error("Error en la solicitud:", err);
+        });
+
+
       }
     };
   
@@ -54,12 +71,12 @@ function Login() {
         <form onSubmit={handleSubmit}>
 
           <div className="mb-3">
-            <label htmlFor="username" className="form-label">Nom de usuari</label>
+            <label htmlFor="username" className="form-label">NIU de usuari</label>
             <input
               type="text"
               className="form-control"
               id="username"
-              onChange={(e) => setValues({...values, username: e.target.value})}
+              onChange={(e) => setValues({...values, niu: e.target.value})}
             />
           </div>
           <div className="mb-3">
@@ -77,7 +94,7 @@ function Login() {
           <button type="submit" className={styles.loginbtn}>Iniciar sessió</button>
 
           
-            <button className={styles.loginbtn} onClick={handleRegister}>¿No tens compte?</button>
+            <button className={styles.loginbtn} onClick={handleRegister}>No tens compte?</button>
           </div>
         </form>
         </div>
