@@ -87,7 +87,8 @@ app.post('/login', (req, res) => {
                     const name = data[0].name;
                     const token = jwt.sign({ name, role }, "jwt-secret-key", { expiresIn: '1d' });
 
-                    res.cookie('token', token);
+                    res.cookie('session', token, { httpOnly: true, secure: true, sameSite: 'None' });
+
                     res.json({ Status: "Success" });
                 } else {
                     res.status(401).json({ Status: "Contrasenya incorrecta" });
