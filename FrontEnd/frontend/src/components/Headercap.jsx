@@ -1,6 +1,6 @@
-import styles from "./Header.module.css";
+import styles from "./";
 
-function Header() {
+function Headercap() {
   return (
     <header className="header-container">
       <div className="content">
@@ -10,4 +10,4 @@ function Header() {
   );
 }
 
-export default Header;
+export default Headercap;

@@ -1,4 +1,4 @@
-import Header from "./Header";
+import Header from "./Headercap";
 
 function ProfessorDashboard() {
   return (
