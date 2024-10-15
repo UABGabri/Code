@@ -17,9 +17,19 @@ app.use(cookieParser());
 
 
 
+const db = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "Ga21012002",
+    database: "web_examen"
+});
+
+
 app.get('/', (req, res) => {
     res.send('Servidor funcionando correctamente');
 });
+
+
 
 app.post('/register', (req, res) => { //lloc on rebem trucada post de register amb la informació necessaria
 
@@ -39,7 +49,7 @@ app.post('/register', (req, res) => { //lloc on rebem trucada post de register a
 
     const sql = "INSERT INTO users (niu, username, password, role, gmail) VALUES (?)"; 
 
-    bcrypt.hash(req.body.password.toString(), salt, ( (err, hash) => {
+    bcrypt.hash(req.body.password.toString(), salt, ( (err, hash) => { //funció guardat amb hash de la password
 
         if(err) return res.json({Error:"Error hashing password"});
 
@@ -60,7 +70,7 @@ app.post('/register', (req, res) => { //lloc on rebem trucada post de register a
 
     }))
 
-    db.end();
+    
 })
 
 
@@ -87,12 +97,15 @@ app.post('/login', (req, res) => {
                     return res.status(500).json({ Error: "Error intern" });
                 }
                 if (response) {
-
+                    
+                    const role = data[0].role;
                     const name = data[0].name; //revisar cookies bien hechas
-                    const token = jwt.sign({name}, "jwt-secret-key", {expiresIn: '1d'});
+                    const token = jwt.sign({name, role}, "jwt-secret-key", {expiresIn: '1d'});
 
-                    res.cookie('token', token);
-                    res.json({ Status: "Success" });
+                    res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'Strict' }); //evitem atacs XSS i enviem a través de HTTPS 
+                    res.json({ Status: "Success", role });
+
+
                 } else {
                     res.status(401).json({ Status: "Contrasenya incorrecta" });
                 }
@@ -102,7 +115,7 @@ app.post('/login', (req, res) => {
         }
     });
 
-    db.end();
+    
 })
 
 

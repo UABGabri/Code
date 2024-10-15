@@ -26,7 +26,7 @@ function Login() {
 
       axios.defaults.withCredentials = true;
 
-    const handleSubmit = (e) => {
+      const handleSubmit = (e) => {
 
       e.preventDefault(); 
       console.log(values);
@@ -46,7 +46,12 @@ function Login() {
         axios.post('http://localhost:8081/login', values)
         .then(res => {
           if (res.data.Status === "Success") {
-            navigate('/modules');
+
+            
+            const role = res.data.role;
+            console.log(role);
+            
+            navigate('/modules', {state:{role}});
           } else {
             alert("Error en post");
           }
@@ -55,12 +60,10 @@ function Login() {
           console.error("Error a la solicitud:", err);
         });
 
-
       }
     };
   
     return (
-
 
       <div className= {styles.homecontainer}>
       <div className={styles.green}>

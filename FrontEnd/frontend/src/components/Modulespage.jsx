@@ -2,7 +2,7 @@
 
 function Modulespage() {
   return (
-    <div>HOLAHOLA </div>
+    <div></div>
   )
 }
 
