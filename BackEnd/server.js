@@ -87,7 +87,7 @@ app.post('/login', (req, res) => {
                     const name = data[0].name;
                     const token = jwt.sign({ name, role }, "jwt-secret-key", { expiresIn: '1d' });
 
-                    res.cookie('session', token, { httpOnly: true, secure: true, sameSite: 'None' });
+                    res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'None' });
 
                     res.json({ Status: "Success" });
                 } else {

@@ -1,10 +1,9 @@
-import Header from "./Headercap";
+import Headercap from "./Headercap";
 
 function ProfessorDashboard() {
   return (
     <div>
-      <Header />
-
+      <Headercap></Headercap>
       <div>BENVINGUT PROFESSOR</div>
     </div>
   );

@@ -1,11 +1,17 @@
-.header-container {
+.headercontainer {
     background-color: green; 
     padding: 10px 20px;
     display: flex;
-    align-items: center;
+    align-items: right;
     justify-content: space-between;
     height: 60px; 
     position: fixed;
     top: 0;
     width: 100%;
+  }
+
+  .dropdownmenu{
+    right: 0;
+    background-color: green;
+    border-radius: 5px;
   }
