@@ -6,13 +6,24 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownToggle,
-} from "react-bootstrap"; // Cambia esto a react-bootstrap
+} from "react-bootstrap";
+
+import axios from "axios";
 
 function Headercap() {
   const [dropdown, setDropdown] = useState(false);
 
   const openCloseDropdown = () => {
     setDropdown(!dropdown);
+  };
+
+  const handleDelete = () => {
+    axios
+      .get("http://localhost:8081/logout")
+      .then((res) => {
+        location.reload(true);
+      })
+      .catch((err) => console.log(err));
   };
 
   return (
@@ -29,7 +40,9 @@ function Headercap() {
           <Dropdown.Menu>
             <Dropdown.Item href="#">Perfil</Dropdown.Item>
 
-            <Dropdown.Item href="#">Logout</Dropdown.Item>
+            <Dropdown.Item href="#" onClick={handleDelete}>
+              Logout
+            </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
       </div>

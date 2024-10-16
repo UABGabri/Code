@@ -124,6 +124,19 @@ app.get('/', verifyUser, (req, res) => {
     return res.json({ Status: "Success", name: req.name, role:req.role});
 });
 
+
+
+app.get('/logout', (req, res) => {
+
+    res.clearCookie('token');
+    return res.json({Status: "Success"})
+
+})
+
 app.listen(8081, () => {
     console.log("Running Server...");
 });
+
+
+
+
