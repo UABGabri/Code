@@ -1,6 +1,7 @@
 import { useState } from "react";
 import styles from "./Headercap.module.css";
 import { FaCircleUser } from "react-icons/fa6";
+import { Link } from "react-router-dom";
 import {
   Dropdown,
   DropdownItem,
@@ -12,6 +13,8 @@ import axios from "axios";
 
 function Headercap() {
   const [dropdown, setDropdown] = useState(false);
+
+  const navigate = useNavigate();
 
   const openCloseDropdown = () => {
     setDropdown(!dropdown);
@@ -28,7 +31,11 @@ function Headercap() {
 
   return (
     <header className={styles.headercontainer}>
-      <div className="content">
+      <div className={styles.leftcontent}>
+        <h2>UAB</h2>
+      </div>
+
+      <div className={styles.rightcontent}>
         <Dropdown
           show={dropdown}
           onToggle={openCloseDropdown}
@@ -38,11 +45,11 @@ function Headercap() {
             <FaCircleUser />
           </Dropdown.Toggle>
           <Dropdown.Menu>
-            <Dropdown.Item href="#">Perfil</Dropdown.Item>
-
-            <Dropdown.Item href="#" onClick={handleDelete}>
-              Logout
+            <Dropdown.Item>
+              {" "}
+              <Link to="/profile"> Perfil </Link>
             </Dropdown.Item>
+            <Dropdown.Item onClick={handleDelete}>Logout</Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
       </div>

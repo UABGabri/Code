@@ -5,6 +5,7 @@ import Homepage from "./components/Homepage";
 import Register from "./components/Register";
 import Login from "./components/Login";
 import Modules from "./components/Modulespage";
+import Profile from "./components/Profile";
 
 function App() {
   return (
@@ -20,6 +21,9 @@ function App() {
           {" "}
         </Route>
         <Route path="/modules" element={<Modules />}>
+          {" "}
+        </Route>
+        <Route path="/profile" element={<Profile />}>
           {" "}
         </Route>
       </Routes>
