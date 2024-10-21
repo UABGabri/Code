@@ -73,6 +73,7 @@ app.post('/login', (req, res) => {
     const sql = 'SELECT * FROM usuaris WHERE niu = ?';
 
     db.query(sql, [req.body.niu], (err, data) => {
+
         if (err) {
             return res.status(500).json({ Error: "Error al iniciar sesión" });
         }
@@ -85,7 +86,8 @@ app.post('/login', (req, res) => {
                 if (response) {
                     const role = data[0].role;
                     const name = data[0].name;
-                    const token = jwt.sign({ name, role }, "jwt-secret-key", { expiresIn: '1d' });
+                    const niu = data[0].niu;
+                    const token = jwt.sign({ name, niu, role }, "jwt-secret-key", { expiresIn: '1d' });
 
                     res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'None' });
 
@@ -134,45 +136,90 @@ app.get('/logout', (req, res) => {
 })
 
 
-app.get('/user', (req, res) => {
 
-    const db = mysql.createConnection({
-        host: "localhost",
-        user: "root",
-        password: "Ga21012002",
-        database: "web_examen_tfg"
+app.get('/user', (req, res) => {  //api que retorna la informació del usuari 
+
+    const token = req.cookies.token;
+
+    if (!token) {
+        return res.status(401).json({ Error: "No hi ha token, access denegat" });
+      }
+    
+      jwt.verify(token, "jwt-secret-key", (err, decoded) => {
+        if (err) {
+          return res.status(401).json({ Error: "Token invàlid" });
+        }
+    
+        const niu = decoded.niu;
+
+        console.log(decoded);
+        
+        const db = mysql.createConnection({
+            host: "localhost",
+            user: "root",
+            password: "Ga21012002",
+            database: "web_examen_tfg"
+
+        });
+
+        const sql = 'SELECT * FROM usuaris WHERE niu = ?';
+
+        db.query(sql, [niu], (err, result) => {
+
+            if (result.length > 0) {
+                return res.json({ user: result[0], Status: "Succeeded" });
+            } else {
+                return res.status(404).json({ Error: "Usuari no trobat" });
+            }
+        });
+
+        
     });
 
-    const sql = 'SELECT * FROM usuaris WHERE niu = ?';
 
-    db.query(sql, (err, result) => {
-        if (err) return res.json({ Error: err.message });
-        return res.json({ Status: "Succeeded" });
-    });
 
 })
 
 
 
 
-app.post('/profile', (req, res)=>{
+app.put('/updateUser', (req, res) => {
+    const token = req.cookies.token;
 
-    const db = mysql.createConnection({
-        host: "localhost",
-        user: "root",
-        password: "Ga21012002",
-        database: "web_examen_tfg"
-    });
-
-    const { niu, username, password, role, email } = req.body; 
-
-    if (!niu || !username || !password || !role || !email) {
-        return res.status(400).json({ error: "Tots els camps es requereixen" });
+    if (!token) {
+        return res.status(401).json({ Error: "No hi ha token, accés denegat" });
     }
 
-    const sql = 'UPDATE * FROM usuaris WHERE niu = ?';
+    jwt.verify(token, "jwt-secret-key", (err, decoded) => {
+        if (err) {
+            return res.json({ Error: "Token invàlid" });
+        }
 
+        const niu = decoded.niu;
+        const { username, email, password } = req.body;
+
+        if (!username || !email || !password) {
+            return res.json({ Error: "Tots els camps són obligatoris" });
+        }
+
+     
+        bcrypt.hash(password.toString(), salt, (err, hash) => {
+            if (err) return res.json({ Error: "Error encriptant la contrasenya" });
+
+            const sql = 'UPDATE usuaris SET username = ?, email = ?, password = ? WHERE niu = ?';
+            db.query(sql, [username, email, hash, niu], (err, result) => {
+                if (err) return res.json({ Error: "Error actualitzant l'usuari" });
+                
+                if (result.affectedRows > 0) {
+                    return res.json({ Status: "Success", Message: "Dades actualitzades correctament" });
+                } else {
+                    return res.json({ Error: "Usuari no trobat" });
+                }
+            });
+        });
+    });
 });
+
 
 
 
