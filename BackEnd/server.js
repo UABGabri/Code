@@ -19,7 +19,7 @@ const db = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "Ga21012002",
-    database: "web_examen"
+    database: "web_examen_tfg"
 });
 
 /*
@@ -33,7 +33,7 @@ app.post('/register', (req, res) => {//lloc on rebem trucada post de register am
         host: "localhost",
         user: "root",
         password: "Ga21012002",
-        database: "web_examen"
+        database: "web_examen_tfg"
     });
 
     const { niu, username, password, role, gmail } = req.body; 
@@ -42,7 +42,7 @@ app.post('/register', (req, res) => {//lloc on rebem trucada post de register am
         return res.status(400).json({ error: "Tots els camps es requereixen" });
     }
 
-    const sql = "INSERT INTO users (niu, username, password, role, gmail) VALUES (?)"; 
+    const sql = "INSERT INTO usuaris (niu, username, password, role, email) VALUES (?)"; 
 
     bcrypt.hash(req.body.password.toString(), salt, (err, hash) => {//funció guardat amb hash de la password
         if(err) return res.json({Error:"Error hashing password"});
@@ -67,10 +67,10 @@ app.post('/login', (req, res) => {
         host: "localhost",
         user: "root",
         password: "Ga21012002",
-        database: "web_examen"
+        database: "web_examen_tfg"
     });
 
-    const sql = 'SELECT * FROM users WHERE niu = ?';
+    const sql = 'SELECT * FROM usuaris WHERE niu = ?';
 
     db.query(sql, [req.body.niu], (err, data) => {
         if (err) {
@@ -132,6 +132,49 @@ app.get('/logout', (req, res) => {
     return res.json({Status: "Success"})
 
 })
+
+
+app.get('/user', (req, res) => {
+
+    const db = mysql.createConnection({
+        host: "localhost",
+        user: "root",
+        password: "Ga21012002",
+        database: "web_examen_tfg"
+    });
+
+    const sql = 'SELECT * FROM usuaris WHERE niu = ?';
+
+    db.query(sql, (err, result) => {
+        if (err) return res.json({ Error: err.message });
+        return res.json({ Status: "Succeeded" });
+    });
+
+})
+
+
+
+
+app.post('/profile', (req, res)=>{
+
+    const db = mysql.createConnection({
+        host: "localhost",
+        user: "root",
+        password: "Ga21012002",
+        database: "web_examen_tfg"
+    });
+
+    const { niu, username, password, role, email } = req.body; 
+
+    if (!niu || !username || !password || !role || !email) {
+        return res.status(400).json({ error: "Tots els camps es requereixen" });
+    }
+
+    const sql = 'UPDATE * FROM usuaris WHERE niu = ?';
+
+});
+
+
 
 app.listen(8081, () => {
     console.log("Running Server...");

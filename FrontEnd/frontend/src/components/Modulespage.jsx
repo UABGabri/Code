@@ -37,9 +37,9 @@ function Modulespage() {
       <h3>Welcome -- {name} </h3>
       {auth ? (
         <div>
-          {role === "Professor" ? (
+          {role === "professor" ? (
             <ProfessorDashboard />
-          ) : role === "Alumne" ? (
+          ) : role === "alumne" ? (
             <StudentDashboard />
           ) : (
             <h3>Rol no reconegut</h3>

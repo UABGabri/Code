@@ -14,8 +14,6 @@ import axios from "axios";
 function Headercap() {
   const [dropdown, setDropdown] = useState(false);
 
-  const navigate = useNavigate();
-
   const openCloseDropdown = () => {
     setDropdown(!dropdown);
   };
@@ -47,7 +45,13 @@ function Headercap() {
           <Dropdown.Menu>
             <Dropdown.Item>
               {" "}
-              <Link to="/profile"> Perfil </Link>
+              <Link
+                to="/profile"
+                style={{ textDecoration: "none", color: "black" }}
+              >
+                {" "}
+                Perfil{" "}
+              </Link>
             </Dropdown.Item>
             <Dropdown.Item onClick={handleDelete}>Logout</Dropdown.Item>
           </Dropdown.Menu>
