@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Headercap from "./Headercap";
 
 function Profile() {
   const [values, setValues] = useState({
@@ -54,7 +55,8 @@ function Profile() {
 
   return (
     <div>
-      <h1>Editar Perfil de Usuario</h1>
+      <Headercap />
+      <h1>Editar Perfil d'Usuari</h1>
 
       <form onSubmit={handleSubmit}>
         <div>

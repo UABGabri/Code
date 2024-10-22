@@ -43,15 +43,8 @@ function Headercap() {
             <FaCircleUser />
           </Dropdown.Toggle>
           <Dropdown.Menu>
-            <Dropdown.Item>
-              {" "}
-              <Link
-                to="/profile"
-                style={{ textDecoration: "none", color: "black" }}
-              >
-                {" "}
-                Perfil{" "}
-              </Link>
+            <Dropdown.Item as={Link} to="/profile">
+              Perfil
             </Dropdown.Item>
             <Dropdown.Item onClick={handleDelete}>Logout</Dropdown.Item>
           </Dropdown.Menu>

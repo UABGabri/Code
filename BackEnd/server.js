@@ -10,7 +10,7 @@ const app = express();
 app.use(express.json());
 app.use(cors({
     origin: 'http://localhost:5173', //origen específic
-    methods: ['GET', 'POST'],// Metodes permesos
+    methods: ['GET', 'POST', 'PUT'],// Metodes permesos
     credentials: true // Credencials necessaris
 }));
 app.use(cookieParser());
