@@ -177,7 +177,6 @@ app.get('/user', (req, res) => {  //api que retorna la informació del usuari
     });
 
 
-
 })
 
 
