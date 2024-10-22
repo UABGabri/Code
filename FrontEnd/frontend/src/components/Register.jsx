@@ -84,7 +84,7 @@ function Register() {
                 placeholder="Introdueix el teu nom de usuari"
                 required
                 pattern="^[A-Za-zÀ-ÿ\s]+$"
-                title="El nom no ha de contenir dígits"
+                title="El nom només ha de tenir lletres de l'abecedari"
               />
             </div>
 
@@ -101,7 +101,7 @@ function Register() {
                 placeholder="Introdueix el teu NIU"
                 required
                 pattern="^\d{7}$"
-                title="El NIU ha de ser un nombre de 7 dígits"
+                title="El NIU ha de ser un número de 7 dígits"
               />
             </div>
             <div>

@@ -167,6 +167,8 @@ app.get('/user', (req, res) => {  //api que retorna la informació del usuari
         db.query(sql, [niu], (err, result) => {
 
             if (result.length > 0) {
+
+                
                 return res.json({ user: result[0], Status: "Succeeded" });
             } else {
                 return res.json({ Error: "Usuari no trobat" });

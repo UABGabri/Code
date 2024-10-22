@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Headercap from "./Headercap";
+import styles from "./Profile.module.css";
 
 function Profile() {
   const [values, setValues] = useState({
@@ -56,51 +57,59 @@ function Profile() {
   return (
     <div>
       <Headercap />
-      <h1>Editar Perfil d'Usuari</h1>
+      <div className={styles.maindisplay}>
+        <h1>Editar Perfil</h1>
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>NIU (No editable):</label>
-          <input type="text" name="niu" value={values.niu} readOnly />
-        </div>
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label>NIU (No editable):</label>
+            <input type="text" name="niu" value={values.niu} readOnly />
+          </div>
 
-        <div>
-          <label>Username:</label>
-          <input
-            type="text"
-            name="username"
-            value={values.username}
-            onChange={handleInputChange}
-          />
-        </div>
+          <div>
+            <label>Username:</label>
+            <input
+              type="text"
+              name="username"
+              value={values.username}
+              onChange={handleInputChange}
+              required
+              pattern="^[A-Za-zÀ-ÿ\s]+$"
+              title="El nom només ha de tenir lletres de l'abecedari"
+            />
+          </div>
 
-        <div>
-          <label>Email:</label>
-          <input
-            type="email"
-            name="email"
-            value={values.email}
-            onChange={handleInputChange}
-          />
-        </div>
+          <div>
+            <label>Email:</label>
+            <input
+              type="email"
+              name="email"
+              value={values.email}
+              onChange={handleInputChange}
+              required
+              title="Introdueix un email vàlid"
+            />
+          </div>
 
-        <div>
-          <label>Password:</label>
-          <input
-            type="password"
-            name="password"
-            value={values.password}
-            onChange={handleInputChange}
-          />
-        </div>
+          <div>
+            <label>Password:</label>
+            <input
+              name="password"
+              onChange={handleInputChange}
+              required
+              minLength={8}
+              title="La contrasenya ha de tenir 8 carácters min"
+            />
+          </div>
 
-        <div>
-          <label>Role (No editable):</label>
-          <input type="text" name="role" value={values.role} readOnly />
-        </div>
+          <div>
+            <label>Role (No editable):</label>
+            <input type="text" name="role" value={values.role} readOnly />
+          </div>
 
-        <button type="submit">Guardar Cambios</button>
-      </form>
+          <button type="submit">Guardar Cambios</button>
+        </form>
+      </div>
     </div>
   );
 }
