@@ -39,7 +39,7 @@ app.post('/register', (req, res) => {//lloc on rebem trucada post de register am
     const { niu, username, password, role, gmail } = req.body; 
 
     if (!niu || !username || !password || !role || !gmail) {
-        return res.status(400).json({ error: "Tots els camps es requereixen" });
+        return res.json({ error: "Tots els camps es requereixen" });
     }
 
     const sql = "INSERT INTO usuaris (niu, username, password, role, email) VALUES (?)"; 
@@ -75,13 +75,13 @@ app.post('/login', (req, res) => {
     db.query(sql, [req.body.niu], (err, data) => {
 
         if (err) {
-            return res.status(500).json({ Error: "Error al iniciar sesión" });
+            return res.json({ Error: "Error al iniciar sesión" });
         }
 
         if (data.length > 0) {
             bcrypt.compare(req.body.password.toString(), data[0].password, (err, response) => {
                 if (err) {
-                    return res.status(500).json({ Error: "Error intern" });
+                    return res.json({ Error: "Error intern" });
                 }
                 if (response) {
                     const role = data[0].role;
@@ -93,11 +93,11 @@ app.post('/login', (req, res) => {
 
                     res.json({ Status: "Success" });
                 } else {
-                    res.status(401).json({ Status: "Contrasenya incorrecta" });
+                    res.json({ Status: "Contrasenya incorrecta" });
                 }
             });
         } else {
-            return res.status(404).json({ Error: "NIU no existent" });
+            return res.json({ Error: "NIU no existent" });
         }
     });
 });
@@ -142,12 +142,12 @@ app.get('/user', (req, res) => {  //api que retorna la informació del usuari
     const token = req.cookies.token;
 
     if (!token) {
-        return res.status(401).json({ Error: "No hi ha token, access denegat" });
+        return res.json({ Error: "No hi ha token, access denegat" });
       }
     
       jwt.verify(token, "jwt-secret-key", (err, decoded) => {
         if (err) {
-          return res.status(401).json({ Error: "Token invàlid" });
+          return res.json({ Error: "Token invàlid" });
         }
     
         const niu = decoded.niu;
@@ -169,7 +169,7 @@ app.get('/user', (req, res) => {  //api que retorna la informació del usuari
             if (result.length > 0) {
                 return res.json({ user: result[0], Status: "Succeeded" });
             } else {
-                return res.status(404).json({ Error: "Usuari no trobat" });
+                return res.json({ Error: "Usuari no trobat" });
             }
         });
 
