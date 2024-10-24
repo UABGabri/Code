@@ -6,6 +6,7 @@ import Register from "./components/Register";
 import Login from "./components/Login";
 import Modules from "./components/Modulespage";
 import Profile from "./components/Profile";
+import AfegirAssignatura from "./components/AfegirAssignatura";
 
 function App() {
   return (
@@ -24,6 +25,9 @@ function App() {
           {" "}
         </Route>
         <Route path="/profile" element={<Profile />}>
+          {" "}
+        </Route>
+        <Route path="/AfegirAssignatura" element={<AfegirAssignatura />}>
           {" "}
         </Route>
       </Routes>

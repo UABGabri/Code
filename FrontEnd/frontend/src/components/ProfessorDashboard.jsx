@@ -1,10 +1,18 @@
+import { Link } from "react-router-dom";
 import Headercap from "./Headercap";
+import styles from "./ProfessorDashboard.module.css";
 
 function ProfessorDashboard() {
   return (
     <div>
       <Headercap></Headercap>
-      <div>BENVINGUT PROFESSOR</div>
+      <div className={styles.container}>
+        <div>
+          <Link to={"/AfegirAssignatura"}>
+            <button>Afegir Assignatura</button>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

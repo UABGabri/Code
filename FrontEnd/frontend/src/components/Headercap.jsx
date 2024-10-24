@@ -1,7 +1,7 @@
 import { useState } from "react";
 import styles from "./Headercap.module.css";
 import { FaCircleUser } from "react-icons/fa6";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   Dropdown,
   DropdownItem,
@@ -13,6 +13,7 @@ import axios from "axios";
 
 function Headercap() {
   const [dropdown, setDropdown] = useState(false);
+  const location = useLocation();
 
   const openCloseDropdown = () => {
     setDropdown(!dropdown);
@@ -25,6 +26,15 @@ function Headercap() {
         location.reload(true);
       })
       .catch((err) => console.log(err));
+  };
+
+  const handleGoBack = () => {
+    //Per veure quan estem dins la pantalla perfil o altres.
+
+    if (location.pathname === "/profile") {
+      return "/modules";
+    }
+    return "/profile";
   };
 
   return (
@@ -43,8 +53,8 @@ function Headercap() {
             <FaCircleUser />
           </Dropdown.Toggle>
           <Dropdown.Menu>
-            <Dropdown.Item as={Link} to="/profile">
-              Perfil
+            <Dropdown.Item as={Link} to={handleGoBack()}>
+              {location.pathname === "/profile" ? "Tornar" : "Perfil"}
             </Dropdown.Item>
             <Dropdown.Item onClick={handleDelete}>Logout</Dropdown.Item>
           </Dropdown.Menu>

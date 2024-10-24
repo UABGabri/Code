@@ -1,0 +1,18 @@
+.container {
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    height: calc(100vh - 80px); 
+    width: 100vw; 
+  }
+
+.addButton {
+    background-color: green;
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 1rem;
+  }

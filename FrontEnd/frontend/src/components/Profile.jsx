@@ -107,7 +107,7 @@ function Profile() {
             <input type="text" name="role" value={values.role} readOnly />
           </div>
 
-          <button type="submit">Guardar Cambios</button>
+          <button type="submit">Guardar Cambis</button>
         </form>
       </div>
     </div>

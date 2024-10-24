@@ -29,12 +29,12 @@ app.get('/', (req, res) => {
 */
 
 app.post('/register', (req, res) => {//lloc on rebem trucada post de register amb la informació necessaria
-    const db = mysql.createConnection({//crear connexio amb db.
+    /*const db = mysql.createConnection({//crear connexio amb db.
         host: "localhost",
         user: "root",
         password: "Ga21012002",
         database: "web_examen_tfg"
-    });
+    });*/
 
     const { niu, username, password, role, gmail } = req.body; 
 

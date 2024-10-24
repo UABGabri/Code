@@ -34,7 +34,6 @@ function Modulespage() {
   //en aquest mòdul es busca la bifurcació de forma segura de la visualització de continguts. Es fa servir el token com a mètode per poder actuar.
   return (
     <div>
-      <h3>Welcome -- {name} </h3>
       {auth ? (
         <div>
           {role === "professor" ? (
