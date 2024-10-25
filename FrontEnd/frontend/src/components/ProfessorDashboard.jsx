@@ -19,7 +19,6 @@ function ProfessorDashboard() {
 
   const openModal = () => {
     setModal(true);
-    //setButtonLeft(!buttonLeft);
   };
 
   return (

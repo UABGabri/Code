@@ -25,8 +25,6 @@ function AddAssignaturaModal({ onClose }) {
         .split(",")
         .map((niu) => niu.trim());
 
-      console.log(niuArrayAlumnes);
-
       const values = {
         idAssignatura,
         nomAssignatura,
