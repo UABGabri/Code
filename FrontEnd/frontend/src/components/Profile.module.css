@@ -31,16 +31,19 @@
     width: 100%;
   }
   
-  button {
-    padding: 0.75rem 1.5rem;
-    background-color: green;
-    color: white;
-    border: none;
-    border-radius: 4px;
+  .saveButton {
+    padding: 10px 20px;
     cursor: pointer;
+    color: white;
+    background-color: green;
+    border: 0;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 1rem;
+    margin-top: 10px;
+    font-size: 15px;
   }
-  
-  button:hover {
-    background-color: darkgreen;
+
+  .saveButton:hover{
+    background-color: white;
+    color: black;
   }
-  

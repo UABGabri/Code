@@ -9,9 +9,17 @@ function ProfessorDashboard() {
   const [modal, setModal] = useState(false); //control de finestra emergent Modal.
 
   const addSubject = () => {
-    setModal(!modal);
     setButtonLeft(!buttonLeft);
     //console.log(buttonLeft);
+  };
+
+  const closeModal = () => {
+    setModal(false);
+  };
+
+  const openModal = () => {
+    setModal(true);
+    //setButtonLeft(!buttonLeft);
   };
 
   return (
@@ -20,20 +28,20 @@ function ProfessorDashboard() {
       <div className={styles.container}>
         <div className={styles.left}>
           {buttonLeft && (
-            <button onClick={addSubject} className={styles.addButton}>
+            <button onClick={openModal} className={styles.addButton}>
               Afegir Assignatura
             </button>
           )}
         </div>
         <div className={styles.right}>
           {!buttonLeft && (
-            <button onClick={addSubject} className={styles.addButton}>
+            <button onClick={openModal} className={styles.addButton}>
               Afegir Assignatura
             </button>
           )}
         </div>
       </div>
-      {modal && <AddAssignaturaModal onClose={addSubject} />}{" "}
+      {modal && <AddAssignaturaModal onClose={closeModal} />}{" "}
       {/* Manera d'afegir un comentari i obtenir modal*/}
     </div>
   );

@@ -94,9 +94,12 @@ function Profile() {
           <div>
             <label>Password:</label>
             <input
+              type="password"
               name="password"
               onChange={handleInputChange}
               required
+              id="password"
+              value={values.password}
               minLength={8}
               title="La contrasenya ha de tenir 8 carácters min"
             />
@@ -107,7 +110,9 @@ function Profile() {
             <input type="text" name="role" value={values.role} readOnly />
           </div>
 
-          <button type="submit">Guardar Cambis</button>
+          <button type="submit" className={styles.saveButton}>
+            Guardar Cambis
+          </button>
         </form>
       </div>
     </div>
