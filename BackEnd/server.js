@@ -29,12 +29,12 @@ app.get('/', (req, res) => {
 */
 
 app.post('/register', (req, res) => {//lloc on rebem trucada post de register amb la informació necessaria
-    /*const db = mysql.createConnection({//crear connexio amb db.
+    const db = mysql.createConnection({//crear connexio amb db.
         host: "localhost",
         user: "root",
         password: "Ga21012002",
         database: "web_examen_tfg"
-    });*/
+    });
 
     const { niu, username, password, role, gmail } = req.body; 
 
@@ -221,6 +221,104 @@ app.put('/updateUser', (req, res) => {
     });
 });
 
+
+
+app.post('/registerSubject', async (req, res) => {
+
+
+    const db = mysql.createConnection({
+        host: "localhost",
+        user: "root",
+        password: "Ga21012002",
+        database: "web_examen_tfg"
+    });
+
+    const id = req.body.idAssignatura;
+    const nomAssignatura = req.body.nomAssignatura;
+    const niuProfessors = req.body.niuArrayProfessors;
+    const niuAlumnes = req.body.niuArrayAlumnes;
+
+    const sql = "INSERT INTO assignatures (id_assignatura, nom_assignatura) VALUES (?, ?)";
+    const sqlComprobant = "SELECT * FROM usuaris WHERE niu = ?";
+
+    const errors = [];
+    const success = [];
+
+    const insertSubject = () => {
+        return new Promise((resolve, reject) => { //fer promesa ja que les consultes triguen a executar
+            db.query(sql, [id, nomAssignatura], (err) => {
+                if (err) {
+                    errors.push("Error insertar Asignatura");
+                    reject();
+                } else {
+                    success.push("Success insertar Asignatura");
+                    resolve();
+                }
+            });
+        });
+    };
+
+    const checkAndInsertAlumne = (niu) => {
+        return new Promise((resolve, reject) => {
+            db.query(sqlComprobant, [niu], (err, result) => { //comprobació existencia alumne
+                if (err || result.length === 0) {
+                    errors.push("Error, un usuari alumne no existent: " + niu);
+                    reject();
+                } else {
+                    const sqlAlumneInsert = "INSERT INTO alumnes_assignatures (id_alumne, id_assignatura) VALUES (?, ?)";
+                    db.query(sqlAlumneInsert, [niu, id], (err) => { //inserció alumne
+                        if (err) {
+                            errors.push("Error, usuari alumne no afegit a la taula alumnes_assignatures: " + niu);
+                            reject();
+                        } else {
+                            success.push("Alumne insertat: " + niu);
+                            resolve();
+                        }
+                    });
+                }
+            });
+        });
+    };
+
+    const checkAndInsertProfessor = (niu) => {
+        return new Promise((resolve, reject) => {
+            db.query(sqlComprobant, [niu], (err, result) => { //comprobació existencia professor
+                if (err || result.length === 0) {
+                    errors.push("Error, un usuari professor no existent: " + niu);
+                    reject();
+                } else {
+                    const sqlProfessorInsert = "INSERT INTO professors_assignatures (id_professor, id_assignatura) VALUES (?, ?)";
+                    db.query(sqlProfessorInsert, [niu, id], (err) => { //inserció professor
+                        if (err) {
+                            errors.push("Error, usuari professor no afegit a la taula professors_assignatures: " + niu);
+                            reject();
+                        } else {
+                            success.push("Professor insertat: " + niu);
+                            resolve();
+                        }
+                    });
+                }
+            });
+        });
+    };
+
+    try {
+        await insertSubject();
+
+        await Promise.all(niuAlumnes.map(checkAndInsertAlumne));
+        await Promise.all(niuProfessors.map(checkAndInsertProfessor));
+
+        if (errors.length > 0) {
+            return res.json({ Status: "Failed", Messages: errors });
+        } else {
+            return res.json({ Status: "Success", Messages: success });
+        }
+    } catch (error) {
+        return res.json({ Status: "Failed", Messages: errors });
+    } finally {
+        db.end(); 
+    }
+});
 
 
 
