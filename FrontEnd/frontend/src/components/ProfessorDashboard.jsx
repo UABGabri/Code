@@ -4,6 +4,10 @@ import { useState } from "react";
 
 function ProfessorDashboard() {
   const [buttonLeft, setButtonLeft] = useState(true);
+  const [assignatures, setAssignatures] = useState([]);
+  const [modal, setModal] = useState(false);
+
+  const changeModal = () => setModal(!modal);
 
   const addSubject = () => {
     setButtonLeft(!buttonLeft);
