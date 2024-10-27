@@ -40,7 +40,7 @@ function ProfessorDashboard() {
           )}
         </div>
       </div>
-      {modal && <AddAssignaturaModal onClose={closeModal} />}{" "}
+      {modal && <AddAssignaturaModal onClose={closeModal} onAdd={addSubject} />}{" "}
       {/* Manera d'afegir un comentari i obtenir modal*/}
     </div>
   );
