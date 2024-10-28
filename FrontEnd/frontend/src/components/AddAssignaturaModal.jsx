@@ -2,6 +2,7 @@ import { useState } from "react";
 import styles from "./ProfessorDashboard.module.css";
 import PropTypes from "prop-types";
 import axios from "axios";
+
 function AddAssignaturaModal({ onClose }) {
   const [nomAssignatura, setNomAssignatura] = useState("");
   const [idAssignatura, setIdAssignatura] = useState("");

@@ -9,6 +9,7 @@ function Modulespage() {
   const [name, setName] = useState("");
   const [auth, setAuth] = useState(false);
   const [message, setMessage] = useState(false);
+  const [niuTeacher, setNiuTeacher] = useState("");
 
   axios.defaults.withCredentials = true;
 
@@ -20,7 +21,8 @@ function Modulespage() {
           setAuth(true);
           setName(res.data.name);
           setRole(res.data.role);
-          console.log(res.data.role);
+          setNiuTeacher(res.data.niu);
+          console.log(res.data.niu);
         } else {
           setAuth(false);
           setMessage(res.data.Error);
@@ -37,7 +39,7 @@ function Modulespage() {
       {auth ? (
         <div>
           {role === "professor" ? (
-            <ProfessorDashboard />
+            <ProfessorDashboard professorId={niuTeacher} />
           ) : role === "alumne" ? (
             <StudentDashboard />
           ) : (

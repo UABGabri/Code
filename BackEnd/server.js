@@ -92,6 +92,7 @@ app.post('/login', (req, res) => {
                     res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'None' });
 
                     res.json({ Status: "Success" });
+
                 } else {
                     res.json({ Status: "Contrasenya incorrecta" });
                 }
@@ -115,6 +116,7 @@ const verifyUser = (req, res, next) => {
                 return res.json({ Error: "Token incorrecte" });
             } else {
                 req.name = decoded.name;
+                req.niu = decoded.niu;
                 req.role = decoded.role;
                 next();
             }
@@ -123,7 +125,7 @@ const verifyUser = (req, res, next) => {
 };
 
 app.get('/', verifyUser, (req, res) => {
-    return res.json({ Status: "Success", name: req.name, role:req.role});
+    return res.json({ Status: "Success", name: req.name, niu:req.niu, role:req.role});
 });
 
 
@@ -320,7 +322,22 @@ app.post('/registerSubject', async (req, res) => {
     }
 });
 
+app.post('/recoverSubjects', (req, res) => {
 
+    const idProfessor = req.body.professorId;
+
+
+    const sql = 'SELECT a.id_assignatura, a.nom_assignatura FROM assignatures a JOIN professors_assignatures pa ON a.id_assignatura = pa.id_assignatura WHERE pa.id_professor = ?';
+
+    db.query(sql, [idProfessor], (error, result) => {
+        if (error) {
+          console.error("Error en la consulta:", error);
+          return res.json({ Status: "Failed" });
+        } else {
+          return res.json(result); 
+        }
+      });
+}) 
 
 app.listen(8081, () => {
     console.log("Running Server...");
