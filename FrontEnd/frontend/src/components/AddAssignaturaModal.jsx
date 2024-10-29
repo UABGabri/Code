@@ -42,6 +42,7 @@ function AddAssignaturaModal({ onClose }) {
           console.error("Error a la solicitud:", err);
         });
 
+      window.location.reload();
       onClose();
     } catch (error) {
       console.log("Error afegir assignatura", error);

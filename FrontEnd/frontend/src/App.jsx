@@ -7,6 +7,7 @@ import Login from "./components/Login";
 import Modules from "./components/Modulespage";
 import Profile from "./components/Profile";
 import AfegirAssignatura from "./components/AfegirAssignatura";
+import AssignaturaLayout from "./components/AssignaturaLayout";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path="/AfegirAssignatura" element={<AfegirAssignatura />}>
           {" "}
         </Route>
+        <Route path="/assignatura/:id" element={<AssignaturaLayout />} />
       </Routes>
     </BrowserRouter>
   );
