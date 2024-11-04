@@ -8,6 +8,7 @@ import Modules from "./components/Modulespage";
 import Profile from "./components/Profile";
 import AfegirAssignatura from "./components/AfegirAssignatura";
 import AssignaturaLayout from "./components/AssignaturaLayout";
+import AfegirPregunta from "./components/AfegirPregunta";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
           {" "}
         </Route>
         <Route path="/assignatura/:id" element={<AssignaturaLayout />} />
+        <Route path="/afegirPregunta" element={<AfegirPregunta />}></Route>
       </Routes>
     </BrowserRouter>
   );

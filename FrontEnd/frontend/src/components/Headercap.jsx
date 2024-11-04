@@ -49,7 +49,14 @@ function Headercap() {
           onToggle={openCloseDropdown}
           className={styles.dropdownmenu}
         >
-          <Dropdown.Toggle>
+          <Dropdown.Toggle
+            variant="link"
+            style={{
+              color: "white",
+              backgroundColor: "transparent",
+              border: "1px,solid, white",
+            }}
+          >
             <FaCircleUser />
           </Dropdown.Toggle>
           <Dropdown.Menu>

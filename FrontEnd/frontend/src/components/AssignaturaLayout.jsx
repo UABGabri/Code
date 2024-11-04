@@ -4,6 +4,9 @@ import styles from "./AssignaturaLayout.module.css";
 import { BiArrowBack } from "react-icons/bi";
 import { useState } from "react";
 import ElementsCurs from "./ElementsCurs";
+import ElementsPreguntes from "./ElementsPreguntes";
+import ElementsParticipants from "./ElementsParticipants";
+import ElementsTests from "./ElementsTests";
 
 function AssignaturaLayout() {
   const { id } = useParams();
@@ -17,6 +20,12 @@ function AssignaturaLayout() {
     switch (menuOption) {
       case "CURS":
         return <ElementsCurs />;
+      case "PARTICIPANTS":
+        return <ElementsParticipants />;
+      case "PREGUNTES":
+        return <ElementsPreguntes />;
+      case "TESTS":
+        return <ElementsTests />;
     }
   };
 
@@ -59,7 +68,8 @@ function AssignaturaLayout() {
           TESTS
         </span>
       </div>
-      <div className={styles.content}>{render()}</div>
+
+      <div className={styles.contentElements}>{render()}</div>
     </div>
   );
 }
