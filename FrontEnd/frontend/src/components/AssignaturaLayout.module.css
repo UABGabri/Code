@@ -36,7 +36,15 @@
     align-items: center;
     justify-content: center; 
     gap: 10px;
+    cursor: pointer;
+    padding: 20px;
+    color: #333;
 }
+
+.activeTab {
+    font-weight: bold;
+    color: black;
+  }
 
 .menuWrapper {
     display: flex;

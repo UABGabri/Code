@@ -51,6 +51,10 @@ function ProfessorDashboard({ professorId }) {
   return (
     <div>
       <Headercap />
+      <div className={styles.title}>
+        <h1>ELS TEUS CURSOS</h1>
+      </div>
+
       <div className={styles.container}>
         <div className={styles.left}>
           {leftColumn.map((assignatura) => (

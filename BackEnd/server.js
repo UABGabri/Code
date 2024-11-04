@@ -317,9 +317,7 @@ app.post('/registerSubject', async (req, res) => {
         }
     } catch (error) {
         return res.json({ Status: "Failed", Messages: errors });
-    } finally {
-        db.end(); 
-    }
+    } 
 });
 
 app.post('/recoverSubjects', (req, res) => {
