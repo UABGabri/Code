@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styles from "./AfegirPregunta.module.css";
 import Headercap from "./Headercap";
+import { BiArrowBack } from "react-icons/bi";
 
 function AfegirPregunta() {
   const [values, setValues] = useState({
@@ -31,6 +32,7 @@ function AfegirPregunta() {
   return (
     <div className={styles.content}>
       <Headercap />
+      <BiArrowBack onClick={() => history(-1)} className={styles.backArrow} />
       <h1>AFEGIR PREGUNTA</h1>
       <form onSubmit={handleSubmit} className={styles.addQuestionForm}>
         <div className={styles.formGroup}>

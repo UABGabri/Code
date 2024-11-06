@@ -4,14 +4,16 @@
     width: 100%;
     height: 100vh;
     top: 0;
-
+    left: 0;
+    right: 0;
     flex-direction: column;
     justify-content: center;
     align-items: center;
   }
   
-  h1 {
+  .addQuestionTitle {
     margin-bottom: 20px;
+    color: green;
   }
   
   .addQuestionForm {
@@ -63,3 +65,16 @@
     border: 1px solid #ccc;
   }
   
+
+  .arrowBack {
+    position: absolute;
+    top: 40px;
+    left: 20px;
+    font-size: 30px;
+    cursor: pointer;
+    color: #28a745;
+}
+
+.arrowBack:hover {
+    color: #006400;
+}
