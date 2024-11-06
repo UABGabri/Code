@@ -14,7 +14,7 @@
     margin-bottom: 20px;
   }
   
-  form {
+  .addQuestionForm {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-gap: 16px;

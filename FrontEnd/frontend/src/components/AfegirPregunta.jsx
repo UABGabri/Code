@@ -32,7 +32,7 @@ function AfegirPregunta() {
     <div className={styles.content}>
       <Headercap />
       <h1>AFEGIR PREGUNTA</h1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className={styles.addQuestionForm}>
         <div className={styles.formGroup}>
           <label htmlFor="tema">Tema:</label>
           <input
