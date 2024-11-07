@@ -55,6 +55,10 @@
     flex-direction: column;
   }
   
+  .titleQuestion{
+    color: green;
+    
+  }
   .sendButton {
     grid-column: span 3;
     padding: 10px;

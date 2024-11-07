@@ -39,7 +39,7 @@ function AfegirPregunta() {
       <div className={styles.content}>
         <BiArrowBack onClick={() => history(-1)} className={styles.arrowBack} />
 
-        <h1>AFEGIR PREGUNTA</h1>
+        <h1 className={styles.titleQuestion}>AFEGIR PREGUNTA</h1>
         <form onSubmit={handleSubmit} className={styles.addQuestionForm}>
           <div className={styles.formGroup}>
             <label htmlFor="tema">Tema:</label>
