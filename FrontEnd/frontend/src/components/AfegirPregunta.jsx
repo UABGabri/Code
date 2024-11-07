@@ -89,6 +89,7 @@ function AfegirPregunta() {
                 value={values.pregunta}
                 onChange={handleChange}
                 className={styles.textarea}
+                placeholder="Introdueix la teva pregunta"
               />
             </div>
           </div>
@@ -101,6 +102,7 @@ function AfegirPregunta() {
               name="solucio"
               value={values.solucio}
               onChange={handleChange}
+              placeholder="Introdueix la teva solució"
             />
           </div>
 
