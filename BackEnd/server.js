@@ -224,7 +224,6 @@ app.put('/updateUser', (req, res) => {
 });
 
 
-
 app.post('/registerSubject', async (req, res) => {
 
 
@@ -336,6 +335,16 @@ app.post('/recoverSubjects', (req, res) => {
         }
       });
 }) 
+
+app.post('/addQuestion', (req, res) => {
+
+    const { pregunta, solucio_correcta, solucio_erronia1, solucio_erronia2, solucio_erronia3, dificultat, estat, conceptes_clau } = req.body;
+
+
+    const sql = `INSERT INTO pregunta (pregunta, solucio_correcta, solucio_erronia1, solucio_erronia2, solucio_erronia3, dificultat, estat, conceptes_clau, id_creador, id_tema) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?)`;
+
+    //necesario un id de un tema y un creador. Hay que recuperar el niu del creador y inventarse un id para el tema. 
+})
 
 app.listen(8081, () => {
     console.log("Running Server...");

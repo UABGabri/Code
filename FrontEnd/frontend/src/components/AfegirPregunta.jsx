@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import styles from "./AfegirPregunta.module.css";
 import Headercap from "./Headercap";
 import { BiArrowBack } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function AfegirPregunta() {
   const [values, setValues] = useState({
@@ -14,7 +15,6 @@ function AfegirPregunta() {
     erronea_1: "",
     erronea_2: "",
     erronea_3: "",
-    erronea_4: "",
   });
 
   const history = useNavigate();
@@ -29,6 +29,24 @@ function AfegirPregunta() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const conceptesArray = values.conceptes
+      .split(",")
+      .map((concept) => concept.trim()); //conversió a Array
+
+    const valors = {
+      ...values,
+      conceptes: JSON.stringify(conceptesArray), //transformació a JSOn
+    };
+
+    axios
+      .post("http://localhost:8081/addQuestion", valors)
+      .then((res) => {
+        console.log("Resposta del servidor:", res.data);
+      })
+      .catch((err) => {
+        console.error("Error a la solicitud:", err);
+      });
     console.log(values);
   };
 
@@ -136,17 +154,6 @@ function AfegirPregunta() {
                 id="erronea_3"
                 name="erronea_3"
                 value={values.erronea_3}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className={styles.formGroup}>
-              <label htmlFor="erronea_4">Solució Incorrecta 4:</label>
-              <input
-                type="text"
-                id="erronea_4"
-                name="erronea_4"
-                value={values.erronea_4}
                 onChange={handleChange}
               />
             </div>
