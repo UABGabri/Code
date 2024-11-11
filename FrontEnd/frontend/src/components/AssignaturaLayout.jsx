@@ -9,7 +9,7 @@ import ElementsParticipants from "./ElementsParticipants";
 import ElementsTests from "./ElementsTests";
 
 function AssignaturaLayout() {
-  const { id } = useParams();
+  const { id } = useParams(); //id de la ASSIGNATURA
   const location = useLocation();
   const { name, professorId } = location.state;
   const history = useNavigate();
@@ -19,11 +19,13 @@ function AssignaturaLayout() {
     //estructura per modificar contingut visualitzat
     switch (menuOption) {
       case "CURS":
-        return <ElementsCurs />;
+        return <ElementsCurs idAssignatura={id} />;
       case "PARTICIPANTS":
         return <ElementsParticipants />;
       case "PREGUNTES":
-        return <ElementsPreguntes professorId={professorId} />;
+        return (
+          <ElementsPreguntes professorId={professorId} idAssignatura={id} />
+        );
       case "TESTS":
         return <ElementsTests />;
     }

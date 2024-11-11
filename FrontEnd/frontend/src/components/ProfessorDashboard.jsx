@@ -42,7 +42,8 @@ function ProfessorDashboard({ professorId }) {
   };
 
   const handleSelectAssignatura = (id, name) => {
-    navigate(`/assignatura/${id}`, { state: { name, professorId } });
+    //mou id_professor i assignatura per posterior inserció de preguntes i temes a la base de dades -> AssignaturaLayout -> Elements
+    navigate(`/assignatura/${id}`, { state: { name, id, professorId } });
   };
 
   const leftColumn = assignatures.filter((_, index) => index % 2 === 0);

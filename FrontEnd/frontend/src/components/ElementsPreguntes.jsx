@@ -1,12 +1,13 @@
 import React from "react";
 import styles from "./Elements.module.css";
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 
-function ElementsPreguntes(professorId) {
+function ElementsPreguntes({ professorId, idAssignatura }) {
   const navigate = useNavigate();
 
   const handleButton = () => {
-    navigate("/afegirPregunta");
+    navigate("/afegirPregunta", { state: { professorId, idAssignatura } });
   };
 
   return (
@@ -19,5 +20,10 @@ function ElementsPreguntes(professorId) {
     </div>
   );
 }
+
+ElementsPreguntes.propTypes = {
+  professorId: PropTypes.number.isRequired,
+  idAssignatura: PropTypes.number.isRequired,
+};
 
 export default ElementsPreguntes;
