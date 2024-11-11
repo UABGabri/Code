@@ -42,7 +42,7 @@ function ProfessorDashboard({ professorId }) {
   };
 
   const handleSelectAssignatura = (id, name) => {
-    navigate(`/assignatura/${id}`, { state: { name } });
+    navigate(`/assignatura/${id}`, { state: { name, professorId } });
   };
 
   const leftColumn = assignatures.filter((_, index) => index % 2 === 0);

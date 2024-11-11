@@ -2,7 +2,7 @@ import React from "react";
 import styles from "./Elements.module.css";
 import { useNavigate } from "react-router-dom";
 
-function ElementsPreguntes() {
+function ElementsPreguntes(professorId) {
   const navigate = useNavigate();
 
   const handleButton = () => {

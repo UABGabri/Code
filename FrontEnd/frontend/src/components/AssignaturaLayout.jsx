@@ -11,7 +11,7 @@ import ElementsTests from "./ElementsTests";
 function AssignaturaLayout() {
   const { id } = useParams();
   const location = useLocation();
-  const { name } = location.state;
+  const { name, professorId } = location.state;
   const history = useNavigate();
   const [menuOption, setMenuOption] = useState("CURS");
 
@@ -23,7 +23,7 @@ function AssignaturaLayout() {
       case "PARTICIPANTS":
         return <ElementsParticipants />;
       case "PREGUNTES":
-        return <ElementsPreguntes />;
+        return <ElementsPreguntes professorId={professorId} />;
       case "TESTS":
         return <ElementsTests />;
     }
