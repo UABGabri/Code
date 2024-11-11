@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import styles from "./AfegirPregunta.module.css";
 import Headercap from "./Headercap";
-import PropTypes from "prop-types";
+
 import { BiArrowBack } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -12,13 +12,14 @@ function AfegirPregunta() {
   const { professorId, idAssignatura } = location.state;
 
   const [temes, setTemes] = useState([]);
-  const [selectedTema, setSelectedTema] = useState("");
+  const [selectedTema, setSelectedTema] = useState();
 
   const [values, setValues] = useState({
-    conceptes: "",
+    conceptes_materia: "",
     dificultat: "",
     pregunta: "",
-    solucio: "",
+    solucio_correcta: "",
+    estat: "pendent",
     erronea_1: "",
     erronea_2: "",
     erronea_3: "",
@@ -28,35 +29,24 @@ function AfegirPregunta() {
 
   const history = useNavigate();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const updateField = (fieldName, value) => {
     setValues((prevValues) => ({
       ...prevValues,
-      [name]: value,
+      [fieldName]: value,
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const conceptesArray = values.conceptes
-      .split(",")
-      .map((concept) => concept.trim()); //conversió a Array
-
-    const valors = {
-      ...values,
-      conceptes: JSON.stringify(conceptesArray), //transformació a JSOn
-    };
-
     axios
-      .post("http://localhost:8081/addQuestion", valors)
+      .post("http://localhost:8081/addQuestion", values)
       .then((res) => {
         console.log("Resposta del servidor:", res.data);
       })
       .catch((err) => {
         console.error("Error a la solicitud:", err);
       });
-    console.log(values);
   };
 
   const recoverTemasAssignatura = () => {
@@ -94,10 +84,7 @@ function AfegirPregunta() {
               value={selectedTema}
               onChange={(e) => {
                 setSelectedTema(e.target.value);
-                setValues((prevValues) => ({
-                  ...prevValues,
-                  id_tema: e.target.value,
-                }));
+                updateField("id_tema", e.target.value);
               }}
               placeholder="Selecciona un tema"
             >
@@ -114,10 +101,10 @@ function AfegirPregunta() {
             <label htmlFor="conceptes">Conceptes:</label>
             <input
               type="text"
-              id="conceptes"
-              name="conceptes"
-              value={values.conceptes}
-              onChange={handleChange}
+              id="conceptes_materia"
+              name="conceptes_materia"
+              value={values.conceptes_materia}
+              onChange={(e) => updateField("conceptes_materia", e.target.value)}
               placeholder="Conceptes separats per comes"
             />
           </div>
@@ -128,7 +115,7 @@ function AfegirPregunta() {
               id="dificultat"
               name="dificultat"
               value={values.dificultat}
-              onChange={handleChange}
+              onChange={(e) => updateField("dificultat", e.target.value)}
             >
               <option value="">Selecciona</option>
               <option value="Fàcil">Fàcil</option>
@@ -144,7 +131,7 @@ function AfegirPregunta() {
                 id="pregunta"
                 name="pregunta"
                 value={values.pregunta}
-                onChange={handleChange}
+                onChange={(e) => updateField("pregunta", e.target.value)}
                 className={styles.textarea}
                 placeholder="Introdueix la teva pregunta"
               />
@@ -158,7 +145,7 @@ function AfegirPregunta() {
               id="solucio"
               name="solucio"
               value={values.solucio}
-              onChange={handleChange}
+              onChange={(e) => updateField("solucio_correcta", e.target.value)}
               placeholder="Introdueix la teva solució"
             />
           </div>
@@ -171,7 +158,7 @@ function AfegirPregunta() {
                 id="erronea_1"
                 name="erronea_1"
                 value={values.erronea_1}
-                onChange={handleChange}
+                onChange={(e) => updateField("erronea_1", e.target.value)}
               />
             </div>
 
@@ -182,7 +169,7 @@ function AfegirPregunta() {
                 id="erronea_2"
                 name="erronea_2"
                 value={values.erronea_2}
-                onChange={handleChange}
+                onChange={(e) => updateField("erronea_2", e.target.value)}
               />
             </div>
 
@@ -193,7 +180,12 @@ function AfegirPregunta() {
                 id="erronea_3"
                 name="erronea_3"
                 value={values.erronea_3}
-                onChange={handleChange}
+                onChange={(e) =>
+                  setValues((prevValues) => ({
+                    ...prevValues,
+                    erronea_3: e.target.value,
+                  }))
+                }
               />
             </div>
           </div>

@@ -337,32 +337,33 @@ app.post('/recoverSubjects', (req, res) => {
 
 app.post('/addQuestion', (req, res) => {
 
-    const { pregunta, solucio_correcta, solucio_erronia1, solucio_erronia2, solucio_erronia3, dificultat, estat, conceptes_clau, id_creador, id_tema } = req.body;
+
 
     const values = [
 
         req.body.pregunta,
         req.body.solucio_correcta,
-        req.body.solucio_erronia1,
-        req.body.solucio_erronia2,
-        req.body.solucio_erronia3,
+        req.body.erronea_1,
+        req.body.erronea_2,
+        req.body.erronea_3,
         req.body.dificultat,
         req.body.estat,
-        req.body.conceptes_clau,
+        req.body.conceptes_materia,
         req.body.id_creador,
-        req.body.id_tema
+        parseInt(req.body.id_tema)
 
     ]
 
-    console.log(typeof(values.conceptes_clau));
+    
 
 
     const sql = `INSERT INTO preguntes (pregunta, solucio_correcta, solucio_erronia1, solucio_erronia2, solucio_erronia3, dificultat, estat, conceptes_clau, id_creador, id_tema) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-     db.query(sql, [values], (error, result) => {
+     db.query(sql, values, (error, result) => {
     
         if (error) {
             console.error("Error en la consulta:", error);
+            console.log(values);
             return res.json({ Status: "Failed" });
           } else {
             return res.json(result); 
@@ -376,8 +377,7 @@ app.get('/recoverTemasAssignatura', (req, res)=>{
 
   
     const id_assignatura = req.query.idAssignatura;
-    
-    
+
     
     const sql = 'SELECT * FROM temes WHERE id_assignatura = ?';
 
