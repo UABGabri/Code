@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styles from "./Elements.module.css";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
+import axios from "axios";
 
 function ElementsPreguntes({ professorId, idAssignatura }) {
   const navigate = useNavigate();
@@ -9,6 +10,17 @@ function ElementsPreguntes({ professorId, idAssignatura }) {
   const handleButton = () => {
     navigate("/afegirPregunta", { state: { professorId, idAssignatura } });
   };
+
+  useEffect(() => {
+    axios
+      .post("http://localhost:8081/recoverQuestions", idAssignatura)
+      .then((res) => {
+        console.log("Resposta del servidor:", res.data);
+      })
+      .catch((err) => {
+        console.error("Error a la solicitud:", err);
+      });
+  });
 
   return (
     <div>

@@ -393,6 +393,31 @@ app.get('/recoverTemasAssignatura', (req, res)=>{
 
 })
 
+app.get('/recoverQuestions', (req, res)=>{
+
+
+/*Utilitzar el id de la assignatura per definir les preguntes segons uns temes específics*/
+
+    id_Assignatura = req.body.idAssignatura;
+
+    const sql = 'SELECT * FROM preguntes JOIN temes ON preguntes.id_tema = temes.id_tema WHERE preguntes.estat = pendent AND temes.id_assignatura = ?';
+
+    db.query(sql,id_Assignatura, (err, res)=>{
+
+        if (error) {
+            console.error("Error en la consulta:", error);
+            return res.json({ Status: "Failed" });
+          } else {
+            return res.json(result); 
+          }
+    })
+
+
+})
+
+
+
+
 app.listen(8081, () => {
     console.log("Running Server...");
 });
