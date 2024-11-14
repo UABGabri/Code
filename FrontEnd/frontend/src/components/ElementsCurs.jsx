@@ -1,9 +1,7 @@
 import React from "react";
 
 function ElementsCurs() {
-  const handleCreateTema = () => {
-    //va a AfegirCurs per afegir nou curs i que es mostri aqui.
-  };
+  const handleCreateTema = () => {};
   return (
     <div>
       <button onClick={handleCreateTema}>Crea Tema</button>
