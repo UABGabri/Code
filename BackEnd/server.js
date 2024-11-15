@@ -62,7 +62,7 @@ app.post('/register', (req, res) => {//lloc on rebem trucada post de register am
     });
 });
 
-app.post('/login', (req, res) => {
+app.post('/login', (req, res) => { //funció de login 
     const db = mysql.createConnection({
         host: "localhost",
         user: "root",
@@ -104,7 +104,7 @@ app.post('/login', (req, res) => {
 });
 
 
-const verifyUser = (req, res, next) => {
+const verifyUser = (req, res, next) => { //funció de verificació existencia de user
 
     const token = req.cookies.token;
 
@@ -186,7 +186,7 @@ app.get('/user', (req, res) => {  //api que retorna la informació del usuari
 
 
 
-app.put('/updateUser', (req, res) => {
+app.put('/updateUser', (req, res) => { //actualització del perfil
     const token = req.cookies.token;
 
     if (!token) {
@@ -224,7 +224,7 @@ app.put('/updateUser', (req, res) => {
 });
 
 
-app.post('/registerSubject', async (req, res) => {
+app.post('/registerSubject', async (req, res) => { //inserció i associació amb els professors i alumnes de una materia
 
     const db = mysql.createConnection({
         host: "localhost",
@@ -280,7 +280,7 @@ app.post('/registerSubject', async (req, res) => {
         });
     };
 
-    const checkAndInsertProfessor = (niu) => {
+    const checkAndInsertProfessor = (niu) => { 
         return new Promise((resolve, reject) => {
             db.query(sqlComprobant, [niu], (err, result) => { //comprobació existencia professor
                 if (err || result.length === 0) {
@@ -318,10 +318,9 @@ app.post('/registerSubject', async (req, res) => {
     } 
 });
 
-app.post('/recoverSubjects', (req, res) => {
+app.post('/recoverSubjects', (req, res) => { //recuperació de les materies associades a un professor en concret
 
     const idProfessor = req.body.professorId;
-
 
     const sql = 'SELECT a.id_assignatura, a.nom_assignatura FROM assignatures a JOIN professors_assignatures pa ON a.id_assignatura = pa.id_assignatura WHERE pa.id_professor = ?';
 
@@ -335,8 +334,7 @@ app.post('/recoverSubjects', (req, res) => {
       });
 }) 
 
-app.post('/addQuestion', (req, res) => {
-
+app.post('/addQuestion', (req, res) => { //super inserció de les preguntes
 
 
     const values = [
@@ -372,10 +370,8 @@ app.post('/addQuestion', (req, res) => {
 })
 
 
-app.get('/recoverTemasAssignatura', (req, res)=>{
+app.get('/recoverTemasAssignatura', (req, res)=>{ //recuperació dels temes de la assignatura per afegir preguntes
 
-
-  
     const id_assignatura = req.query.idAssignatura;
 
     
@@ -393,16 +389,18 @@ app.get('/recoverTemasAssignatura', (req, res)=>{
 
 })
 
-app.get('/recoverQuestions', (req, res)=>{
 
 
-/*Utilitzar el id de la assignatura per definir les preguntes segons uns temes específics*/
 
-    id_Assignatura = req.body.idAssignatura;
+app.get('/recoverQuestions', (req, res)=>{ //recuperació preguntes per ser avaluades
 
-    const sql = 'SELECT * FROM preguntes JOIN temes ON preguntes.id_tema = temes.id_tema WHERE preguntes.estat = pendent AND temes.id_assignatura = ?';
 
-    db.query(sql,id_Assignatura, (err, res)=>{
+    const id_assignatura = req.query.idAssignatura;
+    parseInt(id_assignatura);
+    
+    const sql = `SELECT * FROM preguntes JOIN temes ON preguntes.id_tema = temes.id_tema WHERE preguntes.estat = 'pendent' AND temes.id_assignatura = ?`;
+
+    db.query(sql,[id_assignatura], (error, result)=>{
 
         if (error) {
             console.error("Error en la consulta:", error);
@@ -411,8 +409,6 @@ app.get('/recoverQuestions', (req, res)=>{
             return res.json(result); 
           }
     })
-
-
 })
 
 

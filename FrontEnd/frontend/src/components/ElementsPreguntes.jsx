@@ -13,9 +13,12 @@ function ElementsPreguntes({ professorId, idAssignatura }) {
 
   useEffect(() => {
     axios
-      .post("http://localhost:8081/recoverQuestions", idAssignatura)
+      .get("http://localhost:8081/recoverQuestions", {
+        params: { idAssignatura },
+      })
       .then((res) => {
         console.log("Resposta del servidor:", res.data);
+        console.log(idAssignatura);
       })
       .catch((err) => {
         console.error("Error a la solicitud:", err);
@@ -35,7 +38,7 @@ function ElementsPreguntes({ professorId, idAssignatura }) {
 
 ElementsPreguntes.propTypes = {
   professorId: PropTypes.number.isRequired,
-  idAssignatura: PropTypes.number.isRequired,
+  idAssignatura: PropTypes.string.isRequired,
 };
 
 export default ElementsPreguntes;
