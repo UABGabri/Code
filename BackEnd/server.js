@@ -434,6 +434,29 @@ app.put('/updateQuestionAccept', (req, res) =>{
 })
 
 
+app.get('/recoverAtendees', (req, res) =>{
+
+    const id_assignatura = req.query.idAssignatura;
+    parseInt(id_assignatura);
+
+    const sql = `select * from usuaris JOIN alumnes_assignatures ON usuaris.niu = alumnes_assignatures.id_alumne WHERE alumnes_assignatures.id_assignatura = ?`
+
+    db.query(sql,[id_assignatura], (error, result)=>{
+
+        if (error) {
+            
+            console.error("Error en la consulta:", error);
+            return res.json({ Status: "Failed" });
+          } else {
+       
+            return res.json(result); 
+          }
+    })
+
+
+})
+
+
 app.listen(8081, () => {
     console.log("Running Server...");
 });

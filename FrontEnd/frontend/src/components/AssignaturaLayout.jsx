@@ -21,7 +21,7 @@ function AssignaturaLayout() {
       case "CURS":
         return <ElementsCurs idAssignatura={id} />;
       case "PARTICIPANTS":
-        return <ElementsParticipants />;
+        return <ElementsParticipants idAssignatura={id} />;
       case "PREGUNTES":
         return (
           <ElementsPreguntes professorId={professorId} idAssignatura={id} />
@@ -29,11 +29,6 @@ function AssignaturaLayout() {
       case "TESTS":
         return <ElementsTests />;
     }
-  };
-
-  const handleShowPreguntes = () => {
-    //tornan a pàgina de preguntes
-    setMenuOption("PREGUNTES");
   };
 
   return (
