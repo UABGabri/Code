@@ -10,6 +10,7 @@ import { useLocation } from "react-router-dom";
 function AfegirPregunta() {
   const location = useLocation();
   const { professorId, idAssignatura } = location.state;
+  const navigate = navigate();
 
   const [temes, setTemes] = useState([]);
   const [selectedTema, setSelectedTema] = useState();

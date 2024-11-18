@@ -4,6 +4,7 @@ import cors from "cors";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import cookieParser from "cookie-parser";
+
 const salt = 10;
 
 const app = express();
@@ -352,7 +353,7 @@ app.post('/addQuestion', (req, res) => { //super inserció de les preguntes
 
     ]
 
-    
+
 
 
     const sql = `INSERT INTO preguntes (pregunta, solucio_correcta, solucio_erronia1, solucio_erronia2, solucio_erronia3, dificultat, estat, conceptes_clau, id_creador, id_tema) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
@@ -389,11 +390,7 @@ app.get('/recoverTemasAssignatura', (req, res)=>{ //recuperació dels temes de l
 
 })
 
-
-
-
 app.get('/recoverQuestions', (req, res)=>{ //recuperació preguntes per ser avaluades
-
 
     const id_assignatura = req.query.idAssignatura;
     parseInt(id_assignatura);
@@ -411,7 +408,30 @@ app.get('/recoverQuestions', (req, res)=>{ //recuperació preguntes per ser aval
     })
 })
 
+app.put('/updateQuestionAccept', (req, res) =>{
 
+   
+    const id_pregunta = parseInt(req.body.id_pregunta);
+    const estat = String(req.body.estat);
+
+   
+
+    const sql = `UPDATE preguntes SET estat = ? WHERE id_pregunta = ?`
+
+    db.query(sql,[estat, id_pregunta], (error, result)=>{
+
+        if (error) {
+            
+            console.error("Error en la consulta:", error);
+            return res.json({ Status: "Failed" });
+          } else {
+       
+            return res.json(result); 
+          }
+    })
+    
+
+})
 
 
 app.listen(8081, () => {

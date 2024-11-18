@@ -31,6 +31,11 @@ function AssignaturaLayout() {
     }
   };
 
+  const handleShowPreguntes = () => {
+    //tornan a pàgina de preguntes
+    setMenuOption("PREGUNTES");
+  };
+
   return (
     <div>
       <Headercap />

@@ -1,13 +1,97 @@
+/*SECCIO PREGUNTES*/
 
-.contentQuestion{
-    position: fixed;
+.questionsContainer {
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding-top: 200px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+  
+  .addQuestionButtonContainer {
+    width: 100%;
     display: flex;
     justify-content: center;
-    width: 100vw;
-}
-
-
-.addQuestion{
+    align-items: center;
+    margin-bottom: 30px; /* Espai entre les preguntes i el botó */
+  }
+  
+  .addQuestionButton {
+    padding: 10px 20px;
+    cursor: pointer;
+    color: white;
+    background-color: green;
+    border: 0;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 1rem;
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .addQuestionButton:hover {
+    background-color: white;
+    color: black;
+  }
+  
+  .questionsList {
+    width: 100%;
+    max-width: 900px; /* Amplada màxima per a les preguntes */
     display: flex;
-    color: green;
-}
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .questionCard {
+    width: 100%;
+    background-color: #f9f9f9;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .questionDetails p {
+    margin: 5px 0;
+  }
+  
+  .actionButtonsContainer {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 15px;
+  }
+  
+  .acceptButton, .deleteButton {
+    padding: 8px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-right: 10px;
+  }
+  
+  .acceptButton {
+    background-color: green;
+    color: white;
+    border: none;
+  }
+  
+  .deleteButton {
+    background-color: red;
+    color: white;
+    border: none;
+  }
+  
+  .acceptButton:hover {
+    background-color: darkgreen;
+  }
+  
+  .deleteButton:hover {
+    background-color: darkred;
+  }
+
+  /*FI SECCIO PREGUNTES*/
