@@ -12,7 +12,7 @@ function ElementsPreguntes({ professorId, idAssignatura }) {
 
   const handleButton = () => {
     navigate("/afegirPregunta", {
-      state: { professorId, idAssignatura, returnTo: "PREGUNTES" },
+      state: { professorId, idAssignatura },
     });
   };
 
