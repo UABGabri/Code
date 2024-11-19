@@ -60,10 +60,16 @@ function Profile() {
       <div className={styles.maindisplay}>
         <h1>Editar Perfil</h1>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className={styles.formProfile}>
           <div>
             <label>NIU (No editable):</label>
-            <input type="text" name="niu" value={values.niu} readOnly />
+            <input
+              type="text"
+              name="niu"
+              value={values.niu}
+              readOnly
+              className={styles.inputProfile}
+            />
           </div>
 
           <div>
@@ -76,6 +82,7 @@ function Profile() {
               required
               pattern="^[A-Za-zÀ-ÿ\s]+$"
               title="El nom només ha de tenir lletres de l'abecedari"
+              className={styles.inputProfile}
             />
           </div>
 
@@ -88,6 +95,7 @@ function Profile() {
               onChange={handleInputChange}
               required
               title="Introdueix un email vàlid"
+              className={styles.inputProfile}
             />
           </div>
 
@@ -99,15 +107,21 @@ function Profile() {
               onChange={handleInputChange}
               required
               id="password"
-              value={values.password}
               minLength={8}
               title="La contrasenya ha de tenir 8 carácters min"
+              className={styles.inputProfile}
             />
           </div>
 
           <div>
             <label>Role (No editable):</label>
-            <input type="text" name="role" value={values.role} readOnly />
+            <input
+              type="text"
+              name="role"
+              value={values.role}
+              readOnly
+              className={styles.inputProfile}
+            />
           </div>
 
           <button type="submit" className={styles.saveButton}>

@@ -42,11 +42,8 @@
       grid-column-start: 1 ;
       grid-column-end: 4;
       grid-gap: 16px;
-      
       grid-row-start: 5;
       grid-row-end: 5;
-
-
     }
   }
   

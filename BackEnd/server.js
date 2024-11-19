@@ -457,6 +457,26 @@ app.get('/recoverAtendees', (req, res) =>{
 })
 
 
+
+app.get('/recoverElementsTest', (req, res)=>{ //recuperació dels temes de la assignatura per afegir preguntes
+
+    const id_assignatura = req.query.idAssignatura;
+
+    
+    const sql = `SELECT t.nom_tema AS tema, GROUP_CONCAT(p.conceptes_clau SEPARATOR ', ') AS tots_els_conceptes FROM preguntes p JOIN temes t ON p.id_tema = t.id_tema WHERE t.id_assignatura = ? AND p.estat = 'acceptada' GROUP BY t.nom_tema`
+
+    db.query(sql, [id_assignatura], (error, result) => {
+    
+        if (error) {
+            console.error("Error en la consulta:", error);
+            return res.json({ Status: "Failed" });
+          } else {
+            return res.json(result); 
+          }
+    })
+
+})
+
 app.listen(8081, () => {
     console.log("Running Server...");
 });
