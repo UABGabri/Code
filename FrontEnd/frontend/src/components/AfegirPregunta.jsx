@@ -87,6 +87,7 @@ function AfegirPregunta() {
                 updateField("id_tema", e.target.value);
               }}
               placeholder="Selecciona un tema"
+              className={styles.selectInput}
             >
               <option value="">Selecciona un tema</option>
               {temes.map((tema) => (
@@ -116,6 +117,7 @@ function AfegirPregunta() {
               name="dificultat"
               value={values.dificultat}
               onChange={(e) => updateField("dificultat", e.target.value)}
+              className={styles.selectInput}
             >
               <option value="">Selecciona</option>
               <option value="Fàcil">Fàcil</option>

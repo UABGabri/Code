@@ -27,7 +27,7 @@ function AssignaturaLayout() {
           <ElementsPreguntes professorId={professorId} idAssignatura={id} />
         );
       case "TESTS":
-        return <ElementsTests />;
+        return <ElementsTests idAssignatura={id} />;
     }
   };
 
