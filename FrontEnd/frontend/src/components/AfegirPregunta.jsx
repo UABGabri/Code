@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import styles from "./AfegirPregunta.module.css";
+import styles from "./StyleComponents/AfegirPregunta.module.css";
 import Headercap from "./Headercap";
-
 import { BiArrowBack } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import styles from "./Homepage.module.css";
+import styles from "./StyleComponents/Homepage.module.css";
 
 function Login() {
   const [values, setValues] = useState({
@@ -17,8 +17,9 @@ function Login() {
     navigate("/register");
   };
 
-  axios.defaults.withCredentials = true;
+  axios.defaults.withCredentials = true; // Configura axios per incloure credencials (cookies) en totes les sol·licituds
 
+  // Gestiona l'enviament del formulari mitjançant una sol·licitud POST.
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(values);
@@ -27,15 +28,8 @@ function Login() {
       setError("Sisplau, emplena tots els camps.");
       return;
     } else {
-      /*
-        axios.post('http://localhost:8081/login', values)  
-        .then(res => {console.log('Resposta  del servidor:', res.data);})
-        .catch(err => {console.error('Error en la solicitud:', err);});
-        setError(''); 
-        navigate('/');*/
-
       axios
-        .post("http://localhost:8081/login", values)
+        .post("http://localhost:8081/login", values) //Sol·licitud POST al servidor amb els valors de l'usuari.
         .then((res) => {
           if (res.data.Status === "Success") {
             navigate("/modules");

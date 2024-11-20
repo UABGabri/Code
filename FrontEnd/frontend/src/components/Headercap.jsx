@@ -1,5 +1,5 @@
 import { useState } from "react";
-import styles from "./Headercap.module.css";
+import styles from "./StyleComponents/Headercap.module.css";
 import { FaCircleUser } from "react-icons/fa6";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -15,10 +15,12 @@ function Headercap() {
   const [dropdown, setDropdown] = useState(false);
   const location = useLocation();
 
+  //Funció per definir la visualització del dropdown
   const openCloseDropdown = () => {
     setDropdown(!dropdown);
   };
 
+  //Funció que serveix per fer un logout
   const handleDelete = () => {
     axios
       .get("http://localhost:8081/logout")
@@ -28,9 +30,8 @@ function Headercap() {
       .catch((err) => console.log(err));
   };
 
+  //Funció per tornar a la pestanya anterior
   const handleGoBack = () => {
-    //Per veure quan estem dins la pantalla perfil o altres.
-
     if (location.pathname === "/profile") {
       return "/modules";
     }

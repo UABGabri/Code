@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import styles from "./Elements.module.css";
+import styles from "./StyleComponents/Elements.module.css";
+
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import axios from "axios";
@@ -10,12 +11,14 @@ function ElementsPreguntes({ professorId, idAssignatura }) {
 
   const navigate = useNavigate();
 
+  //Funció que navega a la secció d'afegir pregunta amb els elements necessaris
   const handleButton = () => {
     navigate("/afegirPregunta", {
       state: { professorId, idAssignatura },
     });
   };
 
+  //Funcióp que recupera totes les preguntes pendents d'avaluació
   useEffect(() => {
     axios
       .get("http://localhost:8081/recoverQuestions", {
@@ -29,6 +32,7 @@ function ElementsPreguntes({ professorId, idAssignatura }) {
       });
   }, [idAssignatura]);
 
+  //Funció que actualitza l'estat de les preguntes a 'Acceptada'
   const handleStatusChange = (idPregunta, nouEstat) => {
     axios
       .put("http://localhost:8081/updateQuestionAccept", {
@@ -52,6 +56,7 @@ function ElementsPreguntes({ professorId, idAssignatura }) {
       });
   };
 
+  //Funció que elimina les preguntes no necessàries
   const handleDelete = (idPregunta) => {
     axios
       .delete("http://localhost:8081/deleteQuestion", { data: { idPregunta } })

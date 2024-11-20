@@ -1,4 +1,5 @@
-import styles from "./Elements.module.css";
+import styles from "./StyleComponents/Elements.module.css";
+
 import PropTypes from "prop-types";
 import axios from "axios";
 import { useState, useEffect } from "react";
@@ -8,6 +9,7 @@ function ElementsTests({ idAssignatura }) {
   const [selectedTema, setSelectedTema] = useState("");
   const [conceptes, setConceptes] = useState([]);
 
+  //Funció per recuperar elements necessaris per la creació del test com temes i conceptes
   const recoverTemasAssignatura = () => {
     axios
       .get("http://localhost:8081/recoverElementsTest", {
@@ -25,6 +27,7 @@ function ElementsTests({ idAssignatura }) {
       });
   };
 
+  //Funció que modifica els conceptes segons el tema escollit
   useEffect(() => {
     if (selectedTema) {
       const temaSeleccionat = temes.find(
@@ -42,6 +45,7 @@ function ElementsTests({ idAssignatura }) {
     }
   }, [selectedTema, temes]);
 
+  //Funció que recupera els temes associats a una assignatura
   useEffect(() => {
     if (idAssignatura) {
       recoverTemasAssignatura();

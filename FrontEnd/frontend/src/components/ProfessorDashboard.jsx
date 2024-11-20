@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import AddAssignaturaModal from "./AddAssignaturaModal";
-import styles from "./ProfessorDashboard.module.css";
+import styles from "./StyleComponents/ProfessorDashboard.module.css";
 import Headercap from "./Headercap";
 import axios from "axios";
 
@@ -12,6 +12,7 @@ function ProfessorDashboard({ professorId }) {
   const [buttonColumn, setButtonColumn] = useState(false);
   const navigate = useNavigate();
 
+  // Funció per recuperar assignatures associades al professor des del backend
   const fetchAssignaturesForProfessor = async (professorId) => {
     try {
       const res = await axios.post("http://localhost:8081/recoverSubjects", {
@@ -24,6 +25,7 @@ function ProfessorDashboard({ professorId }) {
     }
   };
 
+  // Recupera assignatures quan `professorId` està disponible
   useEffect(() => {
     if (professorId) {
       fetchAssignaturesForProfessor(professorId).then((data) => {
@@ -32,20 +34,23 @@ function ProfessorDashboard({ professorId }) {
     }
   }, [professorId]);
 
+  //Funció auxiliar per obrir el modal/pestanya d'afegir Assignatura
   const openModal = () => {
     setModal(true);
   };
 
+  //Funció auxiliar per tanvar el modal/pestanya d'afegir Assignatura
   const closeModal = () => {
     setModal(false);
     setButtonColumn(!buttonColumn);
   };
 
+  // Navega a la vista d'una assignatura seleccionada, passant dades necessàries (AssignaturaLayout -> Elements)
   const handleSelectAssignatura = (id, name) => {
-    //mou id_professor i assignatura per posterior inserció de preguntes i temes a la base de dades -> AssignaturaLayout -> Elements
     navigate(`/assignatura/${id}`, { state: { name, id, professorId } });
   };
 
+  // Divideix les assignatures en dues columnes (esquerra i dreta) segons el seu índex
   const leftColumn = assignatures.filter((_, index) => index % 2 === 0);
   const rightColumn = assignatures.filter((_, index) => index % 2 !== 0);
 
@@ -96,6 +101,7 @@ function ProfessorDashboard({ professorId }) {
               <p>ID: {assignatura.id_assignatura}</p>
             </div>
           ))}
+
           {buttonColumn === false && (
             <button onClick={openModal} className={styles.addButton}>
               Afegir Assignatura

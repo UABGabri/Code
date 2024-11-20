@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import styles from "./Homepage.module.css";
+import styles from "./StyleComponents/Homepage.module.css";
 
 function Register() {
   const [values, setValues] = useState({
+    //Emmagatzema tots els components necessaris per crear un usuari.
     niu: "",
     username: "",
     gmail: "",
@@ -13,8 +14,9 @@ function Register() {
   });
 
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(""); //Errors utilitzats per la verificació de les passwords.
 
+  //Defineix el rol de l'usuari a la base de dades segons l'extensió del gmail introduit.
   useEffect(() => {
     const gmailDomain = values.gmail.split("@")[1];
     if (gmailDomain === "teacher.cat") {
@@ -24,17 +26,17 @@ function Register() {
     }
   }, [values.gmail]);
 
+  //Registra l'usuari a la base de dades. Realitza una verificació doble de les passwords.
   const handleConfirmPassword = (event) => {
     console.log(values);
     event.preventDefault();
 
     if (values.password !== confirmPassword) {
-      //filtre per veure si les dues passwords son iguals
       setError("Sisplau, introdueix contrasenyes iguals");
       return;
     } else {
       axios
-        .post("http://localhost:8081/register", values) //trucada post al servidor amb els valors introduits al obj values
+        .post("http://localhost:8081/register", values) //Sol·licitud POST al servidor amb els valors de l'usuari.
         .then((res) => {
           console.log("Resposta del servidor:", res.data);
         })
@@ -44,13 +46,6 @@ function Register() {
       setError("");
       handleLogin();
     }
-
-    /*
-      axios.post('http://localhost:8081/test', values.username)  
-      .then(res => {console.log('Respuesta del servidor:', res.data);})
-      .catch(err => {console.error('Error en la solicitud:', err);});
-      setError(''); 
-      handleLogin(); */
   };
 
   const navigate = useNavigate();

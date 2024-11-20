@@ -1,5 +1,5 @@
 import { useState } from "react";
-import styles from "./ProfessorDashboard.module.css";
+import styles from "./StyleComponents/ProfessorDashboard.module.css";
 import PropTypes from "prop-types";
 import axios from "axios";
 
@@ -10,16 +10,10 @@ function AddAssignaturaModal({ onClose }) {
   const [niuProfessors, setNiuProfessors] = useState("");
   // const [error, setError] = useState("");
 
+  // Funció per gestionar l'enviament del formulari. Estableix els usuaris que poden accedir a una assignatura i els registra a la base de dades.
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    /*
-    e.preventDefault();
-    if (!nomAssignatura || !idAssignatura || !niuAlumnes) {
-      alert("Per favor, completa tots els camps.");
-      return;
-    }
-*/
     try {
       const niuArrayAlumnes = niuAlumnes.split(",").map((niu) => niu.trim());
       const niuArrayProfessors = niuProfessors
@@ -34,7 +28,7 @@ function AddAssignaturaModal({ onClose }) {
       };
 
       axios
-        .post("http://localhost:8081/registerSubject", values) //trucada post al servidor amb els valors introduits al obj values
+        .post("http://localhost:8081/registerSubject", values)
         .then((res) => {
           console.log("Resposta del servidor:", res.data);
         })

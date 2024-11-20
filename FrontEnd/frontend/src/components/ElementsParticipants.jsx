@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
-import styles from "./Elements.module.css";
+import styles from "./StyleComponents/Elements.module.css";
 function ElementsParticipants({ idAssignatura }) {
   const [users, setUsers] = useState([]);
 
+  //Funció per recuperar els participants d'una assignatura
   useEffect(() => {
     axios
       .get("http://localhost:8081/recoverAtendees", {

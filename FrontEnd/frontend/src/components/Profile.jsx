@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Headercap from "./Headercap";
-import styles from "./Profile.module.css";
+import styles from "./StyleComponents/Profile.module.css";
 
 function Profile() {
   const [values, setValues] = useState({
@@ -12,14 +12,8 @@ function Profile() {
     role: "", //valor no intercanviable
   });
 
-  /*
-  const [isEditing, setIsEditing] = useState({
-    username: false,
-    password: false,
-    email: false,
-  });*/
-
   useEffect(() => {
+    // Recupera les dades de l'usuari en carregar el component
     axios
       .get("http://localhost:8081/user", { withCredentials: true })
       .then((res) => {
@@ -32,6 +26,7 @@ function Profile() {
       });
   }, []);
 
+  // Actualitza l'estat amb els canvis introduïts a cada camp
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setValues((prevData) => ({
@@ -40,6 +35,7 @@ function Profile() {
     }));
   };
 
+  // Envia les dades actualitzades al servidor.
   const handleSubmit = (e) => {
     e.preventDefault();
     axios

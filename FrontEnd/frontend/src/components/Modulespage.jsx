@@ -11,8 +11,10 @@ function Modulespage() {
   const [message, setMessage] = useState(false);
   const [niuTeacher, setNiuTeacher] = useState("");
 
+  // Configura axios perquè inclogui les cookies en totes les sol·licituds
   axios.defaults.withCredentials = true;
 
+  // Recupera informació de l'usuari quan es carrega el component
   useEffect(() => {
     axios
       .get("http://localhost:8081/")
@@ -33,7 +35,8 @@ function Modulespage() {
       });
   }, []);
 
-  //en aquest mòdul es busca la bifurcació de forma segura de la visualització de continguts. Es fa servir el token com a mètode per poder actuar.
+  // Aquest mòdul gestiona la bifurcació segura de la visualització de continguts.
+  // Utilitza el token d'autenticació per decidir les accions disponibles.
   return (
     <div>
       {auth ? (

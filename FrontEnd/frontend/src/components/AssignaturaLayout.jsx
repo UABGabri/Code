@@ -1,6 +1,6 @@
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import Headercap from "./Headercap";
-import styles from "./AssignaturaLayout.module.css";
+import styles from "./StyleComponents/AssignaturaLayout.module.css";
 import { BiArrowBack } from "react-icons/bi";
 import { useState } from "react";
 import ElementsCurs from "./ElementsCurs";
@@ -15,8 +15,8 @@ function AssignaturaLayout() {
   const history = useNavigate();
   const [menuOption, setMenuOption] = useState("CURS");
 
+  //Estructura per modificar contingut visualitzat sota la capçalera segons la selecció del menu
   const render = () => {
-    //estructura per modificar contingut visualitzat
     switch (menuOption) {
       case "CURS":
         return <ElementsCurs idAssignatura={id} />;
