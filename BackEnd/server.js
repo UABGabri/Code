@@ -16,6 +16,7 @@ app.use(cors({
 }));
 app.use(cookieParser());
 
+//Connexió amb la base de dades MySQL.  
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -23,20 +24,17 @@ const db = mysql.createConnection({
     database: "web_examen_tfg"
 });
 
-/*
-app.get('/', (req, res) => {
-    res.send('Servidor funcionando correctamente');
-});
-*/
 
-app.post('/register', (req, res) => {//lloc on rebem trucada post de register amb la informació necessaria
-    const db = mysql.createConnection({//crear connexio amb db.
+//Funció per registrar usuaris a la taula MySQl users
+app.post('/register', (req, res) => {
+    /*
+    const db = mysql.createConnection({
         host: "localhost",
         user: "root",
         password: "Ga21012002",
         database: "web_examen_tfg"
     });
-
+*/
     const { niu, username, password, role, gmail } = req.body; 
 
     if (!niu || !username || !password || !role || !gmail) {
@@ -45,7 +43,8 @@ app.post('/register', (req, res) => {//lloc on rebem trucada post de register am
 
     const sql = "INSERT INTO usuaris (niu, username, password, role, email) VALUES (?)"; 
 
-    bcrypt.hash(req.body.password.toString(), salt, (err, hash) => {//funció guardat amb hash de la password
+    //Funció guardat amb hash de la password
+    bcrypt.hash(req.body.password.toString(), salt, (err, hash) => {
         if(err) return res.json({Error:"Error hashing password"});
 
         const values = [
@@ -63,7 +62,9 @@ app.post('/register', (req, res) => {//lloc on rebem trucada post de register am
     });
 });
 
-app.post('/login', (req, res) => { //funció de login 
+
+//Funció per realitzar login. Utilitza jwt token per poder accedir de forma segura 
+app.post('/login', (req, res) => {  
     const db = mysql.createConnection({
         host: "localhost",
         user: "root",
@@ -104,8 +105,8 @@ app.post('/login', (req, res) => { //funció de login
     });
 });
 
-
-const verifyUser = (req, res, next) => { //funció de verificació existencia de user
+//Funció de verificació existencia de user gràcies a les cookies
+const verifyUser = (req, res, next) => { 
 
     const token = req.cookies.token;
 
@@ -125,12 +126,13 @@ const verifyUser = (req, res, next) => { //funció de verificació existencia de
     }
 };
 
+//Funció per verificar al usuari, el seu rol i id
 app.get('/', verifyUser, (req, res) => {
     return res.json({ Status: "Success", name: req.name, niu:req.niu, role:req.role});
 });
 
 
-
+//Funció per fer un logout eliminant les possibles cookies
 app.get('/logout', (req, res) => {
 
     res.clearCookie('token');
@@ -139,8 +141,8 @@ app.get('/logout', (req, res) => {
 })
 
 
-
-app.get('/user', (req, res) => {  //api que retorna la informació del usuari 
+ //Funció que retorna la informació del usuari desde la base de dades
+app.get('/user', (req, res) => {  
 
     const token = req.cookies.token;
 
@@ -186,8 +188,8 @@ app.get('/user', (req, res) => {  //api que retorna la informació del usuari
 
 
 
-
-app.put('/updateUser', (req, res) => { //actualització del perfil
+//Funció que serveix per actualització del perfil a la base de dades
+app.put('/updateUser', (req, res) => { 
     const token = req.cookies.token;
 
     if (!token) {
@@ -224,16 +226,16 @@ app.put('/updateUser', (req, res) => { //actualització del perfil
     });
 });
 
-
-app.post('/registerSubject', async (req, res) => { //inserció i associació amb els professors i alumnes de una materia
-
+//Funció que serveix per la inserció i associació amb els professors i alumnes de una materia a la base de dades
+app.post('/registerSubject', async (req, res) => { 
+/*
     const db = mysql.createConnection({
         host: "localhost",
         user: "root",
         password: "Ga21012002",
         database: "web_examen_tfg"
     });
-
+*/
     const id = req.body.idAssignatura;
     const nomAssignatura = req.body.nomAssignatura;
     const niuProfessors = req.body.niuArrayProfessors;
@@ -245,8 +247,9 @@ app.post('/registerSubject', async (req, res) => { //inserció i associació amb
     const errors = [];
     const success = [];
 
+    //Funció per insertar una assignatura a la taula Assignatures de la base de dades
     const insertSubject = () => {
-        return new Promise((resolve, reject) => { //fer promesa ja que les consultes triguen a executar
+        return new Promise((resolve, reject) => { 
             db.query(sql, [id, nomAssignatura], (err) => {
                 if (err) {
                     errors.push("Error insertar Asignatura");
@@ -259,6 +262,7 @@ app.post('/registerSubject', async (req, res) => { //inserció i associació amb
         });
     };
 
+    //Funció per insertar alumne a la taula alumnes_assignatura de la base de dades
     const checkAndInsertAlumne = (niu) => {
         return new Promise((resolve, reject) => {
             db.query(sqlComprobant, [niu], (err, result) => { //comprobació existencia alumne
@@ -281,6 +285,7 @@ app.post('/registerSubject', async (req, res) => { //inserció i associació amb
         });
     };
 
+    //Funció per insertar els professors a la taula professors_assignatura de la base de dades
     const checkAndInsertProfessor = (niu) => { 
         return new Promise((resolve, reject) => {
             db.query(sqlComprobant, [niu], (err, result) => { //comprobació existencia professor
@@ -303,9 +308,11 @@ app.post('/registerSubject', async (req, res) => { //inserció i associació amb
         });
     };
 
+    //Estructura ideada per esperar a que les insercions es compleixin de forma asíncrona i es torni un resultat 
     try {
         await insertSubject();
 
+        //Es realitza una inserció per cada NIU d'alumne i professor separat per comes
         await Promise.all(niuAlumnes.map(checkAndInsertAlumne));
         await Promise.all(niuProfessors.map(checkAndInsertProfessor));
 
@@ -319,7 +326,8 @@ app.post('/registerSubject', async (req, res) => { //inserció i associació amb
     } 
 });
 
-app.post('/recoverSubjects', (req, res) => { //recuperació de les materies associades a un professor en concret
+//Funció de recuperació de les materies associades a un professor en concret
+app.post('/recoverSubjects', (req, res) => { 
 
     const idProfessor = req.body.professorId;
 
@@ -335,7 +343,8 @@ app.post('/recoverSubjects', (req, res) => { //recuperació de les materies asso
       });
 }) 
 
-app.post('/addQuestion', (req, res) => { //super inserció de les preguntes
+//Funció inserció de les preguntes a la taula preguntes de la base de dades
+app.post('/addQuestion', (req, res) => { 
 
 
     const values = [
@@ -370,8 +379,8 @@ app.post('/addQuestion', (req, res) => { //super inserció de les preguntes
     })
 })
 
-
-app.get('/recoverTemasAssignatura', (req, res)=>{ //recuperació dels temes de la assignatura per afegir preguntes
+//Funció de recuperació dels temes de la assignatura per afegir preguntes
+app.get('/recoverTemasAssignatura', (req, res)=>{ 
 
     const id_assignatura = req.query.idAssignatura;
 
@@ -390,7 +399,8 @@ app.get('/recoverTemasAssignatura', (req, res)=>{ //recuperació dels temes de l
 
 })
 
-app.get('/recoverQuestions', (req, res)=>{ //recuperació preguntes per ser avaluades
+//Funció de recuperació preguntes per ser avaluades pel professor
+app.get('/recoverQuestions', (req, res)=>{ 
 
     const id_assignatura = req.query.idAssignatura;
     parseInt(id_assignatura);
@@ -408,6 +418,8 @@ app.get('/recoverQuestions', (req, res)=>{ //recuperació preguntes per ser aval
     })
 })
 
+
+//Funció d'actualització d'estat de les preguntes a la taula preguntes de la base de dades
 app.put('/updateQuestionAccept', (req, res) =>{
 
    
@@ -433,7 +445,7 @@ app.put('/updateQuestionAccept', (req, res) =>{
 
 })
 
-
+//Funció de recuperació dels alumnes assistents a una assignatura
 app.get('/recoverAtendees', (req, res) =>{
 
     const id_assignatura = req.query.idAssignatura;
@@ -457,8 +469,8 @@ app.get('/recoverAtendees', (req, res) =>{
 })
 
 
-
-app.get('/recoverElementsTest', (req, res)=>{ //recuperació dels temes de la assignatura per afegir preguntes
+//Funció de recuperació dels temes de la assignatura i conceptes per poder crear tests
+app.get('/recoverElementsTest', (req, res)=>{ 
 
     const id_assignatura = req.query.idAssignatura;
 
@@ -477,6 +489,7 @@ app.get('/recoverElementsTest', (req, res)=>{ //recuperació dels temes de la as
 
 })
 
+//Funció d'escolta del servidor 
 app.listen(8081, () => {
     console.log("Running Server...");
 });

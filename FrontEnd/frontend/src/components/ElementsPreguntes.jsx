@@ -39,7 +39,7 @@ function ElementsPreguntes({ professorId, idAssignatura }) {
         id_pregunta: idPregunta,
         estat: nouEstat,
       })
-      .then((res) => {
+      .then(() => {
         axios
           .get("http://localhost:8081/recoverQuestions", {
             params: { idAssignatura },
