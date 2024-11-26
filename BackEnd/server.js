@@ -492,6 +492,10 @@ app.get('/recoverElementsTest', (req, res)=>{
 //Funció de recuperació de deu preguntes random segons el paràmetres establerts per l'usuari
 app.get('/recoverRandomTestQuestions', (req, res)=>{ 
 
+    const tema = req.query.tema;
+    const concepte = req.query.concepte;
+    const dificultat = req.query.dificultat;
+
 
 
 
