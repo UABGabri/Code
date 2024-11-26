@@ -489,6 +489,17 @@ app.get('/recoverElementsTest', (req, res)=>{
 
 })
 
+//Funció de recuperació de deu preguntes random segons el paràmetres establerts per l'usuari
+app.get('/recoverRandomTestQuestions', (req, res)=>{ 
+
+
+
+
+})
+
+
+
+
 //Funció d'escolta del servidor 
 app.listen(8081, () => {
     console.log("Running Server...");

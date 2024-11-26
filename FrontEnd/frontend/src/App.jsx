@@ -6,9 +6,9 @@ import Register from "./components/Register";
 import Login from "./components/Login";
 import Modules from "./components/Modulespage";
 import Profile from "./components/Profile";
-import AfegirAssignatura from "./components/AfegirAssignatura";
 import AssignaturaLayout from "./components/AssignaturaLayout";
 import AfegirPregunta from "./components/AfegirPregunta";
+import TestLayout from "./components/TestLayout";
 
 function App() {
   return (
@@ -29,11 +29,10 @@ function App() {
         <Route path="/profile" element={<Profile />}>
           {" "}
         </Route>
-        <Route path="/AfegirAssignatura" element={<AfegirAssignatura />}>
-          {" "}
-        </Route>
+
         <Route path="/assignatura/:id" element={<AssignaturaLayout />} />
         <Route path="/afegirPregunta" element={<AfegirPregunta />}></Route>
+        <Route path="/testlayout" element={<TestLayout />}></Route>
       </Routes>
     </BrowserRouter>
   );

@@ -48,12 +48,6 @@ function AfegirPregunta() {
       });
   };
 
-  useEffect(() => {
-    if (idAssignatura) {
-      recoverTemasAssignatura();
-    }
-  }, [idAssignatura, recoverTemasAssignatura]);
-
   const recoverTemasAssignatura = () => {
     axios
       .get("http://localhost:8081/recoverTemasAssignatura", {
@@ -64,6 +58,12 @@ function AfegirPregunta() {
         setTemes(res.data);
       });
   };
+
+  useEffect(() => {
+    if (idAssignatura) {
+      recoverTemasAssignatura();
+    }
+  }, [idAssignatura]);
 
   return (
     <div>
