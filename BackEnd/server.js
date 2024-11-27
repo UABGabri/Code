@@ -46,7 +46,7 @@ app.post('/register', (req, res) => {
     //Funció guardat amb hash de la password
     bcrypt.hash(req.body.password.toString(), salt, (err, hash) => {
         if(err) return res.json({Error:"Error hashing password"});
-
+        
         const values = [
             req.body.niu,
             req.body.username,
