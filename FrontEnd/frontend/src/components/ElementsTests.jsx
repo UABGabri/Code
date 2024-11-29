@@ -11,10 +11,11 @@ function ElementsTests({ idAssignatura }) {
   const [conceptes, setConceptes] = useState([]);
   const [selectedConcepte, setSelectedConcepte] = useState("");
   const [parametersTest, setParametersTest] = useState({
-    tema: selectedTema,
-    concepte: selectedConcepte,
+    tema: "",
+    concepte: "",
     dificultat: "",
   });
+  const [formError, setFormError] = useState("");
 
   const recoverTemasAssignatura = () => {
     axios
@@ -28,6 +29,9 @@ function ElementsTests({ idAssignatura }) {
           tots_els_conceptes: item.tots_els_conceptes,
         }));
         setTemes(temas);
+      })
+      .catch((error) => {
+        console.error("Error al recuperar els temes:", error);
       });
   };
 
@@ -55,7 +59,15 @@ function ElementsTests({ idAssignatura }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(parametersTest); //no pasa bien las cosas de la dificultat aqui. Arreglar eso.
+    const { tema, concepte, dificultat } = parametersTest;
+
+    if (!tema || !concepte || !dificultat) {
+      setFormError("Sisplau, emplena tots els camps per continuar");
+      return;
+    }
+
+    setFormError("");
+    console.log("Formulario enviado con:", parametersTest);
     navigate("/testlayout", { state: { parametersTest } });
   };
 
@@ -71,13 +83,13 @@ function ElementsTests({ idAssignatura }) {
               name="id_tema"
               value={selectedTema}
               onChange={(e) => {
-                setSelectedTema(e.target.value);
+                const tema = e.target.value;
+                setSelectedTema(tema);
                 setParametersTest((prevState) => ({
                   ...prevState,
-                  tema: e.target.value,
+                  tema: tema,
                 }));
               }}
-              placeholder="Selecciona un tema"
             >
               <option value="">Selecciona un tema</option>
               {temes.map((tema) => (
@@ -93,13 +105,13 @@ function ElementsTests({ idAssignatura }) {
               name="conceptes"
               value={selectedConcepte}
               onChange={(e) => {
-                setSelectedConcepte(e.target.value);
+                const concepte = e.target.value;
+                setSelectedConcepte(concepte);
                 setParametersTest((prevState) => ({
                   ...prevState,
-                  concepte: e.target.value,
+                  concepte: concepte,
                 }));
               }}
-              placeholder="Selecciona un concepte"
             >
               <option value="">Selecciona un concepte</option>
               {conceptes.map((concepte, index) => (
@@ -113,6 +125,7 @@ function ElementsTests({ idAssignatura }) {
             <select
               id="dificultat"
               name="dificultat"
+              value={parametersTest.dificultat}
               onChange={(e) => {
                 const dificultat = e.target.value;
                 setParametersTest((prevState) => ({
@@ -120,13 +133,14 @@ function ElementsTests({ idAssignatura }) {
                   dificultat: dificultat,
                 }));
               }}
-              value={parametersTest.dificultat}
-              placeholder="Selecciona la dificultad"
             >
+              <option value="">Selecciona una dificultat</option>
               <option value="Fàcil">Fàcil</option>
               <option value="Mitjà">Mitjà</option>
               <option value="Difícil">Difícil</option>
             </select>
+
+            {formError && <p className={styles.error}>{formError}</p>}
 
             <button type="submit">Generar Test</button>
           </form>
