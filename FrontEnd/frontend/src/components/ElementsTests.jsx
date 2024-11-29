@@ -55,7 +55,7 @@ function ElementsTests({ idAssignatura }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(parametersTest);
+    console.log(parametersTest); //no pasa bien las cosas de la dificultat aqui. Arreglar eso.
     navigate("/testlayout", { state: { parametersTest } });
   };
 

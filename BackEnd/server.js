@@ -496,6 +496,8 @@ app.get('/recoverRandomTestQuestions', (req, res)=>{
     const concepte = req.query.concepte;
     const dificultat = req.query.dificultat;
 
+    console.log(tema,concepte,dificultat);
+
 
 
 
