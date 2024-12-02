@@ -18,7 +18,7 @@ function ElementsPreguntes({ professorId, idAssignatura }) {
     });
   };
 
-  //Funcióp que recupera totes les preguntes pendents d'avaluació
+  //Funció que recupera totes les preguntes pendents d'avaluació
   useEffect(() => {
     axios
       .get("http://localhost:8081/recoverQuestions", {
@@ -58,8 +58,12 @@ function ElementsPreguntes({ professorId, idAssignatura }) {
 
   //Funció que elimina les preguntes no necessàries
   const handleDelete = (idPregunta) => {
+    //console.log(idPregunta);
+
     axios
-      .delete("http://localhost:8081/deleteQuestion", { data: { idPregunta } })
+      .delete("http://localhost:8081/deleteQuestion", {
+        params: { idPregunta },
+      })
       .then((res) => {
         setQuestions((prevQuestions) =>
           prevQuestions.filter(

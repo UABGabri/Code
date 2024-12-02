@@ -17,6 +17,7 @@ function ElementsTests({ idAssignatura }) {
   });
   const [formError, setFormError] = useState("");
 
+  // Recupera temes i conceptes
   const recoverTemasAssignatura = () => {
     axios
       .get("http://localhost:8081/recoverElementsTest", {
@@ -26,7 +27,9 @@ function ElementsTests({ idAssignatura }) {
         const temas = res.data.map((item) => ({
           id_tema: item.id_tema,
           nom_tema: item.tema,
-          tots_els_conceptes: item.tots_els_conceptes,
+          tots_els_conceptes: item.tots_els_conceptes
+            .split(",")
+            .map((concepto) => concepto.trim()),
         }));
         setTemes(temas);
       })
@@ -35,22 +38,21 @@ function ElementsTests({ idAssignatura }) {
       });
   };
 
+  // Al cambiar el tema, actualizar los conceptos disponibles
   useEffect(() => {
     if (selectedTema) {
-      const temaSeleccionat = temes.find(
+      const temaSeleccionado = temes.find(
         (tema) => tema.nom_tema === selectedTema
       );
-      if (temaSeleccionat) {
-        const conceptesArray = temaSeleccionat.tots_els_conceptes
-          .split(",")
-          .map((concepte) => concepte.trim());
-        setConceptes(conceptesArray);
+      if (temaSeleccionado) {
+        setConceptes(temaSeleccionado.tots_els_conceptes);
       }
     } else {
       setConceptes([]);
     }
   }, [selectedTema, temes]);
 
+  // Recuperar  temes al carregar el component
   useEffect(() => {
     if (idAssignatura) {
       recoverTemasAssignatura();
@@ -67,8 +69,18 @@ function ElementsTests({ idAssignatura }) {
     }
 
     setFormError("");
-    console.log("Formulario enviado con:", parametersTest);
-    navigate("/testlayout", { state: { parametersTest } });
+
+    axios
+      .get("http://localhost:8081/recoverRandomTestQuestions", {
+        params: { tema, concepte, dificultat, idAssignatura },
+      })
+      .then((res) => {
+        console.log("Preguntes recuperades:", res.data);
+        navigate("/testlayout", { state: { parametersTest } });
+      })
+      .catch((error) => {
+        console.error("Error al recuperar les preguntes:", error);
+      });
   };
 
   return (

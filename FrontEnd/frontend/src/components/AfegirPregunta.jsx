@@ -9,6 +9,8 @@ import { useLocation } from "react-router-dom";
 function AfegirPregunta() {
   const location = useLocation();
   const { professorId, idAssignatura } = location.state;
+  const { errors, setFormErrors } = useState("");
+  const navigate = useNavigate();
 
   const [temes, setTemes] = useState([]);
   const [selectedTema, setSelectedTema] = useState();
@@ -35,17 +37,23 @@ function AfegirPregunta() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    axios
-      .post("http://localhost:8081/addQuestion", values)
-      .then((res) => {
-        console.log("Resposta del servidor:", res.data);
-      })
-      .catch((err) => {
-        console.error("Error a la solicitud:", err);
-      });
+    try {
+      const res = await axios.post("http://localhost:8081/addQuestion", values);
+      console.log("Resposta del servidor:", res.data);
+
+      if (res.data.Status === "Failed") {
+        setFormErrors(res.data.Message || "No s'ha pogut afegir la pregunta.");
+      } else {
+        alert("Pregunta afegida correctament!");
+        navigate(-1);
+      }
+    } catch (error) {
+      console.error("Error a la sol·licitud:", error);
+      setFormErrors("Hi ha hagut un error en enviar la sol·licitud.");
+    }
   };
 
   const recoverTemasAssignatura = () => {

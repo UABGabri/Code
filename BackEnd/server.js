@@ -11,7 +11,7 @@ const app = express();
 app.use(express.json());
 app.use(cors({
     origin: 'http://localhost:5173', //origen específic
-    methods: ['GET', 'POST', 'PUT'],// Metodes permesos
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],// Metodes permesos
     credentials: true // Credencials necessaris
 }));
 app.use(cookieParser());
@@ -157,7 +157,7 @@ app.get('/user', (req, res) => {
     
         const niu = decoded.niu;
 
-        console.log(decoded);
+        //console.log(decoded);
         
         const db = mysql.createConnection({
             host: "localhost",
@@ -344,39 +344,122 @@ app.post('/recoverSubjects', (req, res) => {
 }) 
 
 //Funció inserció de les preguntes a la taula preguntes de la base de dades
-app.post('/addQuestion', (req, res) => { 
+app.post('/addQuestion', async (req, res) => {
+    const {
+        pregunta,
+        solucio_correcta,
+        erronea_1,
+        erronea_2,
+        erronea_3,
+        dificultat,
+        conceptes_materia,
+        id_creador,
+        id_tema,
+    } = req.body;
+
+    if (
+        !pregunta ||
+        !solucio_correcta ||
+        !erronea_1 ||
+        !erronea_2 ||
+        !erronea_3 ||
+        !dificultat ||
+        !conceptes_materia ||
+        !id_creador ||
+        !id_tema
+    ) {
+        return res.json({ Status: "Failed", Message: "Falten camps obligatoris." });
+    }
+
+    const dbQuery = (sql, values) =>
+        new Promise((resolve, reject) => {
+            db.query(sql, values, (err, result) => {
+                if (err) return reject(err);
+                resolve(result);
+            });
+        });
+
+    try {
+        // Insertar la pregunta
+        const questionSql = `
+            INSERT INTO preguntes 
+            (pregunta, solucio_correcta, solucio_erronia1, solucio_erronia2, solucio_erronia3, dificultat, estat, id_creador, id_tema) 
+            VALUES (?, ?, ?, ?, ?, ?, 'pendent', ?, ?)`;
+
+        const questionResult = await dbQuery(questionSql, [
+            pregunta,
+            solucio_correcta,
+            erronea_1,
+            erronea_2,
+            erronea_3,
+            dificultat,
+            id_creador,
+            id_tema,
+        ]);
+
+        const questionId = questionResult.insertId;
+
+        // Insertar conceptes
+        const conceptos = conceptes_materia.split(",").map((concept) => concept.trim());
+        const conceptIds = [];
+        for (const concept of conceptos) {
+            let conceptId;
+
+            // Verificar si el concepte ja existeix
+            const existingConcept = await dbQuery(
+                "SELECT id_concepte FROM conceptes WHERE nom_concepte = ?",
+                [concept]
+            );
+
+            if (existingConcept.length > 0) {
+                conceptId = existingConcept[0].id_concepte;
+            } else {
+                // Insertar nou concepte
+                const conceptInsert = await dbQuery(
+                    "INSERT INTO conceptes (nom_concepte) VALUES (?)",
+                    [concept]
+                );
+                conceptId = conceptInsert.insertId;
+            }
+
+            conceptIds.push(conceptId);
+        }
+
+        // Associar conceptos amb la pregunta
+        const conceptQuestionSql = `
+            INSERT INTO preguntes_conceptes (id_pregunta, id_concepte) VALUES (?, ?)`;
+        for (const conceptId of conceptIds) {
+            await dbQuery(conceptQuestionSql, [questionId, conceptId]);
+        }
+
+        return res.json({ Status: "Success", Message: "Pregunta afegida correctament!" });
+    } catch (error) {
+        console.error("Error al processar la pregunta:", error);
+        return res.json({ Status: "Failed", Message: "Error en el servidor." });
+    }
+});
 
 
-    const values = [
 
-        req.body.pregunta,
-        req.body.solucio_correcta,
-        req.body.erronea_1,
-        req.body.erronea_2,
-        req.body.erronea_3,
-        req.body.dificultat,
-        req.body.estat,
-        req.body.conceptes_materia,
-        req.body.id_creador,
-        parseInt(req.body.id_tema)
+app.delete('/deleteQuestion', (req,res)=>{
 
-    ]
+    const id_Pregunta = req.query.idPregunta;
 
+    //console.log(id_Pregunta);
 
+    const sql = 'DELETE FROM preguntes WHERE id_pregunta = ?'
 
-
-    const sql = `INSERT INTO preguntes (pregunta, solucio_correcta, solucio_erronia1, solucio_erronia2, solucio_erronia3, dificultat, estat, conceptes_clau, id_creador, id_tema) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-
-     db.query(sql, values, (error, result) => {
+    db.query(sql, [id_Pregunta], (error, result) => {
     
         if (error) {
             console.error("Error en la consulta:", error);
-            console.log(values);
             return res.json({ Status: "Failed" });
           } else {
             return res.json(result); 
           }
     })
+
+
 })
 
 //Funció de recuperació dels temes de la assignatura per afegir preguntes
@@ -470,38 +553,113 @@ app.get('/recoverAtendees', (req, res) =>{
 
 
 //Funció de recuperació dels temes de la assignatura i conceptes per poder crear tests
-app.get('/recoverElementsTest', (req, res)=>{ 
-
+app.get('/recoverElementsTest', (req, res) => {
     const id_assignatura = req.query.idAssignatura;
 
-    
-    const sql = `SELECT t.nom_tema AS tema, GROUP_CONCAT(p.conceptes_clau SEPARATOR ', ') AS tots_els_conceptes FROM preguntes p JOIN temes t ON p.id_tema = t.id_tema WHERE t.id_assignatura = ? AND p.estat = 'acceptada' GROUP BY t.nom_tema`
+    const sql = `SELECT t.nom_tema AS tema, GROUP_CONCAT(c.nom_concepte SEPARATOR ', ') AS tots_els_conceptes FROM temes t
+        JOIN preguntes p ON t.id_tema = p.id_tema
+        JOIN preguntes_conceptes pc ON p.id_pregunta = pc.id_pregunta
+        JOIN conceptes c ON pc.id_concepte = c.id_concepte
+        WHERE t.id_assignatura = ? AND p.estat = 'acceptada'
+        GROUP BY t.nom_tema
+    `;
 
     db.query(sql, [id_assignatura], (error, result) => {
-    
         if (error) {
             console.error("Error en la consulta:", error);
             return res.json({ Status: "Failed" });
-          } else {
-            return res.json(result); 
-          }
-    })
+        } else {
+            return res.json(result);
+        }
+    });
+});
 
-})
 
 //Funció de recuperació de deu preguntes random segons el paràmetres establerts per l'usuari
-app.get('/recoverRandomTestQuestions', (req, res)=>{ 
-
+app.get('/recoverRandomTestQuestions', async (req, res) => { 
     const tema = req.query.tema;
     const concepte = req.query.concepte;
     const dificultat = req.query.dificultat;
+    const idAssignatura = req.query.idAssignatura;
 
-    console.log(tema,concepte,dificultat);
+    if (!tema || !concepte || !dificultat) {
+        return res.json({ Status: "Failed", Message: "Falten paràmetres requerits: tema, concepte o dificultat." });
+    }
+
+    const sqlGetTemaId = "SELECT id_tema FROM temes WHERE nom_tema = ?";
+    const sqlGetConcepteId = "SELECT id_concepte FROM conceptes WHERE nom_concepte = ?";
+    const sqlGetQuestions = `
+        SELECT p.* FROM preguntes p
+        INNER JOIN preguntes_conceptes pc ON p.id_pregunta = pc.id_pregunta
+        WHERE p.id_tema = ? 
+        AND pc.id_concepte = ? 
+        AND p.dificultat = ? 
+        AND p.estat = 'acceptada'
+        ORDER BY RAND() LIMIT 10
+    `;
+
+    const errors = [];
+    const success = [];
+
+    const getTemaId = () => {
+        return new Promise((resolve, reject) => {
+            db.query(sqlGetTemaId, [tema], (err, result) => {
+                if (err || result.length === 0) {
+                    errors.push("El tema proporcionat no existeix.");
+                    reject();
+                } else {
+                    success.push("ID del tema recuperat correctament.");
+                    resolve(result[0].id_tema);
+                }
+            });
+        });
+    };
+
+    const getConcepteId = () => {
+        return new Promise((resolve, reject) => {
+            db.query(sqlGetConcepteId, [concepte], (err, result) => {
+                if (err || result.length === 0) {
+                    errors.push("El concepte proporcionat no existeix.");
+                    reject();
+                } else {
+                    success.push("ID del concepte recuperat correctament.");
+                    resolve(result[0].id_concepte);
+                }
+            });
+        });
+    };
+
+    const getQuestions = (idTema, idConcepte) => {
+        return new Promise((resolve, reject) => {
+            db.query(sqlGetQuestions, [idTema, idConcepte, dificultat], (err, result) => {
+                if (err || result.length === 0) {
+                    errors.push("No s'han trobat preguntes que coincideixin amb els criteris.");
+                    reject();
+                } else {
+                    success.push("Preguntes recuperades correctament.");
+                    resolve(result);
+                }
+            });
+        });
+    };
+
+    try {
+        const idTema = await getTemaId();
+        const idConcepte = await getConcepteId();
+        const preguntes = await getQuestions(idTema, idConcepte);
+
+        if (errors.length > 0) {
+            return res.json({ Status: "Partial Success", Messages: errors, Preguntes: preguntes || [] });
+        } else {
+            return res.json({ Status: "Success", Messages: success, Preguntes: preguntes });
+        }
+    } catch (error) {
+        return res.json({ Status: "Failed", Messages: errors });
+    }
+});
 
 
 
-
-})
 
 
 
