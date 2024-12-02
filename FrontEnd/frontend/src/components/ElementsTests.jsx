@@ -14,6 +14,7 @@ function ElementsTests({ idAssignatura }) {
     tema: "",
     concepte: "",
     dificultat: "",
+    id_Assignatura: idAssignatura,
   });
   const [formError, setFormError] = useState("");
 
@@ -38,7 +39,7 @@ function ElementsTests({ idAssignatura }) {
       });
   };
 
-  // Al cambiar el tema, actualizar los conceptos disponibles
+  // Al canviar el tema, actualitzar els conceptes disponibles
   useEffect(() => {
     if (selectedTema) {
       const temaSeleccionado = temes.find(
@@ -69,18 +70,7 @@ function ElementsTests({ idAssignatura }) {
     }
 
     setFormError("");
-
-    axios
-      .get("http://localhost:8081/recoverRandomTestQuestions", {
-        params: { tema, concepte, dificultat, idAssignatura },
-      })
-      .then((res) => {
-        console.log("Preguntes recuperades:", res.data);
-        navigate("/testlayout", { state: { parametersTest } });
-      })
-      .catch((error) => {
-        console.error("Error al recuperar les preguntes:", error);
-      });
+    navigate("/testlayout", { state: { parametersTest } });
   };
 
   return (
