@@ -4,7 +4,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-function ElementsTests({ idAssignatura }) {
+function ElementsTests({ professorId, idAssignatura }) {
   const navigate = useNavigate();
   const [temes, setTemes] = useState([]);
   const [selectedTema, setSelectedTema] = useState("");
@@ -160,6 +160,7 @@ function ElementsTests({ idAssignatura }) {
 
 ElementsTests.propTypes = {
   idAssignatura: PropTypes.string.isRequired,
+  professorId: PropTypes.number.isRequired,
 };
 
 export default ElementsTests;

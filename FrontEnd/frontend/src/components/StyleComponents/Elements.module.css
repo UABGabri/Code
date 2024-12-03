@@ -162,3 +162,115 @@
 
 }
 /*FI SECCIO QUIZZ*/
+
+
+/*SECCIÓ CURS*/
+
+.elementsCursContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  margin-top: 130px;
+  box-sizing: border-box;
+}
+
+.elementsCursHeader {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.temesLista {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 800px;
+  margin-bottom: 20px;
+  flex-grow: 1;
+}
+
+.temaItem {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 15px;
+  background-color: #f9f9f9;
+}
+
+.temaTitle {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.temaContent {
+  display: flex;
+  justify-content: space-between;
+}
+
+.contingut,
+.tests {
+  width: 48%;
+}
+
+.temaSubtitle {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.temaDescription {
+  font-size: 1rem;
+  color: #555;
+}
+
+.noTemes {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #888;
+}
+
+.temaCrear {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 300px;
+  margin-top: 20px;
+}
+
+.temaInput {
+  padding: 10px;
+  margin-bottom: 10px;
+  width: 100%;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.temaButton {
+  padding: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 20px; 
+}
+
+.temaButton:hover {
+  background-color: #45a049;
+}
+
+.temaCrear {
+  position: relative;
+  margin-top: auto; 
+}
+
+
+
+/*FI SECCIÓ CURS*/

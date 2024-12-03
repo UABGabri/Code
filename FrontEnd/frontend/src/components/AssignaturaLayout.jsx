@@ -6,7 +6,7 @@ import { useState } from "react";
 import ElementsCurs from "./ElementsCurs";
 import ElementsPreguntes from "./ElementsPreguntes";
 import ElementsParticipants from "./ElementsParticipants";
-import ElementsTests from "./ElementsTests";
+import ElementsTestsProfessor from "./ElementsTestsProfessor";
 
 function AssignaturaLayout() {
   const { id } = useParams(); //id de la ASSIGNATURA
@@ -27,7 +27,12 @@ function AssignaturaLayout() {
           <ElementsPreguntes professorId={professorId} idAssignatura={id} />
         );
       case "TESTS":
-        return <ElementsTests idAssignatura={id} />;
+        return (
+          <ElementsTestsProfessor
+            professorId={professorId}
+            idAssignatura={id}
+          />
+        );
     }
   };
 

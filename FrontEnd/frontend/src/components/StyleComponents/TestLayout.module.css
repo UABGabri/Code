@@ -1,0 +1,13 @@
+.containerQuizz{
+   width: 100vh;
+   margin: auto;
+   margin-top: 150px;
+   background:white;
+   color:black;
+   display: flex;
+   flex-direction: column;
+   gap: 20px;
+   border-radius: 10px;
+   padding:40px 50px;
+}
+

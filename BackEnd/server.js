@@ -326,6 +326,50 @@ app.post('/registerSubject', async (req, res) => {
     } 
 });
 
+
+//Funció de recuperació dels temes associats a una assignatura pel curs
+
+app.get('/recoverTemesAssignatura', (req, res) => {
+
+    const { idAssignatura } = req.query.idAssignatura;
+
+    const id = parseInt(req.query.idAssignatura,10);
+    const sql = "SELECT * FROM temes WHERE id_assignatura = ?";
+    db.query(sql, [id], (error, result) => {
+      if (error) {
+        console.error("Error al recuperar els temes:", error);
+        return res.json({ success: false, message: "Error al recuperar els temes" });
+      }
+  
+      return res.json(result);
+    });
+
+});
+
+
+//Funció creació d'un tema per una assignatura
+
+app.post('/createTema', (req,res) => {
+    const { idAssignatura, name } = req.body;
+
+    console.log(typeof(idAssignatura));
+
+    if (!name) {
+      return res.json({ success: false, message: "El nom és obligatori" });
+    }
+  
+    const sql = "INSERT INTO temes (id_assignatura, nom_tema) VALUES (?, ?)";
+    db.query(sql, [idAssignatura, name], (error, result) => {
+      if (error) {
+        console.error("Error al inserir el tema:", error);
+        return res.json({ success: false, message: "Error en crear el tema" });
+      }
+  
+      return res.json({ success: true, message: "Tema creat amb èxit" });
+    });
+
+})
+
 //Funció de recuperació de les materies associades a un professor en concret
 app.post('/recoverSubjects', (req, res) => { 
 
@@ -554,14 +598,18 @@ app.get('/recoverAtendees', (req, res) =>{
 
 //Funció de recuperació dels temes de la assignatura i conceptes per poder crear tests
 app.get('/recoverElementsTest', (req, res) => {
-    const id_assignatura = req.query.idAssignatura;
 
-    const sql = `SELECT t.nom_tema AS tema, GROUP_CONCAT(c.nom_concepte SEPARATOR ', ') AS tots_els_conceptes FROM temes t
-        JOIN preguntes p ON t.id_tema = p.id_tema
-        JOIN preguntes_conceptes pc ON p.id_pregunta = pc.id_pregunta
-        JOIN conceptes c ON pc.id_concepte = c.id_concepte
-        WHERE t.id_assignatura = ? AND p.estat = 'acceptada'
-        GROUP BY t.nom_tema
+    const id_assignatura = req.query.idAssignatura;
+    parseInt(id_assignatura,10);
+
+    const sql = `SELECT t.id_tema, t.nom_tema AS tema, GROUP_CONCAT(c.nom_concepte SEPARATOR ', ') AS tots_els_conceptes
+FROM temes t
+LEFT JOIN preguntes p ON t.id_tema = p.id_tema AND p.estat = 'acceptada'
+LEFT JOIN preguntes_conceptes pc ON p.id_pregunta = pc.id_pregunta
+LEFT JOIN conceptes c ON pc.id_concepte = c.id_concepte
+WHERE t.id_assignatura = ?
+GROUP BY t.id_tema, t.nom_tema
+
     `;
 
     db.query(sql, [id_assignatura], (error, result) => {
@@ -573,6 +621,61 @@ app.get('/recoverElementsTest', (req, res) => {
         }
     });
 });
+
+//Funció de creació de test professors
+app.post('/generarTest', (req, res) => {
+    const { idAssignatura, idTema, idCreador, nombreTest } = req.body;
+    const llaveAcceso = Math.random().toString(36).substr(2, 8);
+  
+    const sqlInsertTest = `
+      INSERT INTO tests (nom_test, data_creacio, clau_acces, id_creador, id_assignatura, id_tema)
+      VALUES (?, NOW(), ?, ?, ?, ?)
+    `;
+  
+    db.query(sqlInsertTest, [nombreTest, llaveAcceso, idCreador, idAssignatura, idTema], (error, result) => {
+      if (error) {
+        console.error("Error al crear el test:", error);
+        return res.status(500).json({ Status: "Error al crear el test" });
+      }
+  
+      const idTest = result.insertId;
+  
+      const sqlGetQuestions = `
+        SELECT p.id_pregunta 
+        FROM preguntes p
+        JOIN preguntes_conceptes pc ON p.id_pregunta = pc.id_pregunta
+        WHERE p.id_tema = ? AND p.id_assignatura = ?
+        ORDER BY RAND() LIMIT 10
+      `;
+      
+      db.query(sqlGetQuestions, [idTema, idAssignatura], (error, questions) => {
+        if (error) {
+          console.error("Error al obtenir les preguntas:", error);
+          return res.json({ Status: "Error al obtenir les preguntas" });
+        }
+  
+        const sqlInsertTestQuestions = `
+          INSERT INTO test_preguntes (id_test, id_pregunta) VALUES ?
+        `;
+        
+        const questionsToInsert = questions.map(question => [idTest, question.id_pregunta]);
+        
+        db.query(sqlInsertTestQuestions, [questionsToInsert], (error) => {
+          if (error) {
+            console.error("Error al asociar las preguntas al test:", error);
+            return res.json({ Status: "Error al associar les preguntes al test" });
+          }
+          
+          return res.json({
+            Status: "Test generado correctamente",
+            llaveAcceso,
+            idTest,
+          });
+        });
+      });
+    });
+  });
+  
 
 
 //Funció de recuperació de deu preguntes random segons el paràmetres establerts per l'usuari
