@@ -6,7 +6,8 @@ import { useState } from "react";
 import ElementsCurs from "./ElementsCurs";
 import ElementsPreguntes from "./ElementsPreguntes";
 import ElementsParticipants from "./ElementsParticipants";
-import ElementsTestsProfessor from "./ElementsTestsProfessor";
+//import ElementsTestsProfessor from "./ElementsTestsProfessor";
+import ElementsTests from "./ElementsTests";
 
 function AssignaturaLayout() {
   const { id } = useParams(); //id de la ASSIGNATURA
@@ -19,7 +20,7 @@ function AssignaturaLayout() {
   const render = () => {
     switch (menuOption) {
       case "CURS":
-        return <ElementsCurs idAssignatura={id} />;
+        return <ElementsCurs idAssignatura={id} professorId={professorId} />;
       case "PARTICIPANTS":
         return <ElementsParticipants idAssignatura={id} />;
       case "PREGUNTES":
@@ -27,12 +28,7 @@ function AssignaturaLayout() {
           <ElementsPreguntes professorId={professorId} idAssignatura={id} />
         );
       case "TESTS":
-        return (
-          <ElementsTestsProfessor
-            professorId={professorId}
-            idAssignatura={id}
-          />
-        );
+        return <ElementsTests professorId={professorId} idAssignatura={id} />;
     }
   };
 

@@ -762,6 +762,57 @@ app.get('/recoverRandomTestQuestions', async (req, res) => {
 });
 
 
+app.get('/recoverPreguntesTema', (req, res) =>{
+
+    console.log("Here Am II");
+    const idTema = req.query.id_tema; 
+    console.log("ID Tema recibido en el backend:", idTema);
+
+    if (!idTema) {
+        console.error("ID Tema no proporcionado");
+        return res.status(400).json({ error: "ID Tema es requerido" });
+    }
+
+    const sql = 'SELECT * FROM preguntes WHERE id_tema = ?';
+    db.query(sql, [idTema], (error, result) => {
+        if (error) {
+            console.error("Error en la consulta:", error);
+            return res.status(500).json({ Status: "Failed" });
+        } else {
+            return res.json(result);
+        }
+    });
+
+
+
+})
+
+//Funció creació de test pel professor
+
+app.post('/createTest', async (req, res) => {
+    const { nom_test, id_creador, id_assignatura, idTema} = req.body;
+    const clau_acces = Math.random().toString(36).substr(2, 8);
+    const data_creacio = new Date();
+
+    parseInt(id_creador,10)
+    parseInt(id_assignatura,10)
+    parseInt(idTema,10)
+
+   console.log(id_creador);
+
+    const sql = ' INSERT INTO tests (nom_test, data_creacio, clau_acces, id_creador, id_assignatura, id_tema) VALUES (?, ?, ?, ?, ?, ?)';
+
+    db.query(sql, [nom_test, data_creacio, clau_acces, id_creador, id_assignatura, idTema ], (error, result) => {
+        if (error) {
+            console.error("Error en la consulta:", error);
+            return res.status(500).json({ Status: "Failed" });
+        } else {
+            return res.json(result);
+        }
+    });
+
+   
+});
 
 
 

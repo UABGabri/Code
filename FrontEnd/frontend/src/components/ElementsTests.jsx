@@ -67,11 +67,13 @@ function ElementsTests({ idAssignatura }) {
   }, [idAssignatura]);
 
   const handleSubmit = (e) => {
+    console.log("hOLAAAAAAAA");
     e.preventDefault();
-    const { tema, concepte, dificultat, id_Assignatura } = parametersTest;
+    const { tema, concepte, dificultat } = parametersTest;
 
-    if (!tema || !concepte || !dificultat || !id_Assignatura) {
+    if (!tema || !concepte || !dificultat) {
       setFormError("Sisplau, emplena tots els camps per continuar");
+
       return;
     }
 

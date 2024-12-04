@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import styles from "./StyleComponents/Elements.module.css"; // Asegúrate de importar el archivo CSS
+import styles from "./StyleComponents/Elements.module.css";
+import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 
-function ElementsCurs({ idAssignatura }) {
+function ElementsCurs({ idAssignatura, idProfessor }) {
   const [temes, setTemes] = useState([]);
   const [newTemaName, setNewTemaName] = useState("");
+  const navigate = useNavigate();
 
   const handleCreateTema = () => {
     if (!newTemaName.trim()) {
@@ -19,7 +22,10 @@ function ElementsCurs({ idAssignatura }) {
       })
       .then((response) => {
         if (response.data.success) {
-          setTemes([...temes, { nom_tema: newTemaName }]);
+          setTemes([
+            ...temes,
+            { id_tema: response.data.id_tema, nom_tema: newTemaName },
+          ]);
           setNewTemaName("");
         } else {
           alert("Error en crear el tema");
@@ -45,6 +51,17 @@ function ElementsCurs({ idAssignatura }) {
       });
   }, [idAssignatura]);
 
+  const handleCreateTest = (id_tema) => {
+    console.log(id_tema);
+    navigate("/professorparametres", {
+      state: {
+        idTema: id_tema,
+        id_assignatura: idAssignatura,
+        id_professor: idProfessor,
+      },
+    });
+  };
+
   return (
     <div className={styles.elementsCursContainer}>
       <h1 className={styles.elementsCursHeader}>Gestió de Temes</h1>
@@ -58,15 +75,18 @@ function ElementsCurs({ idAssignatura }) {
               <div className={styles.temaContent}>
                 <div className={styles.contingut}>
                   <h3 className={styles.temaSubtitle}>Contingut</h3>
-                  <p className={styles.temaDescription}>
-                    Contingut per al tema {tema.nom_tema}
-                  </p>
+                  <button>Afegir contingut pel {tema.nom_tema}</button>
                 </div>
                 <div className={styles.tests}>
-                  <h3 className={styles.temaSubtitle}>Tests</h3>
-                  <p className={styles.temaDescription}>
+                  <h3 className={styles.temaSubtitle}>
                     Tests per al tema {tema.nom_tema}
-                  </p>
+                  </h3>
+                  <button
+                    className={styles.buttonAddTest}
+                    onClick={() => handleCreateTest(tema.id_tema)}
+                  >
+                    Afegir test
+                  </button>
                 </div>
               </div>
             </div>
@@ -91,3 +111,8 @@ function ElementsCurs({ idAssignatura }) {
 }
 
 export default ElementsCurs;
+
+ElementsCurs.propTypes = {
+  idAssignatura: PropTypes.string.isRequired,
+  idProfessor: PropTypes.string.isRequired,
+};

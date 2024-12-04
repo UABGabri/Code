@@ -9,6 +9,7 @@ import Profile from "./components/Profile";
 import AssignaturaLayout from "./components/AssignaturaLayout";
 import AfegirPregunta from "./components/AfegirPregunta";
 import TestLayout from "./components/TestLayout";
+import ElementsTestsProfessor from "./components/ElementsTestsProfessor";
 
 function App() {
   return (
@@ -33,6 +34,10 @@ function App() {
         <Route path="/assignatura/:id" element={<AssignaturaLayout />} />
         <Route path="/afegirPregunta" element={<AfegirPregunta />}></Route>
         <Route path="/testlayout" element={<TestLayout />}></Route>
+        <Route
+          path="/professorparametres"
+          element={<ElementsTestsProfessor />}
+        ></Route>
       </Routes>
     </BrowserRouter>
   );

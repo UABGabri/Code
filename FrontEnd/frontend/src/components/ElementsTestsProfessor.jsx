@@ -1,166 +1,139 @@
 import styles from "./StyleComponents/Elements.module.css";
-import PropTypes from "prop-types";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Headercap from "./Headercap";
+import { BiArrowBack } from "react-icons/bi";
 
-function ElementsTests({ professorId, idAssignatura }) {
+function ElementsTests({}) {
+  const location = useLocation();
+  const idTema = location.state?.idTema;
+  const idProfessor = location.state?.id_professor;
+  const idAssignatura = location.state?.id_assignatura;
+
+  const [preguntes, setPreguntes] = useState([]);
+  const [selectedQuestions, setSelectedQuestions] = useState([]);
   const navigate = useNavigate();
-  const [temes, setTemes] = useState([]);
-  const [selectedTema, setSelectedTema] = useState("");
-  const [conceptes, setConceptes] = useState([]);
-  const [selectedConcepte, setSelectedConcepte] = useState("");
-  const [parametersTest, setParametersTest] = useState({
-    tema: "",
-    concepte: "",
-    dificultat: "",
-    id_Assignatura: idAssignatura,
-  });
-  const [formError, setFormError] = useState("");
+  const history = useNavigate();
 
-  // Recupera temes i conceptes
-  const recoverTemasAssignatura = () => {
+  useEffect(() => {
     axios
-      .get("http://localhost:8081/recoverElementsTest", {
-        params: { idAssignatura },
+      .get("http://localhost:8081/recoverPreguntesTema", {
+        params: { id_tema: idTema },
       })
-      .then((res) => {
-        const temas = res.data.map((item) => ({
-          id_tema: item.id_tema,
-          nom_tema: item.tema,
-          tots_els_conceptes: item.tots_els_conceptes
-            ? [
-                ...new Set(
-                  item.tots_els_conceptes
-                    .split(",")
-                    .map((concepto) => concepto.trim())
-                ),
-              ]
-            : [], // Si tots_els_conceptes es null o undefined, asigna un array buit per evitar la seva creació
-        }));
-        setTemes(temas);
+      .then((response) => {
+        setPreguntes(response.data);
       })
       .catch((error) => {
-        console.error("Error al recuperar els temes:", error);
+        console.error("Error al recuperar les preguntes:", error);
+        alert("Error al recuperar les preguntes.");
       });
+  }, []);
+
+  const handleCheckboxChange = (id_pregunta) => {
+    setSelectedQuestions((prevSelected) => {
+      if (prevSelected.includes(id_pregunta)) {
+        return prevSelected.filter((id) => id !== id_pregunta);
+      } else if (prevSelected.length < 10) {
+        return [...prevSelected, id_pregunta];
+      }
+      return prevSelected;
+    });
   };
 
-  // Actualitza els conceptes disponibles en seleccionar un tema
-  useEffect(() => {
-    if (selectedTema) {
-      const temaSeleccionado = temes.find(
-        (tema) => tema.nom_tema === selectedTema
-      );
-      if (temaSeleccionado) {
-        setConceptes(temaSeleccionado.tots_els_conceptes);
-      }
-    } else {
-      setConceptes([]);
-    }
-  }, [selectedTema, temes]);
-
-  // Recupera els temes en carregar el component
-  useEffect(() => {
-    if (idAssignatura) {
-      recoverTemasAssignatura();
-    }
-  }, [idAssignatura]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const { tema, concepte, dificultat, id_Assignatura } = parametersTest;
-
-    if (!tema || !concepte || !dificultat || !id_Assignatura) {
-      setFormError("Sisplau, emplena tots els camps per continuar");
+  //Funció de creació dels tests. No encuentra el id del usuario professor. Hay que resolverlo para que pueda añadir tests, luego en then ejecutar para añadir preguntas seleccinoadas
+  const handleCreateTest = () => {
+    if (selectedQuestions.length < 5) {
+      alert("Selecciona un mínim de 5 preguntes per crear el test.");
       return;
     }
 
-    setFormError("");
-    navigate("/testlayout", { state: { parametersTest } });
+    const testName = prompt("Introdueix el nom del test:");
+    if (!testName) {
+      alert("Has de proporcionar un nom per al test.");
+      return;
+    }
+
+    const id_creador = idProfessor;
+    const id_assignatura = idAssignatura;
+    console.log(id_creador);
+
+    axios
+      .post("http://localhost:8081/createTest", {
+        nom_test: testName,
+        id_creador,
+        id_assignatura,
+        idTema,
+      })
+      .then((response) => {
+        alert("Test creat correctament!");
+        return (
+          <ElementsTests
+            professorId={id_creador}
+            idAssignatura={id_assignatura}
+          />
+        );
+      })
+      .catch((error) => {
+        console.error("Error al crear el test:", error);
+        alert("Hi ha hagut un error al crear el test. Torna-ho a intentar.");
+      });
   };
 
   return (
     <div>
-      <div className={styles.quizzContainerTitle}>
-        <h1 className={styles.titleGenerator}>GENERADOR DE TESTS</h1>
-        <div className={styles.quizzContainerBody}>
-          <form onSubmit={handleSubmit}>
-            <label htmlFor="tema">Tema:</label>
-            <select
-              id="tema"
-              name="id_tema"
-              value={selectedTema}
-              onChange={(e) => {
-                const tema = e.target.value;
-                setSelectedTema(tema);
-                setParametersTest((prevState) => ({
-                  ...prevState,
-                  tema: tema,
-                }));
-              }}
-            >
-              <option value="">Selecciona un tema</option>
-              {temes.map((tema) => (
-                <option key={tema.id_tema} value={tema.nom_tema}>
-                  {tema.nom_tema}
-                </option>
-              ))}
-            </select>
+      <Headercap />
+      <header className={styles.headerSubject}>
+        <BiArrowBack onClick={() => history(-1)} className={styles.backArrow} />
+      </header>
 
-            <label htmlFor="conceptes">Conceptes:</label>
-            <select
-              id="conceptes"
-              name="conceptes"
-              value={selectedConcepte}
-              onChange={(e) => {
-                const concepte = e.target.value;
-                setSelectedConcepte(concepte);
-                setParametersTest((prevState) => ({
-                  ...prevState,
-                  concepte: concepte,
-                }));
-              }}
-            >
-              <option value="">Selecciona un concepte</option>
-              {conceptes.map((concepte, index) => (
-                <option key={index} value={concepte}>
-                  {concepte}
-                </option>
-              ))}
-            </select>
-
-            <label htmlFor="dificultat">Dificultat:</label>
-            <select
-              id="dificultat"
-              name="dificultat"
-              value={parametersTest.dificultat}
-              onChange={(e) => {
-                const dificultat = e.target.value;
-                setParametersTest((prevState) => ({
-                  ...prevState,
-                  dificultat: dificultat,
-                }));
-              }}
-            >
-              <option value="">Selecciona una dificultat</option>
-              <option value="Fàcil">Fàcil</option>
-              <option value="Mitjà">Mitjà</option>
-              <option value="Difícil">Difícil</option>
-            </select>
-
-            {formError && <p className={styles.error}>{formError}</p>}
-
-            <button type="submit">Generar Test</button>
-          </form>
+      <div className={styles.questionsContainerTeacher}>
+        <button
+          className={styles.createTestButton}
+          onClick={handleCreateTest}
+          disabled={selectedQuestions.length < 5}
+        >
+          Crear Test
+        </button>
+        <div className={styles.questionsList}>
+          {preguntes.length === 0 ? (
+            <p>No hi ha preguntes disponibles per a aquest tema.</p>
+          ) : (
+            preguntes.map((question) => (
+              <div key={question.id_pregunta} className={styles.questionCard}>
+                <div className={styles.questionDetails}>
+                  <p>
+                    <strong>Autor:</strong> {question.id_creador}
+                  </p>
+                  <p>
+                    <strong>Tema:</strong> {question.nom_tema}
+                  </p>
+                  <p>
+                    <strong>Dificultat:</strong> {question.dificultat}
+                  </p>
+                  <p>
+                    <strong>Pregunta:</strong> {question.pregunta}
+                  </p>
+                  <p>
+                    <strong>Solució:</strong> {question.solucio_correcta}
+                  </p>
+                </div>
+                <div className={styles.checkboxContainer}>
+                  <input
+                    type="checkbox"
+                    checked={selectedQuestions.includes(question.id_pregunta)}
+                    onChange={() => handleCheckboxChange(question.id_pregunta)}
+                  />
+                  <label>Seleccionar</label>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
   );
 }
-
-ElementsTests.propTypes = {
-  idAssignatura: PropTypes.string.isRequired,
-  professorId: PropTypes.number.isRequired,
-};
 
 export default ElementsTests;
