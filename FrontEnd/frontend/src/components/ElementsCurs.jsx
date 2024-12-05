@@ -80,6 +80,7 @@ function ElementsCurs({ idAssignatura, professorId }) {
     setShowModal(true);
   };
 
+  //Seguent pas -> crear a partit del Id del test el layout. Fer demà
   const handleAccessKeySubmit = () => {
     axios
       .post("http://localhost:8081/validateTestAccess", {
