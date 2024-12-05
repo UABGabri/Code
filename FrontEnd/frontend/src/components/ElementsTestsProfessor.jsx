@@ -42,7 +42,6 @@ function ElementsTests({}) {
     });
   };
 
-  //Funció de creació dels tests. No encuentra el id del usuario professor. Hay que resolverlo para que pueda añadir tests, luego en then ejecutar para añadir preguntas seleccinoadas
   const handleCreateTest = () => {
     if (selectedQuestions.length < 5) {
       alert("Selecciona un mínim de 5 preguntes per crear el test.");
@@ -57,7 +56,6 @@ function ElementsTests({}) {
 
     const id_creador = idProfessor;
     const id_assignatura = idAssignatura;
-    console.log(id_creador);
 
     axios
       .post("http://localhost:8081/createTest", {

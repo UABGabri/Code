@@ -4,7 +4,7 @@ import styles from "./StyleComponents/Elements.module.css";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
-function ElementsCurs({ idAssignatura, idProfessor }) {
+function ElementsCurs({ idAssignatura, professorId }) {
   const [temes, setTemes] = useState([]);
   const [newTemaName, setNewTemaName] = useState("");
   const navigate = useNavigate();
@@ -52,12 +52,11 @@ function ElementsCurs({ idAssignatura, idProfessor }) {
   }, [idAssignatura]);
 
   const handleCreateTest = (id_tema) => {
-    console.log(id_tema);
     navigate("/professorparametres", {
       state: {
         idTema: id_tema,
         id_assignatura: idAssignatura,
-        id_professor: idProfessor,
+        id_professor: professorId,
       },
     });
   };
@@ -65,6 +64,7 @@ function ElementsCurs({ idAssignatura, idProfessor }) {
   return (
     <div className={styles.elementsCursContainer}>
       <h1 className={styles.elementsCursHeader}>Gestió de Temes</h1>
+
       <div className={styles.temesLista}>
         {temes.length === 0 ? (
           <p className={styles.noTemes}>No hi ha temes creats</p>
@@ -113,6 +113,6 @@ function ElementsCurs({ idAssignatura, idProfessor }) {
 export default ElementsCurs;
 
 ElementsCurs.propTypes = {
+  professorId: PropTypes.number.isRequired,
   idAssignatura: PropTypes.string.isRequired,
-  idProfessor: PropTypes.string.isRequired,
 };

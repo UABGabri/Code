@@ -13,6 +13,7 @@ function AssignaturaLayout() {
   const { id } = useParams(); //id de la ASSIGNATURA
   const location = useLocation();
   const { name, professorId } = location.state;
+  const idUser = parseInt(location.state.professorId);
   const history = useNavigate();
   const [menuOption, setMenuOption] = useState("CURS");
 
@@ -20,7 +21,7 @@ function AssignaturaLayout() {
   const render = () => {
     switch (menuOption) {
       case "CURS":
-        return <ElementsCurs idAssignatura={id} professorId={professorId} />;
+        return <ElementsCurs professorId={professorId} idAssignatura={id} />;
       case "PARTICIPANTS":
         return <ElementsParticipants idAssignatura={id} />;
       case "PREGUNTES":
