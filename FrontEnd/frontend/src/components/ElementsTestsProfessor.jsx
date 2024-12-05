@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Headercap from "./Headercap";
 import { BiArrowBack } from "react-icons/bi";
+import ElementsCurs from "./ElementsCurs";
 
 function ElementsTests({}) {
   const location = useLocation();
@@ -42,6 +43,7 @@ function ElementsTests({}) {
     });
   };
 
+  //Funció de creació dels tests a la base de dades. Forma seqüencial: 1r tests, després preguntes_test
   const handleCreateTest = () => {
     if (selectedQuestions.length < 5) {
       alert("Selecciona un mínim de 5 preguntes per crear el test.");
@@ -66,12 +68,20 @@ function ElementsTests({}) {
       })
       .then((response) => {
         alert("Test creat correctament!");
-        return (
-          <ElementsTests
-            professorId={id_creador}
-            idAssignatura={id_assignatura}
-          />
-        );
+        const idTest = parseInt(response.data.id_test);
+
+        axios
+          .post("http://localhost:8081/insertQuestionsTest", {
+            id_test: idTest,
+            questions: selectedQuestions,
+          })
+          .then((response) => {
+            history(-1);
+          })
+          .catch((error) => {
+            console.error("Error al insertar les preguntes:", error);
+            alert("Error al recuperar les preguntes.");
+          });
       })
       .catch((error) => {
         console.error("Error al crear el test:", error);

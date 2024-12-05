@@ -6,7 +6,11 @@ import PropTypes from "prop-types";
 
 function ElementsCurs({ idAssignatura, professorId }) {
   const [temes, setTemes] = useState([]);
+  const [tests, setTests] = useState({});
   const [newTemaName, setNewTemaName] = useState("");
+  const [selectedTest, setSelectedTest] = useState(null);
+  const [accessKey, setAccessKey] = useState("");
+  const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
 
   const handleCreateTema = () => {
@@ -51,6 +55,58 @@ function ElementsCurs({ idAssignatura, professorId }) {
       });
   }, [idAssignatura]);
 
+  useEffect(() => {
+    temes.forEach((tema) => {
+      axios
+        .get("http://localhost:8081/recoverTestsTema", {
+          params: { id_tema: tema.id_tema },
+        })
+        .then((response) => {
+          if (response.data.status === "Success") {
+            setTests((prevTests) => ({
+              ...prevTests,
+              [tema.id_tema]: response.data.result,
+            }));
+          }
+        })
+        .catch((error) => {
+          console.error("Error al recuperar els tests:", error);
+        });
+    });
+  }, [temes]);
+
+  const handleTestClick = (test) => {
+    setSelectedTest(test);
+    setShowModal(true);
+  };
+
+  const handleAccessKeySubmit = () => {
+    axios
+      .post("http://localhost:8081/validateTestAccess", {
+        id_test: selectedTest.id_test,
+        access_key: accessKey,
+      })
+      .then((response) => {
+        if (response.data.status === "Success") {
+          setShowModal(false);
+          navigate("/realizarTest", {
+            state: { idTest: selectedTest.id_test },
+          });
+        } else {
+          alert("La clau d'accés és incorrecta. Torna-ho a intentar.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error validant la clau d'accés:", error);
+        alert("Hi ha hagut un error al validar la clau d'accés.");
+      });
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setAccessKey("");
+  };
+
   const handleCreateTest = (id_tema) => {
     navigate("/professorparametres", {
       state: {
@@ -81,12 +137,31 @@ function ElementsCurs({ idAssignatura, professorId }) {
                   <h3 className={styles.temaSubtitle}>
                     Tests per al tema {tema.nom_tema}
                   </h3>
-                  <button
-                    className={styles.buttonAddTest}
-                    onClick={() => handleCreateTest(tema.id_tema)}
-                  >
-                    Afegir test
-                  </button>
+
+                  <div className={styles.testList}>
+                    {tests[tema.id_tema] && tests[tema.id_tema].length > 0 ? (
+                      <ul>
+                        {tests[tema.id_tema].map((test) => (
+                          <li
+                            key={test.id_test}
+                            className={styles.testItem}
+                            onClick={() => handleTestClick(test)}
+                          >
+                            {test.nom_test}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p>No hi ha tests per aquest tema.</p>
+                    )}
+
+                    <button
+                      className={styles.buttonAddTest}
+                      onClick={() => handleCreateTest(tema.id_tema)}
+                    >
+                      Afegir test
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -106,6 +181,35 @@ function ElementsCurs({ idAssignatura, professorId }) {
           Afegir Tema
         </button>
       </div>
+
+      {showModal && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            <h2>Introdueix la clau accés</h2>
+            <input
+              type="password"
+              value={accessKey}
+              onChange={(e) => setAccessKey(e.target.value)}
+              className={styles.modalInput}
+              placeholder="Clau d'accés"
+            />
+            <div className={styles.modalActions}>
+              <button
+                onClick={handleAccessKeySubmit}
+                className={styles.modalButton}
+              >
+                Validar
+              </button>
+              <button
+                onClick={handleCloseModal}
+                className={styles.modalButtonCancel}
+              >
+                Cancel·lar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

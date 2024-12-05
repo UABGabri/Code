@@ -770,14 +770,14 @@ app.get('/recoverPreguntesTema', (req, res) =>{
 
     if (!idTema) {
         console.error("ID Tema no proporcionat");
-        return res.status(400).json({ error: "ID Tema es requerit" });
+        return res.json({ error: "ID Tema es requerit" });
     }
 
     const sql = 'SELECT * FROM preguntes WHERE id_tema = ?';
     db.query(sql, [idTema], (error, result) => {
         if (error) {
             console.error("Error a la consulta:", error);
-            return res.status(500).json({ Status: "Failed" });
+            return res.json({ Status: "Failed" });
         } else {
             return res.json(result);
         }
@@ -803,9 +803,9 @@ app.post('/createTest', async (req, res) => {
     db.query(sql, [nom_test, data_creacio, clau_acces, id_creador, id_assignatura, idTema ], (error, result) => {
         if (error) {
             console.error("Error en la consulta:", error);
-            return res.status(500).json({ Status: "Failed" });
+            return res.json({ Status: "Failed" });
         } else {
-            return res.json(result);
+            return res.json({success: true, id_test: result.insertId} );
         }
     });
 
@@ -813,6 +813,70 @@ app.post('/createTest', async (req, res) => {
 });
 
 
+app.post('/insertQuestionsTest', (req, res) => {
+
+    const idTest = req.body.id_test;
+    parseInt(idTest);
+    const preguntesTest = req.body.questions;
+
+    const sql = 'INSERT INTO test_preguntes (id_test, id_pregunta) VALUES ?';
+
+    const values = preguntesTest.map((idPregunta) => [idTest, idPregunta]);
+
+    db.query(sql, [values], (error, result) => {
+        if (error) {
+            console.error("Error a la consulta:", error);
+            return res.status(500).json({ status: "Failed" });
+        } else {
+            return res.json({ status: "Success", result });
+        }
+    });
+});
+
+
+app.get('/recoverTestsTema', (req, res) =>{
+
+
+const idTema = req.query.id_tema;
+
+parseInt(idTema, 10);
+const sql = 'SELECT id_test, nom_test FROM tests WHERE id_tema = ?'
+
+db.query(sql, [idTema], (error, result) => {
+    if (error) {
+        console.error("Error a la consulta:", error);
+        return res.json({ status: "Failed" });
+    } else {
+        return res.json({ status: "Success", result });
+    }
+});
+
+})
+
+
+//Funció per validar clau accés a Test
+app.post('/validateTestAccess', (req, res) => {
+
+    const { id_test, access_key } = req.body;
+
+
+
+
+    const sql = 'SELECT id_test FROM tests WHERE id_test = ? AND clau_acces = ?';
+
+    db.query(sql, [id_test, access_key], (error, results) => {
+        if (error) {
+            console.error("Error a la consulta:", error);
+            return res.json({ status: "Failed", message: "Error del servidor." });
+        }
+
+        if (results.length > 0) {
+            return res.json({ status: "Success", message: "Clau d'accés vàlida." });
+        } else {
+            return res.json({ status: "Failed", message: "Clau d'accés incorrecta." });
+        }
+    });
+});
 
 
 

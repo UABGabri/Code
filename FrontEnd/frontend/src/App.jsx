@@ -10,6 +10,7 @@ import AssignaturaLayout from "./components/AssignaturaLayout";
 import AfegirPregunta from "./components/AfegirPregunta";
 import TestLayout from "./components/TestLayout";
 import ElementsTestsProfessor from "./components/ElementsTestsProfessor";
+import TestWithKey from "./components/TestWithKey";
 
 function App() {
   return (
@@ -38,6 +39,8 @@ function App() {
           path="/professorparametres"
           element={<ElementsTestsProfessor />}
         ></Route>
+
+        <Route path="/realizarTest" element={<TestWithKey />}></Route>
       </Routes>
     </BrowserRouter>
   );
