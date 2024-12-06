@@ -90,7 +90,7 @@ function ElementsCurs({ idAssignatura, professorId }) {
       .then((response) => {
         if (response.data.status === "Success") {
           setShowModal(false);
-          navigate("/realizarTest", {
+          navigate("/realitzartest", {
             state: { idTest: selectedTest.id_test },
           });
         } else {

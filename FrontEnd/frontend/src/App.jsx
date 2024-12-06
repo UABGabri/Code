@@ -40,7 +40,7 @@ function App() {
           element={<ElementsTestsProfessor />}
         ></Route>
 
-        <Route path="/realizarTest" element={<TestWithKey />}></Route>
+        <Route path="/realitzartest" element={<TestWithKey />}></Route>
       </Routes>
     </BrowserRouter>
   );

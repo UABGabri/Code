@@ -718,6 +718,11 @@ app.get('/recoverRandomTestQuestions', async (req, res) => {
         });
     };
 
+
+
+
+
+
     const getConcepteId = () => {
         return new Promise((resolve, reject) => {
             db.query(sqlGetConcepteId, [concepte], (err, result) => {
@@ -761,6 +766,29 @@ app.get('/recoverRandomTestQuestions', async (req, res) => {
     }
 });
 
+
+
+
+app.get('/recoverSelectedTestWithKeyQuestions', (req, res) =>{
+
+
+    const idTest = parseInt(req.query.idTest);
+ 
+    
+    const sql = 'SELECT p.id_pregunta,p.pregunta,p.solucio_correcta,solucio_erronia1,solucio_erronia2, solucio_erronia3 FROM test_preguntes pt JOIN preguntes p ON pt.id_pregunta = p.id_pregunta WHERE pt.id_test = ?';
+    
+    
+
+    db.query(sql, [idTest], (error, result) => {
+        if (error) {
+            console.error("Error a la consulta:", error);
+            return res.json({ status: "Failed", error });
+        }
+        res.json({ status: "Success", Preguntes:result });
+    });
+
+
+})
 
 app.get('/recoverPreguntesTema', (req, res) =>{
 
@@ -858,8 +886,6 @@ db.query(sql, [idTema], (error, result) => {
 app.post('/validateTestAccess', (req, res) => {
 
     const { id_test, access_key } = req.body;
-
-
 
 
     const sql = 'SELECT id_test FROM tests WHERE id_test = ? AND clau_acces = ?';
