@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 
 function TestWithKey() {
   const location = useLocation();
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
+  const history = useNavigate();
   const [preguntes, setPreguntes] = useState([]);
   const [respostesBarrejades, setRespostesBarrejades] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -13,7 +14,6 @@ function TestWithKey() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showResults, setShowResults] = useState(false);
-
   const { idTest } = location.state || {};
 
   useEffect(() => {
@@ -22,7 +22,6 @@ function TestWithKey() {
         params: { idTest },
       })
       .then((response) => {
-        console.log(response.data.Preguntes);
         setPreguntes(response.data.Preguntes);
         setRespostesBarrejades(
           response.data.Preguntes.map((pregunta) => barrejarRespostes(pregunta))
@@ -45,8 +44,8 @@ function TestWithKey() {
     return respostes.sort(() => Math.random() - 0.5);
   };
 
-  const seleccionarResposta = (resposta) => {
-    setSelectedAnswers({ ...selectedAnswers, [currentIndex]: resposta });
+  const seleccionarResposta = (respostaUnica) => {
+    setSelectedAnswers({ ...selectedAnswers, [currentIndex]: respostaUnica });
   };
 
   const anarSeguent = () => {
@@ -64,11 +63,16 @@ function TestWithKey() {
   };
 
   const calcularResultats = () => {
-    const correctes = preguntes.filter(
-      (pregunta, index) => selectedAnswers[index] === pregunta.solucio_correcta
-    ).length;
+    const correctes = preguntes.filter((pregunta, index) => {
+      const respostaUnica = selectedAnswers[index];
+      const respostaSeleccionada = respostaUnica?.split("-")[0];
+      return respostaSeleccionada === pregunta.solucio_correcta;
+    }).length;
+
     const incorrectes = preguntes.length - correctes;
-    return { correctes, incorrectes };
+    const percentatge = ((correctes / preguntes.length) * 100).toFixed(2);
+
+    return { correctes, incorrectes, percentatge };
   };
 
   if (loading) {
@@ -80,21 +84,24 @@ function TestWithKey() {
   }
 
   if (respostesBarrejades.length === 0 || preguntes.length === 0) {
-    return <p>No s'han trobat preguntes per aquest test.</p>;
+    return <p>No han trobat preguntes per aquest test.</p>;
   }
 
   if (showResults) {
-    const { correctes, incorrectes } = calcularResultats();
+    const { correctes, incorrectes, percentatge } = calcularResultats();
     return (
       <div className={styles.containerQuizz}>
-        <h1>Resultats</h1>
-        <p>Correctes: {correctes}</p>
-        <p>Incorrectes: {incorrectes}</p>
-        <div className={styles.resultButtons}>
-          <button onClick={() => window.location.reload()}>Reiniciar</button>
-          <button onClick={() => navigate("/modules")}>
-            Tornar a la pàgina principal
-          </button>
+        <div className={styles.resultsBox}>
+          <h1>Resultats</h1>
+          <p>Correctes: {correctes}</p>
+          <p>Incorrectes: {incorrectes}</p>
+          <p>Nota: {percentatge}%</p>{" "}
+          <div className={styles.resultButtons}>
+            <button onClick={() => window.location.reload()}>Reiniciar</button>
+            <button onClick={() => history(-1)}>
+              Tornar a la pàgina principal
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -104,35 +111,36 @@ function TestWithKey() {
 
   return (
     <div className={styles.containerQuizz}>
-      <h1>Formulari</h1>
-      <hr />
-      <h2>
-        Pregunta {currentIndex + 1} de {preguntes.length}
-      </h2>
-      <p>{preguntes[currentIndex].pregunta}</p>
-      <ul>
-        {respostesActuals.map((resposta, index) => (
-          <li key={index}>
-            <label>
-              <input
-                type="radio"
-                name={`pregunta-${currentIndex}`}
-                value={resposta}
-                checked={selectedAnswers[currentIndex] === resposta}
-                onChange={() => seleccionarResposta(resposta)}
-              />
+      <div className={styles.containerElements}>
+        <h1>Formulari</h1>
+        <hr />
+        <p className={styles.pregunta}>{preguntes[currentIndex].pregunta}</p>
+        <ul className={styles.llistaRespostes}>
+          {respostesActuals.map((resposta, index) => (
+            <li
+              key={index}
+              className={
+                selectedAnswers[currentIndex] === `${resposta}-${index}`
+                  ? styles.selected
+                  : ""
+              }
+              onClick={() => seleccionarResposta(`${resposta}-${index}`)}
+            >
               {resposta}
-            </label>
-          </li>
-        ))}
-      </ul>
-      <div>
-        <button onClick={anarAnterior} disabled={currentIndex === 0}>
-          Anterior
-        </button>
-        <button onClick={anarSeguent}>
-          {currentIndex === preguntes.length - 1 ? "Entregar" : "Següent"}
-        </button>
+            </li>
+          ))}
+        </ul>
+        <p className={styles.contadorPreguntes}>
+          Pregunta {currentIndex + 1} de {preguntes.length}
+        </p>
+        <div className={styles.botonsAccio}>
+          <button onClick={anarAnterior} disabled={currentIndex === 0}>
+            Anterior
+          </button>
+          <button onClick={anarSeguent}>
+            {currentIndex === preguntes.length - 1 ? "Entregar" : "Següent"}
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -132,6 +132,29 @@ app.get('/', verifyUser, (req, res) => {
 });
 
 
+app.get("/checkUserExists", async (req, res) => {
+
+
+
+    const { niu } = req.query;
+
+    console.log(niu);
+    /*
+    try {
+      const [result] = await db.query("SELECT COUNT(*) AS count FROM usuaris WHERE niu = ?", [niu]);
+      if (result[0].count > 0) {
+        res.json({ exists: true });
+      } else {
+        res.json({ exists: false });
+      }
+    } catch (error) {
+      console.error("Error checking user existence:", error);
+      res.status(500).json({ message: "Error verifying user existence" });
+    }
+      */
+  });
+  
+
 //Funció per fer un logout eliminant les possibles cookies
 app.get('/logout', (req, res) => {
 
@@ -591,6 +614,52 @@ app.get('/recoverAtendees', (req, res) =>{
             return res.json(result); 
           }
     })
+
+
+})
+
+
+app.post('/addAtendee', (req, res) =>{
+
+    const id_alumne = req.body.id;
+    const assignatura = req.body.idAssignatura;
+
+    const sql = 'INSERT INTO alumnes_assignatures (id_alumne, id_assignatura) VALUES (?,?)'
+
+    db.query(sql,[id_alumne, assignatura], (error, result)=>{
+
+        if (error) {
+            
+            console.error("Error en la consulta:", error);
+            return res.json({ Status: "Failed" });
+          } else {
+       
+            return res.json(result); 
+          }
+    })
+
+})
+
+
+app.delete('/eliminateAtendee', (req,res)=>{
+
+    id_participant = req.query.id;
+
+
+    const sql = `DELETE FROM alumnes_assignatures WHERE id_alumne = ?`
+
+    db.query(sql,[id_participant], (error, result)=>{
+
+            if (error) {
+                
+                console.error("Error en la consulta:", error);
+                return res.json({ Status: "Failed" });
+            } else {
+        
+                return res.json(result); 
+            }
+        })
+
 
 
 })

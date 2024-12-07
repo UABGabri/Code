@@ -5,7 +5,7 @@
    justify-content: center;
    align-items: center;
    height: 100vh;
-   background-color: #f0f0f0;
+   background-image: linear-gradient(white, green);
  }
  
  .containerElements {
@@ -23,6 +23,12 @@
    text-align: center;
  }
  
+ .containerElements hr{
+
+   height: 2px;
+   border: none;
+   background-color: black;
+ }
  .containerElements ul {
    width: 100%;
    padding: 0;
@@ -43,9 +49,9 @@
  }
  
  .containerElements ul li.selected {
-   background-color: #007bff;
+   background-color: black;
    color: white;
-   border-color: #007bff;
+   border-color: black;
  }
  
  .containerElements ul li:hover {
@@ -57,7 +63,9 @@
  }
  
  .containerElements button {
-   padding: 10px 15px;
+   
+   margin: 10px;
+   padding: 10px 50px;
    border: none;
    border-radius: 5px;
    font-size: 16px;
@@ -71,11 +79,72 @@
  }
  
  .containerElements button:not(:disabled) {
-   background-color: #007bff;
+   background-color: black;   
    color: white;
  }
  
  .containerElements button:not(:disabled):hover {
-   background-color: #0056b3;
+   background-color: green;
+ }
+ 
+
+
+ .resultsBox {
+   width: 90%;
+   max-width: 500px;
+   background-color: white;
+   padding: 30px 40px;
+   border-radius: 12px;
+   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+   text-align: center;
+   margin-top: 30px;
+ }
+ 
+ .resultBox h1 {
+   font-size: 2rem;
+   margin-bottom: 20px;
+ }
+ 
+ .resultBox p {
+   font-size: 1.2rem;
+   margin-bottom: 15px;
+ }
+ 
+ .resultBox .nota {
+   font-size: 1.5rem;
+   font-weight: bold;
+   color: #4CAF50;
+   margin-top: 15px;
+ }
+ 
+  .resultButtons {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   gap: 20px;
+   margin-top: 20px;
+   
+
+ }
+ 
+ .resultBox .customButton {
+   padding: 10px 25px;
+   background-color: #4CAF50;
+   border: none;
+   color: white;
+   font-size: 1rem;
+   cursor: pointer;
+   border-radius: 6px;
+   transition: background-color 0.3s ease;
+   
+ }
+ 
+ .resultBox .customButton:hover {
+   background-color: #45a049;
+ }
+ 
+ .resultBox .customButton:disabled {
+   background-color: #ccc;
+   cursor: not-allowed;
  }
  

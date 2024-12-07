@@ -66,13 +66,14 @@ function TestLayout() {
   const calcularResultats = () => {
     const correctes = preguntes.filter((pregunta, index) => {
       const respostaUnica = selectedAnswers[index];
-      const respostaSeleccionada = respostaUnica?.split("-")[0]; // Extrae solo el texto
+      const respostaSeleccionada = respostaUnica?.split("-")[0];
       return respostaSeleccionada === pregunta.solucio_correcta;
     }).length;
 
     const incorrectes = preguntes.length - correctes;
+    const percentatge = ((correctes / preguntes.length) * 100).toFixed(2);
 
-    return { correctes, incorrectes };
+    return { correctes, incorrectes, percentatge };
   };
 
   if (loading) {
@@ -80,17 +81,20 @@ function TestLayout() {
   }
 
   if (showResults) {
-    const { correctes, incorrectes } = calcularResultats();
+    const { correctes, incorrectes, percentatge } = calcularResultats();
     return (
       <div className={styles.containerQuizz}>
-        <h1>Resultats</h1>
-        <p>Correctes: {correctes}</p>
-        <p>Incorrectes: {incorrectes}</p>
-        <div className={styles.resultButtons}>
-          <button onClick={() => window.location.reload()}>Reiniciar</button>
-          <button onClick={() => history(-1)}>
-            Tornar a la pàgina principal
-          </button>
+        <div className={styles.resultsBox}>
+          <h1>Resultats</h1>
+          <p>Correctes: {correctes}</p>
+          <p>Incorrectes: {incorrectes}</p>
+          <p>Nota: {percentatge}%</p>{" "}
+          <div className={styles.resultButtons}>
+            <button onClick={() => window.location.reload()}>Reiniciar</button>
+            <button onClick={() => history(-1)}>
+              Tornar a la pàgina principal
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -101,8 +105,8 @@ function TestLayout() {
   return (
     <div className={styles.containerQuizz}>
       <div className={styles.containerElements}>
-        <h1>Formulari</h1>
-        <hr />
+        <h1>Qüestionari de Pràctica</h1>
+
         <p className={styles.pregunta}>{preguntes[currentIndex].pregunta}</p>
         <ul className={styles.llistaRespostes}>
           {respostesActuals.map((resposta, index) => (

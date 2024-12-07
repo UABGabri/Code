@@ -101,33 +101,123 @@
 
   /*SECCIO PARTICIPANTS*/
 
-  .participantContainer {
-    width: 100vw;
-    height: 100vh;
-    top: 0;
-    left: 0;
-    right: 0;
-    padding-top: 200px; 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 30px;
-  }
-  
+
+
+.participantContainer {
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding-top: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+}
 
 .participantCard {
-    width: 50%;
-    background-color: #f9f9f9;
-    padding: 15px;
-    margin-bottom: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  width: 50%;
+  background-color: #f9f9f9;
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .participantDetails p {
-    margin: 5px 0;
+  margin: 5px 0;
 }
+
+.deleteButton {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+
+.addParticipantButton {
+  padding: 10px 20px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.addParticipantButton:hover {
+  background-color: #45a049;
+}
+
+.modalBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: white;
+  padding: 20px 30px;
+  border-radius: 10px;
+  text-align: center;
+  width: 400px;
+}
+
+.modalContent h2 {
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.inputField {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.modalActions button {
+  padding: 10px 15px;
+  margin: 0 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.modalActions button:first-child {
+  background-color: #4caf50;
+  color: white;
+}
+
+.modalActions button:first-child:hover {
+  background-color: #45a049;
+}
+
+.modalActions button:last-child {
+  background-color: #ff4d4f;
+  color: white;
+}
+
+.modalActions button:last-child:hover {
+  background-color: #e04343;
+}
+
 /*FI SECCIO PARTICIPANT*/
 
 
@@ -369,4 +459,8 @@
     margin-bottom: 30px;
 
 }
+
+
+
+
 /*FI SECCIÓ TEST PROFESSOR*/
