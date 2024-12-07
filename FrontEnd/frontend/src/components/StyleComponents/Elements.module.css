@@ -134,12 +134,25 @@
   margin: 5px 0;
 }
 
-.deleteButton {
+.deleteButtonParticipant {
   position: absolute;
   top: 10px;
   right: 15px;
   font-weight: bold;
   cursor: pointer;
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+ 
+.deleteButtonParticipant:hover {
+  background-color: darkred;
 }
 
 

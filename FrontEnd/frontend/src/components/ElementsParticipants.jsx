@@ -53,6 +53,8 @@ function ElementsParticipants({ idAssignatura }) {
               setShowModal(false);
               setNewNiu("");
               alert("Participant afegit correctament!");
+              setShowModal(false);
+              window.location.reload();
             })
             .catch((err) => {
               console.error("Error a l'afegir el participant:", err);
@@ -66,6 +68,8 @@ function ElementsParticipants({ idAssignatura }) {
         console.error("Error a la verificació del NIU:", err);
         alert("Hi ha hagut un error al verificar el NIU.");
       });
+
+    setShowModal(false);
   };
 
   return (
@@ -85,7 +89,7 @@ function ElementsParticipants({ idAssignatura }) {
               </p>
             </div>
             <div
-              className={styles.deleteButton}
+              className={styles.deleteButtonParticipant}
               onClick={() => handleEliminateParticipant(user.niu)}
             >
               Eliminar

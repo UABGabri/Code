@@ -132,27 +132,9 @@ app.get('/', verifyUser, (req, res) => {
 });
 
 
-app.get("/checkUserExists", async (req, res) => {
 
-
-
-    const { niu } = req.query;
-
-    console.log(niu);
-    /*
-    try {
-      const [result] = await db.query("SELECT COUNT(*) AS count FROM usuaris WHERE niu = ?", [niu]);
-      if (result[0].count > 0) {
-        res.json({ exists: true });
-      } else {
-        res.json({ exists: false });
-      }
-    } catch (error) {
-      console.error("Error checking user existence:", error);
-      res.status(500).json({ message: "Error verifying user existence" });
-    }
-      */
-  });
+  
+  
   
 
 //Funció per fer un logout eliminant les possibles cookies
@@ -619,11 +601,40 @@ app.get('/recoverAtendees', (req, res) =>{
 })
 
 
+
+/*REPASSAR AQUÍ PERQUE NO FUNCIONA*/ 
+app.get("/checkUserExists", async (req, res) => {
+    const { niu } = req.query;
+  
+    try {
+      const [userResult] = await db.query("SELECT COUNT(*) AS count FROM usuaris WHERE niu = ?", [niu]);
+  
+      if (userResult.count === 0) {
+        return res.json({ exists: false, message: "Usuari no trobat" });
+      }
+  
+      const [assignmentResult] = await db.query(
+        "SELECT COUNT(*) AS count FROM alumnes_assignatures WHERE niu = ?",
+        [niu]
+      );
+  
+      if (assignmentResult.count > 0) {
+        return res.json({ exists: false, message: "Usuari ja registrat en aquesta assignatura" });
+      }
+  
+      return res.json({ exists: true, message: "Usuari disponible per registrar-se a l'assignatura" });
+    } catch (error) {
+      res.status(500).json({ message: "Error intern del servidor" });
+    }
+  });
+
+
 app.post('/addAtendee', (req, res) =>{
 
     const id_alumne = req.body.id;
     const assignatura = req.body.idAssignatura;
 
+    console.log(id_alumne, assignatura)
     const sql = 'INSERT INTO alumnes_assignatures (id_alumne, id_assignatura) VALUES (?,?)'
 
     db.query(sql,[id_alumne, assignatura], (error, result)=>{
