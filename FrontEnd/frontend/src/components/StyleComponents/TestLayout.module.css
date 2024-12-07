@@ -1,13 +1,81 @@
-.containerQuizz{
-   width: 100vh;
-   margin: auto;
-   margin-top: 150px;
-   background:white;
-   color:black;
+.containerQuizz {
+   position: relative;
+   width: 100vw;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   height: 100vh;
+   background-color: #f0f0f0;
+ }
+ 
+ .containerElements {
+   width: 80%;
+   max-width: 600px;
+   background: white;
+   color: black;
    display: flex;
    flex-direction: column;
+   align-items: center;
    gap: 20px;
    border-radius: 10px;
-   padding:40px 50px;
-}
-
+   padding: 40px 50px;
+   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+   text-align: center;
+ }
+ 
+ .containerElements ul {
+   width: 100%;
+   padding: 0;
+ }
+ 
+ .containerElements ul li {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   height: 50px;
+   border: 1px solid black;
+   border-radius: 8px;
+   margin-bottom: 20px;
+   font-size: 15px;
+   cursor: pointer;
+   user-select: none;
+   transition: background-color 0.3s ease, color 0.3s ease;
+ }
+ 
+ .containerElements ul li.selected {
+   background-color: #007bff;
+   color: white;
+   border-color: #007bff;
+ }
+ 
+ .containerElements ul li:hover {
+   background-color: #e0e0e0;
+ }
+ 
+ .containerElements ul li input {
+   display: none;
+ }
+ 
+ .containerElements button {
+   padding: 10px 15px;
+   border: none;
+   border-radius: 5px;
+   font-size: 16px;
+   cursor: pointer;
+   transition: background-color 0.3s ease;
+ }
+ 
+ .containerElements button:disabled {
+   background-color: #cccccc;
+   cursor: not-allowed;
+ }
+ 
+ .containerElements button:not(:disabled) {
+   background-color: #007bff;
+   color: white;
+ }
+ 
+ .containerElements button:not(:disabled):hover {
+   background-color: #0056b3;
+ }
+ 

@@ -5,7 +5,8 @@ import styles from "./StyleComponents/TestLayout.module.css";
 
 function TestLayout() {
   const location = useLocation();
-  const navigate = useNavigate();
+
+  const history = useNavigate();
   const [preguntes, setPreguntes] = useState([]);
   const [respostesBarrejades, setRespostesBarrejades] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -44,8 +45,8 @@ function TestLayout() {
     return respostes.sort(() => Math.random() - 0.5);
   };
 
-  const seleccionarResposta = (resposta) => {
-    setSelectedAnswers({ ...selectedAnswers, [currentIndex]: resposta });
+  const seleccionarResposta = (respostaUnica) => {
+    setSelectedAnswers({ ...selectedAnswers, [currentIndex]: respostaUnica });
   };
 
   const anarSeguent = () => {
@@ -63,9 +64,11 @@ function TestLayout() {
   };
 
   const calcularResultats = () => {
-    const correctes = preguntes.filter(
-      (pregunta, index) => selectedAnswers[index] === pregunta.solucio_correcta
-    ).length;
+    const correctes = preguntes.filter((pregunta, index) => {
+      const respostaUnica = selectedAnswers[index];
+      const respostaSeleccionada = respostaUnica?.split("-")[0]; // Extrae solo el texto
+      return respostaSeleccionada === pregunta.solucio_correcta;
+    }).length;
 
     const incorrectes = preguntes.length - correctes;
 
@@ -84,10 +87,8 @@ function TestLayout() {
         <p>Correctes: {correctes}</p>
         <p>Incorrectes: {incorrectes}</p>
         <div className={styles.resultButtons}>
-          {/* Botó per reiniciar el test */}
           <button onClick={() => window.location.reload()}>Reiniciar</button>
-          {/* Botó per tornar a la pàgina principal */}
-          <button onClick={() => navigate("/modules")}>
+          <button onClick={() => history(-1)}>
             Tornar a la pàgina principal
           </button>
         </div>
@@ -99,35 +100,47 @@ function TestLayout() {
 
   return (
     <div className={styles.containerQuizz}>
-      <h1>Formulari</h1>
-      <hr />
-      <h2>
-        Pregunta {currentIndex + 1} de {preguntes.length}
-      </h2>
-      <p>{preguntes[currentIndex].pregunta}</p>
-      <ul>
-        {respostesActuals.map((resposta, index) => (
-          <li key={index}>
-            <label>
-              <input
-                type="radio"
-                name={`pregunta-${currentIndex}`}
-                value={resposta}
-                checked={selectedAnswers[currentIndex] === resposta}
-                onChange={() => seleccionarResposta(resposta)}
-              />
-              {resposta}
-            </label>
-          </li>
-        ))}
-      </ul>
-      <div>
-        <button onClick={anarAnterior} disabled={currentIndex === 0}>
-          Anterior
-        </button>
-        <button onClick={anarSeguent}>
-          {currentIndex === preguntes.length - 1 ? "Entregar" : "Següent"}
-        </button>
+      <div className={styles.containerElements}>
+        <h1>Formulari</h1>
+        <hr />
+        <p className={styles.pregunta}>{preguntes[currentIndex].pregunta}</p>
+        <ul className={styles.llistaRespostes}>
+          {respostesActuals.map((resposta, index) => (
+            <li
+              key={index}
+              className={
+                selectedAnswers[currentIndex] === `${resposta}-${index}`
+                  ? styles.selected
+                  : ""
+              }
+              onClick={() => seleccionarResposta(`${resposta}-${index}`)}
+            >
+              <label>
+                <input
+                  type="radio"
+                  name={`pregunta-${currentIndex}`}
+                  value={`${resposta}-${index}`}
+                  checked={
+                    selectedAnswers[currentIndex] === `${resposta}-${index}`
+                  }
+                  onChange={() => seleccionarResposta(`${resposta}-${index}`)}
+                />
+                {resposta}
+              </label>
+            </li>
+          ))}
+        </ul>
+        <p className={styles.contadorPreguntes}>
+          Pregunta {currentIndex + 1} de {preguntes.length}
+        </p>
+        <div className={styles.botonsAccio}>
+          <button onClick={anarAnterior} disabled={currentIndex === 0}>
+            Anterior
+          </button>
+          <button onClick={anarSeguent}>
+            {currentIndex === preguntes.length - 1 ? "Entregar" : "Següent"}
+          </button>
+        </div>
       </div>
     </div>
   );
