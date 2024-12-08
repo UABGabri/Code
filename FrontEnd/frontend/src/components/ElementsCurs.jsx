@@ -120,8 +120,9 @@ function ElementsCurs({ idAssignatura, professorId }) {
 
   return (
     <div className={styles.elementsCursContainer}>
-      <h1 className={styles.elementsCursHeader}>Gestió de Temes</h1>
-
+      <h1 className={styles.elementsCursHeader}>
+        <strong>GESTIÓ DE TEMES</strong>
+      </h1>
       <div className={styles.temesLista}>
         {temes.length === 0 ? (
           <p className={styles.noTemes}>No hi ha temes creats</p>

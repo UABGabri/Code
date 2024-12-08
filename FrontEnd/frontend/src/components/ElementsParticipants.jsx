@@ -132,6 +132,7 @@ function ElementsParticipants({ idAssignatura }) {
   return (
     <div>
       <div className={styles.participantContainer}>
+        <h1>GESTIÓ DE PARTICIPANTS</h1>
         {users.map((user) => (
           <div key={user.niu} className={styles.participantCard}>
             <div className={styles.participantDetails}>

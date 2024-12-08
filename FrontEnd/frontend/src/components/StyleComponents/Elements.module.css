@@ -109,7 +109,7 @@
   top: 0;
   left: 0;
   right: 0;
-  padding-top: 200px;
+  padding-top: 180px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -284,7 +284,7 @@
 
 .elementsCursHeader {
   text-align: center;
-  font-size: 2rem;
+
   margin-bottom: 20px;
 }
 
