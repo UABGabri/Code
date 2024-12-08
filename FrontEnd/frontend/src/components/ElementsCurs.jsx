@@ -128,17 +128,23 @@ function ElementsCurs({ idAssignatura, professorId }) {
         ) : (
           temes.map((tema, index) => (
             <div key={index} className={styles.temaItem}>
-              <h2 className={styles.temaTitle}>{tema.nom_tema}</h2>
+              <h2 className={styles.temaTitle}>
+                <strong>{tema.nom_tema}</strong>
+              </h2>
+              <hr />
               <div className={styles.temaContent}>
                 <div className={styles.contingut}>
-                  <h3 className={styles.temaSubtitle}>Contingut</h3>
+                  <h3 className={styles.temaSubtitle}>
+                    <strong>Contingut</strong>
+                  </h3>
+                  <hr />
                   <button>Afegir contingut pel {tema.nom_tema}</button>
                 </div>
                 <div className={styles.tests}>
                   <h3 className={styles.temaSubtitle}>
-                    Tests per al tema {tema.nom_tema}
+                    <strong>Tests {tema.nom_tema}</strong>
                   </h3>
-
+                  <hr />
                   <div className={styles.testList}>
                     {tests[tema.id_tema] && tests[tema.id_tema].length > 0 ? (
                       <ul>
@@ -168,19 +174,19 @@ function ElementsCurs({ idAssignatura, professorId }) {
             </div>
           ))
         )}
-      </div>
 
-      <div className={styles.temaCrear}>
-        <input
-          type="text"
-          value={newTemaName}
-          onChange={(e) => setNewTemaName(e.target.value)}
-          placeholder="Nom del tema"
-          className={styles.temaInput}
-        />
-        <button onClick={handleCreateTema} className={styles.temaButton}>
-          Afegir Tema
-        </button>
+        <div className={styles.temaCrear}>
+          <input
+            type="text"
+            value={newTemaName}
+            onChange={(e) => setNewTemaName(e.target.value)}
+            placeholder="Nom del tema"
+            className={styles.temaInput}
+          />
+          <button onClick={handleCreateTema} className={styles.temaButton}>
+            Afegir Tema
+          </button>
+        </div>
       </div>
 
       {showModal && (

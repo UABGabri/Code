@@ -269,7 +269,6 @@
 
 
 /*SECCIÓ CURS*/
-
 .elementsCursContainer {
   display: flex;
   flex-direction: column;
@@ -290,13 +289,13 @@
 }
 
 .temesLista {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   width: 100%;
-  max-width: 800px;
+  max-width: 1200px;
   margin-bottom: 20px;
-  flex-grow: 1;
+  padding: 20px;
 }
 
 .temaItem {
@@ -304,6 +303,10 @@
   border-radius: 5px;
   padding: 15px;
   background-color: #f9f9f9;
+  text-align: center;
+  box-sizing: border-box;
+  width: 100%;
+
 }
 
 .temaTitle {
@@ -314,21 +317,17 @@
 .temaContent {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 .contingut,
 .tests {
-  width: 48%;
+  width: calc(50% - 10px);
 }
 
 .temaSubtitle {
   font-size: 1.2rem;
   margin-bottom: 10px;
-}
-
-.temaDescription {
-  font-size: 1rem;
-  color: #555;
 }
 
 .noTemes {
@@ -363,7 +362,7 @@
   border-radius: 5px;
   cursor: pointer;
   width: 100%;
-  margin-top: 20px; 
+  margin-top: 20px;
 }
 
 .temaButton:hover {
@@ -372,9 +371,8 @@
 
 .temaCrear {
   position: relative;
-  margin-top: auto; 
+  margin-top: auto;
 }
-
 
 .modal {
   position: fixed;
@@ -425,6 +423,8 @@
   border-radius: 4px;
   cursor: pointer;
 }
+
+
 
 /*FI SECCIÓ CURS*/
 
