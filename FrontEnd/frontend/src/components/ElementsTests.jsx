@@ -82,11 +82,11 @@ function ElementsTests({ idAssignatura }) {
   };
 
   return (
-    <div>
-      <div className={styles.quizzContainerTitle}>
-        <h1 className={styles.titleGenerator}>GENERADOR DE TESTS</h1>
-        <div className={styles.quizzContainerBody}>
-          <form onSubmit={handleSubmit}>
+    <div className={styles.quizzContainerTitle}>
+      <h1 className={styles.titleGenerator}>GENERADOR DE TESTS</h1>
+      <div className={styles.quizzContainerBody}>
+        <form className={styles.formRandom} onSubmit={handleSubmit}>
+          <div className={styles.parametersQuizz}>
             <label htmlFor="tema">Tema:</label>
             <select
               id="tema"
@@ -149,12 +149,12 @@ function ElementsTests({ idAssignatura }) {
               <option value="Mitjà">Mitjà</option>
               <option value="Difícil">Difícil</option>
             </select>
+          </div>
 
-            {formError && <p className={styles.error}>{formError}</p>}
+          {formError && <p className={styles.error}>{formError}</p>}
 
-            <button type="submit">Generar Test</button>
-          </form>
-        </div>
+          <button type="submit">Generar Test</button>
+        </form>
       </div>
     </div>
   );
