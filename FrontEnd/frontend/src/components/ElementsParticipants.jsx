@@ -19,19 +19,42 @@ function ElementsParticipants({ idAssignatura }) {
       .catch((err) => {
         console.error("Error a la sol·licitud:", err);
       });
-  }, [idAssignatura]);
+  }, [idAssignatura, users]);
 
-  const handleEliminateParticipant = (niu) => {
-    axios
-      .delete("http://localhost:8081/eliminateAtendee", {
-        params: { id: niu },
-      })
-      .then((res) => {
-        setUsers(res.data);
-      })
-      .catch((err) => {
-        console.error("Error a la sol·licitud:", err);
-      });
+  const handleEliminateParticipant = (niu, role) => {
+    if (role === "professor") {
+      axios
+        .delete("http://localhost:8081/eliminateTeacher", {
+          params: { id: niu, idAssignatura },
+        })
+        .then((res) => {
+          if (Array.isArray(res.data)) {
+            setUsers(res.data);
+          } else {
+            alert("Error al actualitzar la llista de participants.");
+          }
+        })
+        .catch((err) => {
+          console.error("Error a la sol·licitud:", err);
+        });
+    } else if (role === "alumne") {
+      axios
+        .delete("http://localhost:8081/eliminateStudent", {
+          params: { id: niu, idAssignatura },
+        })
+        .then((res) => {
+          if (Array.isArray(res.data)) {
+            setUsers(res.data);
+          } else {
+            alert("Error al actualitzar la llista de participants.");
+          }
+        })
+        .catch((err) => {
+          console.error("Error a la solicitud:", err);
+        });
+    } else {
+      alert("Error al eliminar el participant.");
+    }
   };
 
   const handleAddParticipant = () => {
@@ -43,22 +66,56 @@ function ElementsParticipants({ idAssignatura }) {
       })
       .then((res) => {
         if (res.data.exists) {
+          const role = res.data.role;
+          let checkEndpoint = "";
+
+          if (role === "professor") {
+            checkEndpoint = "http://localhost:8081/checkProfessorInSubject";
+          } else {
+            checkEndpoint = "http://localhost:8081/checkStudentInSubject";
+          }
+
           axios
-            .post("http://localhost:8081/addAtendee", {
-              niu: newNiu,
-              idAssignatura,
+            .get(checkEndpoint, {
+              params: { niu: newNiu, idAssignatura },
             })
-            .then((res) => {
-              setUsers(res.data);
-              setShowModal(false);
-              setNewNiu("");
-              alert("Participant afegit correctament!");
-              setShowModal(false);
-              window.location.reload();
+            .then((checkRes) => {
+              if (checkRes.data.exists) {
+                alert(
+                  "Aquest participant ja està registrat en aquesta assignatura!"
+                );
+              } else {
+                let endpoint = "";
+
+                if (role === "professor") {
+                  endpoint = "http://localhost:8081/addProfessorToSubject";
+                } else {
+                  endpoint = "http://localhost:8081/addStudentToSubject";
+                }
+
+                axios
+                  .post(endpoint, {
+                    niu: newNiu,
+                    idAssignatura,
+                  })
+                  .then((addRes) => {
+                    setUsers(addRes.data);
+                    setShowModal(false);
+                    setNewNiu("");
+                    alert("Participant afegit correctament!");
+                    window.location.reload();
+                  })
+                  .catch((err) => {
+                    console.error("Error a l'afegir el participant:", err);
+                    alert("Hi ha hagut un error al afegir el participant.");
+                  });
+              }
             })
             .catch((err) => {
-              console.error("Error a l'afegir el participant:", err);
-              alert("Hi ha hagut un error al afegir el participant.");
+              console.error("Error a la verificació del participant:", err);
+              alert(
+                "Hi ha hagut un error al verificar si el participant ja està registrat."
+              );
             });
         } else {
           alert("Aquest NIU no existeix a la base de dades d'usuaris!");
@@ -87,10 +144,13 @@ function ElementsParticipants({ idAssignatura }) {
               <p>
                 <strong>Email:</strong> {user.email}
               </p>
+              <p>
+                <strong>Rol: </strong> {user.role}
+              </p>
             </div>
             <div
               className={styles.deleteButtonParticipant}
-              onClick={() => handleEliminateParticipant(user.niu)}
+              onClick={() => handleEliminateParticipant(user.niu, user.role)}
             >
               Eliminar
             </div>

@@ -578,102 +578,164 @@ app.put('/updateQuestionAccept', (req, res) =>{
 })
 
 //Funció de recuperació dels alumnes assistents a una assignatura
-app.get('/recoverAtendees', (req, res) =>{
+app.get('/recoverAtendees', (req, res) => {
+    const id_assignatura = parseInt(req.query.idAssignatura);
 
-    const id_assignatura = req.query.idAssignatura;
-    parseInt(id_assignatura);
+    const sql = `
+        SELECT usuaris.*, 'alumne' AS role 
+        FROM usuaris 
+        JOIN alumnes_assignatures ON usuaris.niu = alumnes_assignatures.id_alumne 
+        WHERE alumnes_assignatures.id_assignatura = ?
+        UNION
+        SELECT usuaris.*, 'professor' AS role 
+        FROM usuaris 
+        JOIN professors_assignatures ON usuaris.niu = professors_assignatures.id_professor 
+        WHERE professors_assignatures.id_assignatura = ?
+    `;
 
-    const sql = `select * from usuaris JOIN alumnes_assignatures ON usuaris.niu = alumnes_assignatures.id_alumne WHERE alumnes_assignatures.id_assignatura = ?`
-
-    db.query(sql,[id_assignatura], (error, result)=>{
-
+    db.query(sql, [id_assignatura, id_assignatura], (error, result) => {
         if (error) {
-            
             console.error("Error en la consulta:", error);
-            return res.json({ Status: "Failed" });
-          } else {
-       
-            return res.json(result); 
-          }
-    })
-
-
-})
+            return res.status(500).json({ Status: "Failed" });
+        }
+        res.json(result);
+    });
+});
 
 
 
 /*REPASSAR AQUÍ PERQUE NO FUNCIONA*/ 
 app.get("/checkUserExists", async (req, res) => {
-    const { niu } = req.query;
-  
-    try {
-      const [userResult] = await db.query("SELECT COUNT(*) AS count FROM usuaris WHERE niu = ?", [niu]);
-  
-      if (userResult.count === 0) {
-        return res.json({ exists: false, message: "Usuari no trobat" });
-      }
-  
-      const [assignmentResult] = await db.query(
-        "SELECT COUNT(*) AS count FROM alumnes_assignatures WHERE niu = ?",
-        [niu]
-      );
-  
-      if (assignmentResult.count > 0) {
-        return res.json({ exists: false, message: "Usuari ja registrat en aquesta assignatura" });
-      }
-  
-      return res.json({ exists: true, message: "Usuari disponible per registrar-se a l'assignatura" });
-    } catch (error) {
-      res.status(500).json({ message: "Error intern del servidor" });
+    const id_niu = parseInt(req.query.niu, 10); 
+
+    if (isNaN(id_niu)) {
+        return res.json({ exists: false, error: "Invalid NIU format" });
     }
-  });
 
+    const sql = 'SELECT role FROM usuaris WHERE niu = ?';
 
-app.post('/addAtendee', (req, res) =>{
-
-    const id_alumne = req.body.id;
-    const assignatura = req.body.idAssignatura;
-
-    console.log(id_alumne, assignatura)
-    const sql = 'INSERT INTO alumnes_assignatures (id_alumne, id_assignatura) VALUES (?,?)'
-
-    db.query(sql,[id_alumne, assignatura], (error, result)=>{
-
+    db.query(sql, [id_niu], (error, result) => {
         if (error) {
-            
+            console.error("Error a la consulta:", error);
+            return res.json({ exists: false, error: "Database query failed" });
+        }
+
+        if (result.length > 0) {
+            const role = result[0].role; 
+            return res.json({ exists: true, role }); 
+        } else {
+            return res.json({ exists: false });
+        }
+    });
+});
+
+app.get("/checkProfessorInSubject", (req, res) => {
+    const { niu, idAssignatura } = req.query;
+
+    const sql =
+        "SELECT COUNT(*) AS count FROM professors_assignatures WHERE id_professor = ? AND id_assignatura = ?";
+    db.query(sql, [niu, idAssignatura], (error, result) => {
+        if (error) {
             console.error("Error en la consulta:", error);
+            return res.status(500).json({ exists: false, error: "Database query failed" });
+        }
+        const exists = result[0].count > 0;
+        res.json({ exists });
+    });
+});
+
+app.get("/checkStudentInSubject", (req, res) => {
+    const { niu, idAssignatura } = req.query;
+
+    const sql =
+        "SELECT COUNT(*) AS count FROM alumnes_assignatures WHERE id_alumne = ? AND id_assignatura = ?";
+
+
+    db.query(sql, [niu, idAssignatura], (error, result) => {
+        if (error) {
+            console.error("Error en la consulta:", error);
+            return res.status(500).json({ exists: false, error: "Database query failed" });
+        }
+        const exists = result[0].count > 0;
+        res.json({ exists });
+    });
+});
+
+
+
+  app.post("/addProfessorToSubject", async (req, res) => {
+    const { niu, idAssignatura } = req.body;
+
+    const sql = 'INSERT INTO professors_assignatures (id_professor, id_assignatura) VALUES (?, ?)';
+    db.query(sql, [niu, idAssignatura], (error, result) => {
+        if (error) {
+            console.error("Error al afegir el professor:", error);
+            return res.status(500).json({ success: false });
+        }
+        return res.json({ success: true });
+    });
+});
+
+app.post("/addStudentToSubject", async (req, res) => {
+    const { niu, idAssignatura } = req.body;
+
+    const sql = 'INSERT INTO alumnes_assignatures (id_alumne, id_assignatura) VALUES (?, ?)';
+    db.query(sql, [niu, idAssignatura], (error, result) => {
+        if (error) {
+            console.error("Error al afegir l'alumne:", error);
+            return res.status(500).json({ success: false });
+        }
+        return res.json({ success: true });
+    });
+});
+
+
+
+
+app.delete('/eliminateStudent', (req, res) => {
+    const id_participant = req.query.id;
+    const id_assignatura = req.query.idAssignatura;
+
+    const deleteSql = `DELETE FROM alumnes_assignatures WHERE id_alumne = ? AND id_assignatura = ?`;
+    const fetchSql = `SELECT * FROM alumnes_assignatures`;
+
+    db.query(deleteSql, [id_participant, id_assignatura], (deleteError) => {
+        if (deleteError) {
+            console.error("Error a la consulta:", deleteError);
             return res.json({ Status: "Failed" });
-          } else {
-       
-            return res.json(result); 
-          }
-    })
-
-})
-
-
-app.delete('/eliminateAtendee', (req,res)=>{
-
-    id_participant = req.query.id;
-
-
-    const sql = `DELETE FROM alumnes_assignatures WHERE id_alumne = ?`
-
-    db.query(sql,[id_participant], (error, result)=>{
-
-            if (error) {
-                
-                console.error("Error en la consulta:", error);
+        }
+        db.query(fetchSql, (fetchError, updatedUsers) => {
+            if (fetchError) {
+                console.error("Error al recuperar els usuaris:", fetchError);
                 return res.json({ Status: "Failed" });
-            } else {
-        
-                return res.json(result); 
             }
-        })
+            return res.json(updatedUsers);
+        });
+    });
+});
 
+app.delete('/eliminateTeacher', (req, res) => {
+    const id_participant = req.query.id;
+    const id_assignatura = req.query.idAssignatura;
 
+    const deleteSql = `DELETE FROM professors_assignatures WHERE id_professor = ? AND id_assignatura = ? `;
+    const fetchSql = `SELECT * FROM professors_assignatures`;
 
-})
+    db.query(deleteSql, [id_participant, id_assignatura], (deleteError) => {
+        if (deleteError) {
+            console.error("Error a la consulta:", deleteError);
+            return res.json({ Status: "Failed" });
+        }
+        db.query(fetchSql, (fetchError, updatedUsers) => {
+            if (fetchError) {
+                console.error("Error al recuperar els usuaris:", fetchError);
+                return res.json({ Status: "Failed" });
+            }
+            return res.json(updatedUsers);
+        });
+    });
+});
+
 
 
 //Funció de recuperació dels temes de la assignatura i conceptes per poder crear tests
