@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Headercap from "./Headercap";
 import styles from "./StyleComponents/Profile.module.css";
+import { useNavigate } from "react-router-dom";
 
 function Profile() {
   const [values, setValues] = useState({
@@ -12,6 +13,9 @@ function Profile() {
     role: "", //valor no intercanviable
   });
 
+  const history = useNavigate();
+  const [error, setError] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   useEffect(() => {
     // Recupera les dades de l'usuari en carregar el component
     axios
@@ -38,16 +42,25 @@ function Profile() {
   // Envia les dades actualitzades al servidor.
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios
-      .put("http://localhost:8081/updateUser", values, {
-        withCredentials: true,
-      })
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+
+    if (values.password !== confirmPassword) {
+      setError("Sisplau, introdueix contrasenyes iguals");
+      alert(error);
+      return;
+    } else {
+      axios
+        .put("http://localhost:8081/updateUser", values, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+
+      history(-1);
+    }
   };
 
   return (
@@ -79,6 +92,7 @@ function Profile() {
               pattern="^[A-Za-zÀ-ÿ\s]+$"
               title="El nom només ha de tenir lletres de l'abecedari"
               className={styles.inputProfile}
+              placeholder="Nom del usuari"
             />
           </div>
 
@@ -92,6 +106,7 @@ function Profile() {
               required
               title="Introdueix un email vàlid"
               className={styles.inputProfile}
+              placeholder="Email"
             />
           </div>
 
@@ -106,6 +121,20 @@ function Profile() {
               minLength={8}
               title="La contrasenya ha de tenir 8 carácters min"
               className={styles.inputProfile}
+              placeholder="Nova contrasenya"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="confirmPassword" className="form-label">
+              Confirmar contraseña
+            </label>
+            <input
+              type="password"
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className={styles.inputProfile}
+              id="confirmPassword"
+              placeholder="Confirma la contrasenya"
             />
           </div>
 

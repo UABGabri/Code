@@ -1,7 +1,7 @@
 import { useState } from "react";
 import styles from "./StyleComponents/Headercap.module.css";
 import { FaCircleUser } from "react-icons/fa6";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Dropdown,
   DropdownItem,
@@ -14,6 +14,7 @@ import axios from "axios";
 function Headercap() {
   const [dropdown, setDropdown] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   //Funció per definir la visualització del dropdown
   const openCloseDropdown = () => {
@@ -25,7 +26,7 @@ function Headercap() {
     axios
       .get("http://localhost:8081/logout")
       .then((res) => {
-        location.reload(true);
+        navigate("/login");
       })
       .catch((err) => console.log(err));
   };
