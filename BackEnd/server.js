@@ -335,20 +335,21 @@ app.post('/registerSubject', async (req, res) => {
 //Funció de recuperació dels temes associats a una assignatura pel curs
 
 app.get('/recoverTemesAssignatura', (req, res) => {
+    const idAssignatura = parseInt(req.query.Id_Assignatura, 10); 
 
-    const { idAssignatura } = req.query.idAssignatura;
+    if (!idAssignatura) {
+        return res.json({ success: false, message: "Id_Assignatura no proporcionado o inválido" });
+    }
 
-    const id = parseInt(req.query.idAssignatura,10);
     const sql = "SELECT * FROM temes WHERE id_assignatura = ?";
-    db.query(sql, [id], (error, result) => {
-      if (error) {
-        console.error("Error al recuperar els temes:", error);
-        return res.json({ success: false, message: "Error al recuperar els temes" });
-      }
-  
-      return res.json(result);
-    });
+    db.query(sql, [idAssignatura], (error, result) => {
+        if (error) {
+            console.error("Error al recuperar els temes:", error);
+            return res.json({ success: false, message: "Error al recuperar els temes" });
+        }
 
+        return res.json(result);
+    });
 });
 
 
@@ -535,7 +536,7 @@ app.delete('/deleteQuestion', (req,res)=>{
 //Funció de recuperació dels temes de la assignatura per afegir preguntes
 app.get('/recoverTemasAssignatura', (req, res)=>{ 
 
-    const id_assignatura = req.query.idAssignatura;
+    const id_assignatura = req.query.Id_Assignatura;
 
     
     const sql = 'SELECT * FROM temes WHERE id_assignatura = ?';
@@ -555,7 +556,7 @@ app.get('/recoverTemasAssignatura', (req, res)=>{
 //Funció de recuperació preguntes per ser avaluades pel professor
 app.get('/recoverQuestions', (req, res)=>{ 
 
-    const id_assignatura = req.query.idAssignatura;
+    const id_assignatura = req.query.Id_Assignatura;
     parseInt(id_assignatura);
     
     const sql = `SELECT * FROM preguntes JOIN temes ON preguntes.id_tema = temes.id_tema WHERE preguntes.estat = 'pendent' AND temes.id_assignatura = ?`;
@@ -600,7 +601,7 @@ app.put('/updateQuestionAccept', (req, res) =>{
 
 //Funció de recuperació dels alumnes assistents a una assignatura
 app.get('/recoverAtendees', (req, res) => {
-    const id_assignatura = parseInt(req.query.idAssignatura);
+    const id_assignatura = parseInt(req.query.Id_Assignatura);
 
     const sql = `
         SELECT usuaris.*, 'alumne' AS role 
@@ -651,11 +652,11 @@ app.get("/checkUserExists", async (req, res) => {
 });
 
 app.get("/checkProfessorInSubject", (req, res) => {
-    const { niu, idAssignatura } = req.query;
+    const { niu, Id_Assignatura } = req.query;
 
     const sql =
         "SELECT COUNT(*) AS count FROM professors_assignatures WHERE id_professor = ? AND id_assignatura = ?";
-    db.query(sql, [niu, idAssignatura], (error, result) => {
+    db.query(sql, [niu, Id_Assignatura], (error, result) => {
         if (error) {
             console.error("Error en la consulta:", error);
             return res.status(500).json({ exists: false, error: "Database query failed" });
@@ -666,13 +667,13 @@ app.get("/checkProfessorInSubject", (req, res) => {
 });
 
 app.get("/checkStudentInSubject", (req, res) => {
-    const { niu, idAssignatura } = req.query;
+    const { niu, Id_Assignatura } = req.query;
 
     const sql =
         "SELECT COUNT(*) AS count FROM alumnes_assignatures WHERE id_alumne = ? AND id_assignatura = ?";
 
 
-    db.query(sql, [niu, idAssignatura], (error, result) => {
+    db.query(sql, [niu, Id_Assignatura], (error, result) => {
         if (error) {
             console.error("Error en la consulta:", error);
             return res.status(500).json({ exists: false, error: "Database query failed" });
@@ -685,10 +686,10 @@ app.get("/checkStudentInSubject", (req, res) => {
 
 
   app.post("/addProfessorToSubject", async (req, res) => {
-    const { niu, idAssignatura } = req.body;
+    const { niu, Id_Assignatura } = req.body;
 
     const sql = 'INSERT INTO professors_assignatures (id_professor, id_assignatura) VALUES (?, ?)';
-    db.query(sql, [niu, idAssignatura], (error, result) => {
+    db.query(sql, [niu, Id_Assignatura], (error, result) => {
         if (error) {
             console.error("Error al afegir el professor:", error);
             return res.status(500).json({ success: false });
@@ -698,10 +699,10 @@ app.get("/checkStudentInSubject", (req, res) => {
 });
 
 app.post("/addStudentToSubject", async (req, res) => {
-    const { niu, idAssignatura } = req.body;
+    const { niu, Id_Assignatura } = req.body;
 
     const sql = 'INSERT INTO alumnes_assignatures (id_alumne, id_assignatura) VALUES (?, ?)';
-    db.query(sql, [niu, idAssignatura], (error, result) => {
+    db.query(sql, [niu, Id_Assignatura], (error, result) => {
         if (error) {
             console.error("Error al afegir l'alumne:", error);
             return res.status(500).json({ success: false });
@@ -715,7 +716,7 @@ app.post("/addStudentToSubject", async (req, res) => {
 
 app.delete('/eliminateStudent', (req, res) => {
     const id_participant = req.query.id;
-    const id_assignatura = req.query.idAssignatura;
+    const id_assignatura = req.query.Id_Assignatura;
 
     const deleteSql = `DELETE FROM alumnes_assignatures WHERE id_alumne = ? AND id_assignatura = ?`;
     const fetchSql = `SELECT * FROM alumnes_assignatures`;
@@ -737,7 +738,7 @@ app.delete('/eliminateStudent', (req, res) => {
 
 app.delete('/eliminateTeacher', (req, res) => {
     const id_participant = req.query.id;
-    const id_assignatura = req.query.idAssignatura;
+    const id_assignatura = req.query.Id_Assignatura;
 
     const deleteSql = `DELETE FROM professors_assignatures WHERE id_professor = ? AND id_assignatura = ? `;
     const fetchSql = `SELECT * FROM professors_assignatures`;

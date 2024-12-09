@@ -4,7 +4,7 @@ import styles from "./StyleComponents/Elements.module.css";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
-function ElementsCurs({ idAssignatura, professorId }) {
+function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
   const [temes, setTemes] = useState([]);
   const [tests, setTests] = useState({});
   const [newTemaName, setNewTemaName] = useState("");
@@ -13,38 +13,11 @@ function ElementsCurs({ idAssignatura, professorId }) {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
 
-  const handleCreateTema = () => {
-    if (!newTemaName.trim()) {
-      alert("Si us plau, introdueix un nom per al tema");
-      return;
-    }
-
-    axios
-      .post("http://localhost:8081/createTema", {
-        idAssignatura,
-        name: newTemaName,
-      })
-      .then((response) => {
-        if (response.data.success) {
-          setTemes([
-            ...temes,
-            { id_tema: response.data.id_tema, nom_tema: newTemaName },
-          ]);
-          setNewTemaName("");
-        } else {
-          alert("Error en crear el tema");
-        }
-      })
-      .catch((error) => {
-        console.error("Error en crear el tema:", error);
-        alert("Hi ha hagut un error, torna-ho a intentar.");
-      });
-  };
-
+  // Recuperar temes asociados a la asignatura
   useEffect(() => {
     axios
       .get("http://localhost:8081/recoverTemesAssignatura", {
-        params: { idAssignatura },
+        params: { Id_Assignatura },
       })
       .then((response) => {
         setTemes(response.data);
@@ -53,8 +26,9 @@ function ElementsCurs({ idAssignatura, professorId }) {
         console.error("Error al recuperar els temes:", error);
         alert("Error al recuperar els temes.");
       });
-  }, [idAssignatura]);
+  }, [Id_Assignatura]);
 
+  // Recuperar tests para cada tema
   useEffect(() => {
     temes.forEach((tema) => {
       axios
@@ -75,12 +49,51 @@ function ElementsCurs({ idAssignatura, professorId }) {
     });
   }, [temes]);
 
+  // Crear un nuevo tema
+  const handleCreateTema = () => {
+    if (!newTemaName.trim()) {
+      alert("Si us plau, introdueix un nom per al tema");
+      return;
+    }
+
+    axios
+      .post("http://localhost:8081/createTema", {
+        Id_Assignatura,
+        name: newTemaName,
+      })
+      .then((response) => {
+        if (response.data.success) {
+          setTemes([
+            ...temes,
+            { id_tema: response.data.id_tema, nom_tema: newTemaName },
+          ]);
+          setNewTemaName("");
+        } else {
+          alert("Error en crear el tema");
+        }
+      })
+      .catch((error) => {
+        console.error("Error en crear el tema:", error);
+        alert("Hi ha hagut un error, torna-ho a intentar.");
+      });
+  };
+
+  // Crear un nuevo test
+  const handleCreateTest = (id_tema) => {
+    navigate("/professorparametres", {
+      state: {
+        idTema: id_tema,
+        id_assignatura: Id_Assignatura,
+        id_professor: Id_User,
+      },
+    });
+  };
+
   const handleTestClick = (test) => {
     setSelectedTest(test);
     setShowModal(true);
   };
 
-  //Seguent pas -> crear a partit del Id del test el layout. Fer demà
   const handleAccessKeySubmit = () => {
     axios
       .post("http://localhost:8081/validateTestAccess", {
@@ -108,16 +121,6 @@ function ElementsCurs({ idAssignatura, professorId }) {
     setAccessKey("");
   };
 
-  const handleCreateTest = (id_tema) => {
-    navigate("/professorparametres", {
-      state: {
-        idTema: id_tema,
-        id_assignatura: idAssignatura,
-        id_professor: professorId,
-      },
-    });
-  };
-
   return (
     <div className={styles.elementsCursContainer}>
       <h1 className={styles.elementsCursHeader}>
@@ -139,7 +142,9 @@ function ElementsCurs({ idAssignatura, professorId }) {
                     <strong>Contingut</strong>
                   </h3>
                   <hr />
-                  <button>Afegir contingut pel {tema.nom_tema}</button>
+                  {Role_User === "professor" && (
+                    <button>Afegir contingut pel {tema.nom_tema}</button>
+                  )}
                 </div>
                 <div className={styles.tests}>
                   <h3 className={styles.temaSubtitle}>
@@ -163,12 +168,14 @@ function ElementsCurs({ idAssignatura, professorId }) {
                       <p>No hi ha tests per aquest tema.</p>
                     )}
 
-                    <button
-                      className={styles.buttonAddTest}
-                      onClick={() => handleCreateTest(tema.id_tema)}
-                    >
-                      Afegir test
-                    </button>
+                    {Role_User === "professor" && (
+                      <button
+                        className={styles.buttonAddTest}
+                        onClick={() => handleCreateTest(tema.id_tema)}
+                      >
+                        Afegir test
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -176,18 +183,20 @@ function ElementsCurs({ idAssignatura, professorId }) {
           ))
         )}
 
-        <div className={styles.temaCrear}>
-          <input
-            type="text"
-            value={newTemaName}
-            onChange={(e) => setNewTemaName(e.target.value)}
-            placeholder="Nom del tema"
-            className={styles.temaInput}
-          />
-          <button onClick={handleCreateTema} className={styles.temaButton}>
-            Afegir Tema
-          </button>
-        </div>
+        {Role_User === "professor" && (
+          <div className={styles.temaCrear}>
+            <input
+              type="text"
+              value={newTemaName}
+              onChange={(e) => setNewTemaName(e.target.value)}
+              placeholder="Nom del tema"
+              className={styles.temaInput}
+            />
+            <button onClick={handleCreateTema} className={styles.temaButton}>
+              Afegir Tema
+            </button>
+          </div>
+        )}
       </div>
 
       {showModal && (
@@ -225,6 +234,7 @@ function ElementsCurs({ idAssignatura, professorId }) {
 export default ElementsCurs;
 
 ElementsCurs.propTypes = {
-  professorId: PropTypes.number.isRequired,
-  idAssignatura: PropTypes.string.isRequired,
+  Id_User: PropTypes.number.isRequired,
+  Id_Assignatura: PropTypes.string.isRequired,
+  Role_User: PropTypes.string.isRequired,
 };

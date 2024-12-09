@@ -8,7 +8,7 @@ import { useLocation } from "react-router-dom";
 
 function AfegirPregunta() {
   const location = useLocation();
-  const { professorId, idAssignatura } = location.state;
+  const { Id_User, Id_Assignatura } = location.state;
   const { errors, setFormErrors } = useState("");
   const navigate = useNavigate();
 
@@ -24,7 +24,7 @@ function AfegirPregunta() {
     erronea_1: "",
     erronea_2: "",
     erronea_3: "",
-    id_creador: professorId,
+    id_creador: Id_User,
     id_tema: selectedTema,
   });
 
@@ -59,7 +59,7 @@ function AfegirPregunta() {
   const recoverTemasAssignatura = () => {
     axios
       .get("http://localhost:8081/recoverTemasAssignatura", {
-        params: { idAssignatura },
+        params: { Id_Assignatura },
       })
       .then((res) => {
         console.log("Resposta servidor:", res.data);
@@ -68,10 +68,10 @@ function AfegirPregunta() {
   };
 
   useEffect(() => {
-    if (idAssignatura) {
+    if (Id_Assignatura) {
       recoverTemasAssignatura();
     }
-  }, [idAssignatura]);
+  }, [Id_Assignatura]);
 
   return (
     <div>

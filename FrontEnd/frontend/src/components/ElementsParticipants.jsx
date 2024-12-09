@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import styles from "./StyleComponents/Elements.module.css";
 
-function ElementsParticipants({ idAssignatura }) {
+function ElementsParticipants({ Id_Assignatura, Role_User }) {
   const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [newNiu, setNewNiu] = useState("");
@@ -11,7 +11,7 @@ function ElementsParticipants({ idAssignatura }) {
   useEffect(() => {
     axios
       .get("http://localhost:8081/recoverAtendees", {
-        params: { idAssignatura },
+        params: { Id_Assignatura },
       })
       .then((res) => {
         setUsers(res.data);
@@ -19,42 +19,28 @@ function ElementsParticipants({ idAssignatura }) {
       .catch((err) => {
         console.error("Error a la sol·licitud:", err);
       });
-  }, [idAssignatura, users]);
+  }, [Id_Assignatura]);
 
   const handleEliminateParticipant = (niu, role) => {
-    if (role === "professor") {
-      axios
-        .delete("http://localhost:8081/eliminateTeacher", {
-          params: { id: niu, idAssignatura },
-        })
-        .then((res) => {
-          if (Array.isArray(res.data)) {
-            setUsers(res.data);
-          } else {
-            alert("Error al actualitzar la llista de participants.");
-          }
-        })
-        .catch((err) => {
-          console.error("Error a la sol·licitud:", err);
-        });
-    } else if (role === "alumne") {
-      axios
-        .delete("http://localhost:8081/eliminateStudent", {
-          params: { id: niu, idAssignatura },
-        })
-        .then((res) => {
-          if (Array.isArray(res.data)) {
-            setUsers(res.data);
-          } else {
-            alert("Error al actualitzar la llista de participants.");
-          }
-        })
-        .catch((err) => {
-          console.error("Error a la solicitud:", err);
-        });
-    } else {
-      alert("Error al eliminar el participant.");
-    }
+    const endpoint =
+      role === "professor"
+        ? "http://localhost:8081/eliminateTeacher"
+        : "http://localhost:8081/eliminateStudent";
+
+    axios
+      .delete(endpoint, {
+        params: { id: niu, Id_Assignatura },
+      })
+      .then((res) => {
+        if (Array.isArray(res.data)) {
+          setUsers(res.data);
+        } else {
+          alert("Error al actualitzar la llista de participants.");
+        }
+      })
+      .catch((err) => {
+        console.error("Error a la sol·licitud:", err);
+      });
   };
 
   const handleAddParticipant = () => {
@@ -67,17 +53,14 @@ function ElementsParticipants({ idAssignatura }) {
       .then((res) => {
         if (res.data.exists) {
           const role = res.data.role;
-          let checkEndpoint = "";
-
-          if (role === "professor") {
-            checkEndpoint = "http://localhost:8081/checkProfessorInSubject";
-          } else {
-            checkEndpoint = "http://localhost:8081/checkStudentInSubject";
-          }
+          const checkEndpoint =
+            role === "professor"
+              ? "http://localhost:8081/checkProfessorInSubject"
+              : "http://localhost:8081/checkStudentInSubject";
 
           axios
             .get(checkEndpoint, {
-              params: { niu: newNiu, idAssignatura },
+              params: { niu: newNiu, Id_Assignatura },
             })
             .then((checkRes) => {
               if (checkRes.data.exists) {
@@ -85,25 +68,21 @@ function ElementsParticipants({ idAssignatura }) {
                   "Aquest participant ja està registrat en aquesta assignatura!"
                 );
               } else {
-                let endpoint = "";
-
-                if (role === "professor") {
-                  endpoint = "http://localhost:8081/addProfessorToSubject";
-                } else {
-                  endpoint = "http://localhost:8081/addStudentToSubject";
-                }
+                const endpoint =
+                  role === "professor"
+                    ? "http://localhost:8081/addProfessorToSubject"
+                    : "http://localhost:8081/addStudentToSubject";
 
                 axios
                   .post(endpoint, {
                     niu: newNiu,
-                    idAssignatura,
+                    Id_Assignatura,
                   })
                   .then((addRes) => {
                     setUsers(addRes.data);
                     setShowModal(false);
                     setNewNiu("");
                     alert("Participant afegit correctament!");
-                    window.location.reload();
                   })
                   .catch((err) => {
                     console.error("Error a l'afegir el participant:", err);
@@ -149,21 +128,25 @@ function ElementsParticipants({ idAssignatura }) {
                 <strong>Rol: </strong> {user.role}
               </p>
             </div>
-            <div
-              className={styles.deleteButtonParticipant}
-              onClick={() => handleEliminateParticipant(user.niu, user.role)}
-            >
-              Eliminar
-            </div>
+            {Role_User !== "alumne" && (
+              <div
+                className={styles.deleteButtonParticipant}
+                onClick={() => handleEliminateParticipant(user.niu, user.role)}
+              >
+                Eliminar
+              </div>
+            )}
           </div>
         ))}
 
-        <button
-          onClick={() => setShowModal(true)}
-          className={styles.addParticipantButton}
-        >
-          Afegir participant
-        </button>
+        {Role_User !== "alumne" && (
+          <button
+            onClick={() => setShowModal(true)}
+            className={styles.addParticipantButton}
+          >
+            Afegir participant
+          </button>
+        )}
       </div>
 
       {showModal && (
@@ -190,7 +173,8 @@ function ElementsParticipants({ idAssignatura }) {
 }
 
 ElementsParticipants.propTypes = {
-  idAssignatura: PropTypes.string.isRequired,
+  Id_Assignatura: PropTypes.string.isRequired,
+  Role_User: PropTypes.string.isRequired,
 };
 
 export default ElementsParticipants;

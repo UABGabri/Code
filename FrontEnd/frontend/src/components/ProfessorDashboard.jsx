@@ -45,7 +45,7 @@ function ProfessorDashboard({ id_User, role_User }) {
 
   // Navegar a una asignatura seleccionada
   const handleSelectAssignatura = (id, name) => {
-    navigate(`/assignatura/${id}`, { state: { name, id, id_User } });
+    navigate(`/assignatura/${id}`, { state: { name, id, id_User, role_User } });
   };
 
   // Dividir las asignaturas en columnas

@@ -6,7 +6,7 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import { FaCheck, FaTimes } from "react-icons/fa";
 
-function ElementsPreguntes({ professorId, idAssignatura }) {
+function ElementsPreguntes({ Id_User, Id_Assignatura, Role_User }) {
   const [questions, setQuestions] = useState([]);
 
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ function ElementsPreguntes({ professorId, idAssignatura }) {
   //Funció que navega a la secció d'afegir pregunta amb els elements necessaris
   const handleButton = () => {
     navigate("/afegirPregunta", {
-      state: { professorId, idAssignatura },
+      state: { Id_User, Id_Assignatura },
     });
   };
 
@@ -22,7 +22,7 @@ function ElementsPreguntes({ professorId, idAssignatura }) {
   useEffect(() => {
     axios
       .get("http://localhost:8081/recoverQuestions", {
-        params: { idAssignatura },
+        params: { Id_Assignatura },
       })
       .then((res) => {
         setQuestions(res.data);
@@ -30,7 +30,7 @@ function ElementsPreguntes({ professorId, idAssignatura }) {
       .catch((err) => {
         console.error("Error a la sol·licitud:", err);
       });
-  }, [idAssignatura]);
+  }, [Id_Assignatura]);
 
   //Funció que actualitza l'estat de les preguntes a 'Acceptada'
   const handleStatusChange = (idPregunta, nouEstat) => {
@@ -42,7 +42,7 @@ function ElementsPreguntes({ professorId, idAssignatura }) {
       .then(() => {
         axios
           .get("http://localhost:8081/recoverQuestions", {
-            params: { idAssignatura },
+            params: { Id_Assignatura },
           })
           .then((res) => {
             setQuestions(res.data);
@@ -58,8 +58,6 @@ function ElementsPreguntes({ professorId, idAssignatura }) {
 
   //Funció que elimina les preguntes no necessàries
   const handleDelete = (idPregunta) => {
-    //console.log(idPregunta);
-
     axios
       .delete("http://localhost:8081/deleteQuestion", {
         params: { idPregunta },
@@ -99,22 +97,24 @@ function ElementsPreguntes({ professorId, idAssignatura }) {
               </p>
             </div>
 
-            <div className={styles.actionButtonsContainer}>
-              <button
-                className={styles.acceptButton}
-                onClick={() =>
-                  handleStatusChange(question.id_pregunta, "acceptada")
-                }
-              >
-                <FaCheck />
-              </button>
-              <button
-                className={styles.deleteButton}
-                onClick={() => handleDelete(question.id_pregunta)}
-              >
-                <FaTimes />
-              </button>
-            </div>
+            {Role_User !== "alumne" && (
+              <div className={styles.actionButtonsContainer}>
+                <button
+                  className={styles.acceptButton}
+                  onClick={() =>
+                    handleStatusChange(question.id_pregunta, "acceptada")
+                  }
+                >
+                  <FaCheck />
+                </button>
+                <button
+                  className={styles.deleteButton}
+                  onClick={() => handleDelete(question.id_pregunta)}
+                >
+                  <FaTimes />
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -129,8 +129,9 @@ function ElementsPreguntes({ professorId, idAssignatura }) {
 }
 
 ElementsPreguntes.propTypes = {
-  professorId: PropTypes.number.isRequired,
-  idAssignatura: PropTypes.string.isRequired,
+  Id_User: PropTypes.number.isRequired,
+  Id_Assignatura: PropTypes.string.isRequired,
+  Role_User: PropTypes.string.isRequired,
 };
 
 export default ElementsPreguntes;

@@ -12,8 +12,7 @@ import ElementsTests from "./ElementsTests";
 function AssignaturaLayout() {
   const { id } = useParams(); //id de la ASSIGNATURA
   const location = useLocation();
-  const { name, professorId } = location.state;
-  const idUser = parseInt(location.state.professorId);
+  const { name, id_User, role_User } = location.state;
   const history = useNavigate();
   const [menuOption, setMenuOption] = useState("CURS");
 
@@ -21,15 +20,33 @@ function AssignaturaLayout() {
   const render = () => {
     switch (menuOption) {
       case "CURS":
-        return <ElementsCurs professorId={professorId} idAssignatura={id} />;
+        return (
+          <ElementsCurs
+            Id_User={id_User}
+            Id_Assignatura={id}
+            Role_User={role_User}
+          />
+        );
       case "PARTICIPANTS":
-        return <ElementsParticipants idAssignatura={id} />;
+        return (
+          <ElementsParticipants Id_Assignatura={id} Role_User={role_User} />
+        );
       case "PREGUNTES":
         return (
-          <ElementsPreguntes professorId={professorId} idAssignatura={id} />
+          <ElementsPreguntes
+            Id_User={id_User}
+            Id_Assignatura={id}
+            Role_User={role_User}
+          />
         );
       case "TESTS":
-        return <ElementsTests professorId={professorId} idAssignatura={id} />;
+        return (
+          <ElementsTests
+            professorId={id_User}
+            idAssignatura={id}
+            Role_User={role_User}
+          />
+        );
     }
   };
 
