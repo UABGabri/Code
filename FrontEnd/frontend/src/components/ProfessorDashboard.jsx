@@ -6,17 +6,17 @@ import styles from "./StyleComponents/ProfessorDashboard.module.css";
 import Headercap from "./Headercap";
 import axios from "axios";
 
-function ProfessorDashboard({ professorId }) {
+function ProfessorDashboard({ id_User, role_User }) {
   const [assignatures, setAssignatures] = useState([]);
   const [modal, setModal] = useState(false);
-  const [buttonColumn, setButtonColumn] = useState(false);
   const navigate = useNavigate();
 
-  // Funció per recuperar assignatures associades al professor des del backend
-  const fetchAssignaturesForProfessor = async (professorId) => {
+  // Función para recuperar asignaturas dependiendo del rol
+  const fetchAssignatures = async () => {
     try {
       const res = await axios.post("http://localhost:8081/recoverSubjects", {
-        professorId: professorId,
+        idUser: id_User,
+        roleUser: role_User,
       });
       return res.data;
     } catch (err) {
@@ -25,32 +25,30 @@ function ProfessorDashboard({ professorId }) {
     }
   };
 
-  // Recupera assignatures quan `professorId` està disponible
+  // Recuperar asignaturas al cargar el componente
   useEffect(() => {
-    if (professorId) {
-      fetchAssignaturesForProfessor(professorId).then((data) => {
+    if (id_User && role_User) {
+      fetchAssignatures().then((data) => {
         setAssignatures(data);
       });
     }
-  }, [professorId]);
+  }, [id_User, role_User]);
 
-  //Funció auxiliar per obrir el modal/pestanya d'afegir Assignatura
+  // Abrir y cerrar el modal de añadir asignatura
   const openModal = () => {
     setModal(true);
   };
 
-  //Funció auxiliar per tanvar el modal/pestanya d'afegir Assignatura
   const closeModal = () => {
     setModal(false);
-    setButtonColumn(!buttonColumn);
   };
 
-  // Navega a la vista d'una assignatura seleccionada, passant dades necessàries (AssignaturaLayout -> Elements)
+  // Navegar a una asignatura seleccionada
   const handleSelectAssignatura = (id, name) => {
-    navigate(`/assignatura/${id}`, { state: { name, id, professorId } });
+    navigate(`/assignatura/${id}`, { state: { name, id, id_User } });
   };
 
-  // Divideix les assignatures en dues columnes (esquerra i dreta) segons el seu índex
+  // Dividir las asignaturas en columnas
   const leftColumn = assignatures.filter((_, index) => index % 2 === 0);
   const rightColumn = assignatures.filter((_, index) => index % 2 !== 0);
 
@@ -78,7 +76,7 @@ function ProfessorDashboard({ professorId }) {
               <p>ID: {assignatura.id_assignatura}</p>
             </div>
           ))}
-          {buttonColumn === true && (
+          {role_User === "professor" && (
             <button onClick={openModal} className={styles.addButton}>
               Afegir Assignatura
             </button>
@@ -101,12 +99,6 @@ function ProfessorDashboard({ professorId }) {
               <p>ID: {assignatura.id_assignatura}</p>
             </div>
           ))}
-
-          {buttonColumn === false && (
-            <button onClick={openModal} className={styles.addButton}>
-              Afegir Assignatura
-            </button>
-          )}
         </div>
       </div>
 
@@ -116,7 +108,8 @@ function ProfessorDashboard({ professorId }) {
 }
 
 ProfessorDashboard.propTypes = {
-  professorId: PropTypes.number,
+  id_User: PropTypes.number,
+  role_User: PropTypes.string,
 };
 
 export default ProfessorDashboard;

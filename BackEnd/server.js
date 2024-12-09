@@ -378,18 +378,39 @@ app.post('/createTema', (req,res) => {
 //Funció de recuperació de les materies associades a un professor en concret
 app.post('/recoverSubjects', (req, res) => { 
 
-    const idProfessor = req.body.professorId;
+    const id_User = req.body.idUser;
+    const roleUser = req.body.roleUser;
 
-    const sql = 'SELECT a.id_assignatura, a.nom_assignatura FROM assignatures a JOIN professors_assignatures pa ON a.id_assignatura = pa.id_assignatura WHERE pa.id_professor = ?';
 
-    db.query(sql, [idProfessor], (error, result) => {
-        if (error) {
-          console.error("Error en la consulta:", error);
-          return res.json({ Status: "Failed" });
-        } else {
-          return res.json(result); 
-        }
-      });
+    if(roleUser === "professor"){
+
+        const sql = 'SELECT a.id_assignatura, a.nom_assignatura FROM assignatures a JOIN professors_assignatures pa ON a.id_assignatura = pa.id_assignatura WHERE pa.id_professor = ?';
+
+        db.query(sql, [id_User], (error, result) => {
+            if (error) {
+              console.error("Error en la consulta:", error);
+              return res.json({ Status: "Failed" });
+            } else {
+              return res.json(result); 
+            }
+          });
+
+    }
+    else if (roleUser === "alumne"){
+        console.log("hahdhas")
+
+        const sql = 'SELECT a.id_assignatura, a.nom_assignatura FROM assignatures a JOIN alumnes_assignatures pa ON a.id_assignatura = pa.id_assignatura WHERE pa.id_alumne = ?';
+
+        db.query(sql, [id_User], (error, result) => {
+            if (error) {
+              console.error("Error en la consulta:", error);
+              return res.json({ Status: "Failed" });
+            } else {
+              return res.json(result); 
+            }
+          });
+    }
+    
 }) 
 
 //Funció inserció de les preguntes a la taula preguntes de la base de dades

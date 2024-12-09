@@ -9,7 +9,7 @@ function Modulespage() {
   const [name, setName] = useState("");
   const [auth, setAuth] = useState(false);
   const [message, setMessage] = useState(false);
-  const [niuTeacher, setNiuTeacher] = useState("");
+  const [niu, setNiu] = useState("");
 
   // Configura axios perquè inclogui les cookies en totes les sol·licituds
   axios.defaults.withCredentials = true;
@@ -23,8 +23,8 @@ function Modulespage() {
           setAuth(true);
           setName(res.data.name);
           setRole(res.data.role);
-          setNiuTeacher(res.data.niu);
-          console.log(res.data.niu);
+          setNiu(res.data.niu);
+          //console.log(typeof res.data.niu);
         } else {
           setAuth(false);
           setMessage(res.data.Error);
@@ -40,15 +40,7 @@ function Modulespage() {
   return (
     <div>
       {auth ? (
-        <div>
-          {role === "professor" ? (
-            <ProfessorDashboard professorId={niuTeacher} />
-          ) : role === "alumne" ? (
-            <StudentDashboard />
-          ) : (
-            <h3>Rol no reconegut</h3>
-          )}
-        </div>
+        <ProfessorDashboard id_User={niu} role_User={role} />
       ) : (
         <div>
           <h3>{message}</h3>
