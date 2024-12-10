@@ -3,14 +3,12 @@ import styles from "./StyleComponents/ProfessorDashboard.module.css";
 import PropTypes from "prop-types";
 import axios from "axios";
 
-function AddAssignaturaModal({ onClose }) {
+function AddAssignaturaModal({ id_user, onClose }) {
   const [nomAssignatura, setNomAssignatura] = useState("");
   const [idAssignatura, setIdAssignatura] = useState("");
   const [niuAlumnes, setNiuAlumnes] = useState("");
   const [niuProfessors, setNiuProfessors] = useState("");
-  // const [error, setError] = useState("");
 
-  // Funció per gestionar l'enviament del formulari. Estableix els usuaris que poden accedir a una assignatura i els registra a la base de dades.
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -21,6 +19,7 @@ function AddAssignaturaModal({ onClose }) {
         .map((niu) => niu.trim());
 
       const values = {
+        idPropietari: id_user,
         idAssignatura,
         nomAssignatura,
         niuArrayProfessors,
@@ -46,9 +45,10 @@ function AddAssignaturaModal({ onClose }) {
 
   return (
     <div className={styles.modalOver} onClick={onClose}>
-      <div onClick={(e) => e.stopPropagation()}>
-        <form onSubmit={handleSubmit}>
-          <div>
+      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+        <h2 className={styles.modalTitle}>Afegir Assignatura</h2>
+        <form onSubmit={handleSubmit} className={styles.modalForm}>
+          <div className={styles.formGroup}>
             <label>ID de la assignatura:</label>
             <input
               type="text"
@@ -58,7 +58,7 @@ function AddAssignaturaModal({ onClose }) {
               required
             />
           </div>
-          <div>
+          <div className={styles.formGroup}>
             <label>Nom de la assignatura:</label>
             <input
               type="text"
@@ -68,7 +68,7 @@ function AddAssignaturaModal({ onClose }) {
               required
             />
           </div>
-          <div>
+          <div className={styles.formGroup}>
             <label>NIUs dels professors (separats per comes):</label>
             <input
               type="text"
@@ -78,7 +78,7 @@ function AddAssignaturaModal({ onClose }) {
               required
             />
           </div>
-          <div>
+          <div className={styles.formGroup}>
             <label>NIUs dels alumnes (separats per comes):</label>
             <input
               type="text"
@@ -88,13 +88,18 @@ function AddAssignaturaModal({ onClose }) {
               required
             />
           </div>
-          <button type="submit" className={styles.addButtonModal}>
-            Afegir Assignatura
-          </button>
-
-          <button className={styles.addButtonModal} onClick={onClose}>
-            Cancelar
-          </button>
+          <div className={styles.buttonGroup}>
+            <button type="submit" className={styles.addButtonModal}>
+              Afegir Assignatura
+            </button>
+            <button
+              type="button"
+              className={styles.cancelButtonModal}
+              onClick={onClose}
+            >
+              Cancelar
+            </button>
+          </div>
         </form>
       </div>
     </div>
@@ -102,6 +107,7 @@ function AddAssignaturaModal({ onClose }) {
 }
 
 AddAssignaturaModal.propTypes = {
+  id_user: PropTypes.number.isRequired,
   onClose: PropTypes.func.isRequired,
 };
 export default AddAssignaturaModal;

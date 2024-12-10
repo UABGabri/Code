@@ -102,7 +102,7 @@ function ProfessorDashboard({ id_User, role_User }) {
         </div>
       </div>
 
-      {modal && <AddAssignaturaModal onClose={closeModal} />}
+      {modal && <AddAssignaturaModal id_user={id_User} onClose={closeModal} />}
     </div>
   );
 }

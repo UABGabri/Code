@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Headercap from "./Headercap";
 import { BiArrowBack } from "react-icons/bi";
-import ElementsCurs from "./ElementsCurs";
 
 function ElementsTests({}) {
   const location = useLocation();
@@ -14,7 +13,9 @@ function ElementsTests({}) {
   const idAssignatura = location.state?.id_assignatura;
 
   const [preguntes, setPreguntes] = useState([]);
+  const [filteredPreguntes, setFilteredPreguntes] = useState([]);
   const [selectedQuestions, setSelectedQuestions] = useState([]);
+  const [filters, setFilters] = useState({ dificultat: "", nom_tema: "" });
   const navigate = useNavigate();
   const history = useNavigate();
 
@@ -25,6 +26,7 @@ function ElementsTests({}) {
       })
       .then((response) => {
         setPreguntes(response.data);
+        setFilteredPreguntes(response.data); // Inicializa con todas las preguntas
       })
       .catch((error) => {
         console.error("Error al recuperar les preguntes:", error);
@@ -33,20 +35,16 @@ function ElementsTests({}) {
   }, []);
 
   const handleCheckboxChange = (id_pregunta) => {
-    setSelectedQuestions((prevSelected) => {
-      if (prevSelected.includes(id_pregunta)) {
-        return prevSelected.filter((id) => id !== id_pregunta);
-      } else if (prevSelected.length < 10) {
-        return [...prevSelected, id_pregunta];
-      }
-      return prevSelected;
-    });
+    setSelectedQuestions((prevSelected) =>
+      prevSelected.includes(id_pregunta)
+        ? prevSelected.filter((id) => id !== id_pregunta)
+        : [...prevSelected, id_pregunta]
+    );
   };
 
-  //Funció de creació dels tests a la base de dades. Forma seqüencial: 1r tests, després preguntes_test
   const handleCreateTest = () => {
-    if (selectedQuestions.length < 5) {
-      alert("Selecciona un mínim de 5 preguntes per crear el test.");
+    if (selectedQuestions.length < 1) {
+      alert("Has de seleccionar almenys una pregunta per crear el test.");
       return;
     }
 
@@ -75,7 +73,7 @@ function ElementsTests({}) {
             id_test: idTest,
             questions: selectedQuestions,
           })
-          .then((response) => {
+          .then(() => {
             history(-1);
           })
           .catch((error) => {
@@ -89,6 +87,40 @@ function ElementsTests({}) {
       });
   };
 
+  const handleRandomSelection = () => {
+    const availableQuestions = preguntes.filter(
+      (q) => !selectedQuestions.includes(q.id_pregunta)
+    );
+    const randomQuestions = availableQuestions
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 5);
+    setSelectedQuestions((prevSelected) => [
+      ...prevSelected,
+      ...randomQuestions.map((q) => q.id_pregunta),
+    ]);
+  };
+
+  const handleFilterChange = (key, value) => {
+    setFilters({ ...filters, [key]: value });
+  };
+
+  const handleResetFilters = () => {
+    setFilters({ dificultat: "", nom_tema: "" });
+    setFilteredPreguntes(preguntes); // Restaura todas las preguntas
+  };
+
+  useEffect(() => {
+    const filtered = preguntes.filter((question) => {
+      return (
+        (filters.dificultat
+          ? question.dificultat === filters.dificultat
+          : true) &&
+        (filters.nom_tema ? question.nom_tema === filters.nom_tema : true)
+      );
+    });
+    setFilteredPreguntes(filtered);
+  }, [filters, preguntes]);
+
   return (
     <div>
       <Headercap />
@@ -97,18 +129,42 @@ function ElementsTests({}) {
       </header>
 
       <div className={styles.questionsContainerTeacher}>
+        <div className={styles.filters}>
+          <select
+            value={filters.dificultat}
+            onChange={(e) => handleFilterChange("dificultat", e.target.value)}
+          >
+            <option value="">Filtrar per dificultat</option>
+            <option value="Fàcil">Fàcil</option>
+            <option value="Mitjà">Mitjà</option>
+            <option value="Difícil">Difícil</option>
+          </select>
+          <input
+            type="text"
+            placeholder="Filtrar per tema"
+            value={filters.nom_tema}
+            onChange={(e) => handleFilterChange("nom_tema", e.target.value)}
+          />
+          <button onClick={handleResetFilters}>Resetear filtres</button>
+        </div>
         <button
           className={styles.createTestButton}
           onClick={handleCreateTest}
-          disabled={selectedQuestions.length < 5}
+          disabled={selectedQuestions.length < 1} // Deshabilitado si no hay preguntas seleccionadas
         >
           Crear Test
         </button>
+        <button
+          className={styles.randomSelectButton}
+          onClick={handleRandomSelection}
+        >
+          Seleccionar 5 preguntes aleatòries
+        </button>
         <div className={styles.questionsList}>
-          {preguntes.length === 0 ? (
-            <p>No hi ha preguntes disponibles per a aquest tema.</p>
+          {filteredPreguntes.length === 0 ? (
+            <p>No hi ha preguntes disponibles segons els filtres.</p>
           ) : (
-            preguntes.map((question) => (
+            filteredPreguntes.map((question) => (
               <div key={question.id_pregunta} className={styles.questionCard}>
                 <div className={styles.questionDetails}>
                   <p>

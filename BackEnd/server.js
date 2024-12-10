@@ -236,6 +236,7 @@ app.post('/registerSubject', async (req, res) => {
         database: "web_examen_tfg"
     });
 */
+    const id_proper = req.body.idPropietari;
     const id = req.body.idAssignatura;
     const nomAssignatura = req.body.nomAssignatura;
     const niuProfessors = req.body.niuArrayProfessors;
@@ -949,18 +950,21 @@ app.get('/recoverSelectedTestWithKeyQuestions', (req, res) =>{
 
 })
 
-app.get('/recoverPreguntesTema', (req, res) =>{
-
-    //console.log("Here Am II");
-    const idTema = req.query.id_tema; 
-    //console.log("ID Tema recibido en el backend:", idTema);
+app.get('/recoverPreguntesTema', (req, res) => {
+    const idTema = req.query.id_tema;
 
     if (!idTema) {
         console.error("ID Tema no proporcionat");
         return res.json({ error: "ID Tema es requerit" });
     }
 
-    const sql = 'SELECT * FROM preguntes WHERE id_tema = ?';
+    const sql = `
+        SELECT preguntes.*, temes.nom_tema 
+        FROM preguntes 
+        JOIN temes ON preguntes.id_tema = temes.id_tema 
+        WHERE preguntes.id_tema = ?
+    `;
+
     db.query(sql, [idTema], (error, result) => {
         if (error) {
             console.error("Error a la consulta:", error);
@@ -969,10 +973,8 @@ app.get('/recoverPreguntesTema', (req, res) =>{
             return res.json(result);
         }
     });
+});
 
-
-
-})
 
 //Funció creació de test pel professor
 

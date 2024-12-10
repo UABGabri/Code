@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import ProfessorDashboard from "./ProfessorDashboard";
-import StudentDashboard from "./StudentDashboard";
 
 function Modulespage() {
   const [role, setRole] = useState("");
