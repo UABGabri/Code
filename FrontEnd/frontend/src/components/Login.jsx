@@ -34,7 +34,7 @@ function Login() {
           if (res.data.Status === "Success") {
             navigate("/modules");
           } else {
-            alert("Error en post");
+            alert("Error. L'usuari no està registrat a la base de dades.");
           }
         })
         .catch((err) => {

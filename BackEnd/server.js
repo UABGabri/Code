@@ -27,40 +27,35 @@ const db = mysql.createConnection({
 
 //Funció per registrar usuaris a la taula MySQl users
 app.post('/register', (req, res) => {
-    /*
-    const db = mysql.createConnection({
-        host: "localhost",
-        user: "root",
-        password: "Ga21012002",
-        database: "web_examen_tfg"
-    });
-*/
-    const { niu, username, password, role, gmail } = req.body; 
+    const { niu, username, password, role, gmail } = req.body;
 
     if (!niu || !username || !password || !role || !gmail) {
         return res.json({ error: "Tots els camps es requereixen" });
     }
 
-    const sql = "INSERT INTO usuaris (niu, username, password, role, email) VALUES (?)"; 
+    const checkNiuSql = "SELECT * FROM usuaris WHERE niu = ?";
+    db.query(checkNiuSql, [niu], (err, result) => {
+        if (err) return res.json({ Error: err.message });
 
-    //Funció guardat amb hash de la password
-    bcrypt.hash(req.body.password.toString(), salt, (err, hash) => {
-        if(err) return res.json({Error:"Error hashing password"});
-        
-        const values = [
-            req.body.niu,
-            req.body.username,
-            hash,
-            req.body.role,
-            req.body.gmail,
-        ];
+        if (result.length > 0) {
+            return res.json({ error: "El NIU ja existeix" });
+        }
 
-        db.query(sql, [values], (err, result) => {
-            if (err) return res.json({ Error: err.message });
-            return res.json({ Status: "Succeeded" });
+        const sql = "INSERT INTO usuaris (niu, username, password, role, email) VALUES (?)";
+
+        //Funció guardat amb hash de la password
+        bcrypt.hash(password.toString(), salt, (err, hash) => {
+            if (err) return res.json({ Error: "Error hashing password" });
+
+            const values = [niu, username, hash, role, gmail];
+            db.query(sql, [values], (err, result) => {
+                if (err) return res.json({ Error: err.message });
+                return res.json({ Status: "Succeeded" });
+            });
         });
     });
 });
+
 
 
 //Funció per realitzar login. Utilitza jwt token per poder accedir de forma segura 

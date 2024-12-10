@@ -36,15 +36,17 @@ function Register() {
       return;
     } else {
       axios
-        .post("http://localhost:8081/register", values) //Sol·licitud POST al servidor amb els valors de l'usuari.
+        .post("http://localhost:8081/register", values)
         .then((res) => {
-          console.log("Resposta del servidor:", res.data);
+          if (res.data.error) {
+            setError(res.data.error);
+          } else {
+            handleLogin();
+          }
         })
         .catch((err) => {
           console.error("Error a la solicitud:", err);
         });
-      setError("");
-      handleLogin();
     }
   };
 
