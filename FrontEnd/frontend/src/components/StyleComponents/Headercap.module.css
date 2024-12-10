@@ -21,6 +21,7 @@
 .rightcontent {
   position: relative;
   
+  
 }
 
 .dropdownmenu {
@@ -28,4 +29,5 @@
   right: 0; 
   background-color: green;
   border-radius: 5px;
+  z-index: 1000;
 }

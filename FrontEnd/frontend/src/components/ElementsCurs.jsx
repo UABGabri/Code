@@ -3,6 +3,7 @@ import axios from "axios";
 import styles from "./StyleComponents/Elements.module.css";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa"; // Iconos de flecha
 
 function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
   const [temes, setTemes] = useState([]);
@@ -11,9 +12,9 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
   const [selectedTest, setSelectedTest] = useState(null);
   const [accessKey, setAccessKey] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [openTema, setOpenTema] = useState({});
   const navigate = useNavigate();
 
-  // Recuperar temes asociados a la asignatura
   useEffect(() => {
     axios
       .get("http://localhost:8081/recoverTemesAssignatura", {
@@ -28,7 +29,6 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
       });
   }, [Id_Assignatura]);
 
-  // Recuperar tests para cada tema
   useEffect(() => {
     temes.forEach((tema) => {
       axios
@@ -49,7 +49,6 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
     });
   }, [temes]);
 
-  // Crear un nuevo tema
   const handleCreateTema = () => {
     if (!newTemaName.trim()) {
       alert("Si us plau, introdueix un nom per al tema");
@@ -78,20 +77,21 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
       });
   };
 
-  // Crear un nuevo test
-  const handleCreateTest = (id_tema) => {
-    navigate("/professorparametres", {
-      state: {
-        idTema: id_tema,
-        id_assignatura: Id_Assignatura,
-        id_professor: Id_User,
-      },
-    });
-  };
-
   const handleTestClick = (test) => {
-    setSelectedTest(test);
-    setShowModal(true);
+    if (Role_User === "professor") {
+      // Si es professor, redirigim a pàgina de personalització
+      navigate("/personalitzarTest", {
+        state: {
+          idTest: test.id_test,
+          idTema: test.id_tema,
+          idAssignatura: Id_Assignatura,
+        },
+      });
+    } else {
+      // Mostrar modal en cas de no ser professor
+      setSelectedTest(test);
+      setShowModal(true);
+    }
   };
 
   const handleAccessKeySubmit = () => {
@@ -121,6 +121,10 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
     setAccessKey("");
   };
 
+  const toggleTema = (id) => {
+    setOpenTema((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
   return (
     <div className={styles.elementsCursContainer}>
       <h1 className={styles.elementsCursHeader}>
@@ -130,55 +134,73 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
         {temes.length === 0 ? (
           <p className={styles.noTemes}>No hi ha temes creats</p>
         ) : (
-          temes.map((tema, index) => (
-            <div key={index} className={styles.temaItem}>
-              <h2 className={styles.temaTitle}>
-                <strong>{tema.nom_tema}</strong>
-              </h2>
+          temes.map((tema) => (
+            <div key={tema.id_tema} className={styles.temaItem}>
+              <div className={styles.temaHeader}>
+                <h2 className={styles.temaTitle}>
+                  <strong>{tema.nom_tema}</strong>
+                </h2>
+                <button
+                  className={styles.toggleButton}
+                  onClick={() => toggleTema(tema.id_tema)}
+                >
+                  {openTema[tema.id_tema] ? <FaChevronUp /> : <FaChevronDown />}
+                </button>
+              </div>
               <hr />
-              <div className={styles.temaContent}>
-                <div className={styles.contingut}>
-                  <h3 className={styles.temaSubtitle}>
-                    <strong>Contingut</strong>
-                  </h3>
-                  <hr />
-                  {Role_User === "professor" && (
-                    <button>Afegir contingut pel {tema.nom_tema}</button>
-                  )}
-                </div>
-                <div className={styles.tests}>
-                  <h3 className={styles.temaSubtitle}>
-                    <strong>Tests {tema.nom_tema}</strong>
-                  </h3>
-                  <hr />
-                  <div className={styles.testList}>
-                    {tests[tema.id_tema] && tests[tema.id_tema].length > 0 ? (
-                      <ul>
-                        {tests[tema.id_tema].map((test) => (
-                          <li
-                            key={test.id_test}
-                            className={styles.testItem}
-                            onClick={() => handleTestClick(test)}
-                          >
-                            {test.nom_test}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p>No hi ha tests per aquest tema.</p>
-                    )}
-
+              {openTema[tema.id_tema] && (
+                <div className={styles.temaContent}>
+                  <div className={styles.contingut}>
+                    <h3 className={styles.temaSubtitle}>
+                      <strong>Contingut</strong>
+                    </h3>
+                    <hr />
                     {Role_User === "professor" && (
-                      <button
-                        className={styles.buttonAddTest}
-                        onClick={() => handleCreateTest(tema.id_tema)}
-                      >
-                        Afegir test
-                      </button>
+                      <button>Afegir contingut pel {tema.nom_tema}</button>
                     )}
                   </div>
+                  <div className={styles.tests}>
+                    <h3 className={styles.temaSubtitle}>
+                      <strong>Tests Avaluatius</strong>
+                    </h3>
+                    <hr />
+                    <div className={styles.testList}>
+                      {tests[tema.id_tema] && tests[tema.id_tema].length > 0 ? (
+                        <ul>
+                          {tests[tema.id_tema].map((test) => (
+                            <li
+                              key={test.id_test}
+                              className={styles.testItem}
+                              onClick={() => handleTestClick(test)}
+                            >
+                              {test.nom_test}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p>No hi ha tests per aquest tema.</p>
+                      )}
+
+                      {Role_User === "professor" && (
+                        <button
+                          className={styles.buttonAddTest}
+                          onClick={() =>
+                            navigate("/professorparametres", {
+                              state: {
+                                idTema: tema.id_tema,
+                                id_assignatura: Id_Assignatura,
+                                id_professor: Id_User,
+                              },
+                            })
+                          }
+                        >
+                          Afegir test
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           ))
         )}

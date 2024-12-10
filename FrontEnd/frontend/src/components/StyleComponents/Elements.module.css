@@ -131,6 +131,7 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  
 }
 
 .participantDetails p {
@@ -316,117 +317,117 @@
 
 
 /*SECCIÓ CURS*/
+
 .elementsCursContainer {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  height: 100vh;
-  width: 100vw;
+
   padding: 20px;
+  background-color: white;
   font-family: Arial, sans-serif;
-  margin-top: 130px;
-  box-sizing: border-box;
+  
+  margin-top: 150px;
+ 
+  width: 100vw;
+  align-items: center;
 }
 
 .elementsCursHeader {
   text-align: center;
-
+  color: #333;
+  font-size: 2rem;
   margin-bottom: 20px;
 }
 
 .temesLista {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  width: 100%;
-  max-width: 1200px;
-  margin-bottom: 20px;
-  padding: 20px;
+  margin-top: 20px;
 }
 
 .temaItem {
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  padding: 15px;
-  background-color: #f9f9f9;
-  text-align: center;
-  box-sizing: border-box;
-  width: 100%;
+  margin-bottom: 20px;  
+}
 
+.temaHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .temaTitle {
+  margin: 0;
   font-size: 1.5rem;
-  margin-bottom: 10px;
+}
+
+.toggleButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+}
+
+hr {
+  border: 1px solid #ccc;
+  margin-top: 10px;
 }
 
 .temaContent {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-}
-
-.contingut,
-.tests {
-  width: calc(50% - 10px);
+  margin-top: 10px;
+  padding-left: 20px;
 }
 
 .temaSubtitle {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   margin-bottom: 10px;
 }
 
-.noTemes {
-  text-align: center;
-  font-size: 1.2rem;
-  color: #888;
+.contingut, .tests {
+  margin-bottom: 20px;
+}
+
+.testList {
+  list-style: none;
+  padding-left: 0;
+}
+
+.testItem {
+  cursor: pointer;
+  color: #007bff;
+}
+
+.testItem:hover {
+  text-decoration: underline;
 }
 
 .temaCrear {
+  margin-top: 20px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  width: 100%;
-  max-width: 300px;
-  margin-top: 20px;
 }
 
 .temaInput {
-  padding: 10px;
+  padding: 8px;
   margin-bottom: 10px;
-  width: 100%;
-  border-radius: 5px;
-  border: 1px solid #ccc;
+  width: 300px;
 }
 
 .temaButton {
-  padding: 10px;
-  background-color: #4CAF50;
+  padding: 8px 16px;
+  background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 5px;
   cursor: pointer;
-  width: 100%;
-  margin-top: 20px;
 }
 
 .temaButton:hover {
-  background-color: #45a049;
+  background-color: #0056b3;
 }
 
-.temaCrear {
-  position: relative;
-  margin-top: auto;
-}
-
+/* Estilos del modal */
 .modal {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  right: 0;
+  bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
@@ -435,17 +436,16 @@
 }
 
 .modalContent {
-  background: #fff;
+  background-color: white;
   padding: 20px;
-  border-radius: 8px;
-  text-align: center;
+  border-radius: 10px;
   width: 300px;
 }
 
 .modalInput {
   width: 100%;
-  padding: 10px;
-  margin: 10px 0;
+  padding: 8px;
+  margin-bottom: 10px;
 }
 
 .modalActions {
@@ -454,22 +454,21 @@
 }
 
 .modalButton {
-  padding: 10px 15px;
-  background: #007bff;
-  color: #fff;
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
 }
 
 .modalButtonCancel {
-  padding: 10px 15px;
-  background: #dc3545;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  background-color: #ccc;
 }
+
+.modalButton:hover, .modalButtonCancel:hover {
+  opacity: 0.8;
+}
+
 
 
 

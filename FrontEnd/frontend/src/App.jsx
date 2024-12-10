@@ -11,6 +11,7 @@ import AfegirPregunta from "./components/AfegirPregunta";
 import TestLayout from "./components/TestLayout";
 import ElementsTestsProfessor from "./components/ElementsTestsProfessor";
 import TestWithKey from "./components/TestWithKey";
+import PersonalitzarTest from "./components/PersonalitzarTest";
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
         ></Route>
 
         <Route path="/realitzartest" element={<TestWithKey />}></Route>
+        <Route path="/personalitzarTest" element={<PersonalitzarTest />} />
       </Routes>
     </BrowserRouter>
   );
