@@ -150,7 +150,7 @@ function ElementsTests({}) {
         <button
           className={styles.createTestButton}
           onClick={handleCreateTest}
-          disabled={selectedQuestions.length < 1} // Deshabilitado si no hay preguntas seleccionadas
+          disabled={selectedQuestions.length < 1}
         >
           Crear Test
         </button>

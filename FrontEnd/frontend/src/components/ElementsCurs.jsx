@@ -77,14 +77,14 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
       });
   };
 
-  const handleTestClick = (test) => {
+  const handleTestClick = (test, tema) => {
+    const id_tema = parseInt(tema);
     if (Role_User === "professor") {
       // Si es professor, redirigim a pàgina de personalització
       navigate("/personalitzarTest", {
         state: {
           idTest: test.id_test,
-          idTema: test.id_tema,
-          idAssignatura: Id_Assignatura,
+          idTema: id_tema,
         },
       });
     } else {
@@ -171,7 +171,9 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                             <li
                               key={test.id_test}
                               className={styles.testItem}
-                              onClick={() => handleTestClick(test)}
+                              onClick={() =>
+                                handleTestClick(test, tema.id_tema)
+                              }
                             >
                               {test.nom_test}
                             </li>
@@ -184,15 +186,16 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                       {Role_User === "professor" && (
                         <button
                           className={styles.buttonAddTest}
-                          onClick={() =>
+                          onClick={() => {
+                            console.log("ID del tema enviado:", tema.id_tema);
                             navigate("/professorparametres", {
                               state: {
                                 idTema: tema.id_tema,
                                 id_assignatura: Id_Assignatura,
                                 id_professor: Id_User,
                               },
-                            })
-                          }
+                            });
+                          }}
                         >
                           Afegir test
                         </button>

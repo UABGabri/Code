@@ -950,6 +950,7 @@ app.get('/recoverSelectedTestWithKeyQuestions', (req, res) =>{
 
 })
 
+
 app.get('/recoverPreguntesTema', (req, res) => {
     const idTema = req.query.id_tema;
 
@@ -974,6 +975,7 @@ app.get('/recoverPreguntesTema', (req, res) => {
         }
     });
 });
+
 
 
 //Funció creació de test pel professor
