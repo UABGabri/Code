@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BiArrowBack } from "react-icons/bi";
 import Headercap from "./Headercap";
@@ -12,6 +12,21 @@ function PersonalitzarTest() {
   const [bancPreguntes, setBancPreguntes] = useState([]);
   const [selectedQuestions, setSelectedQuestions] = useState([]);
   const { idTest, idTema } = location.state || {};
+  const dragPregunta = useRef(0);
+  const dragOverPregunta = useRef(0);
+
+  const handleSort = () => {
+    const preguntaClone = [...testPreguntes];
+
+    const temp = preguntaClone[dragPregunta.current];
+
+    preguntaClone[dragPregunta.current] =
+      preguntaClone[dragOverPregunta.current];
+
+    preguntaClone[dragOverPregunta.current] = temp;
+
+    setTestPreguntes(preguntaClone);
+  };
 
   useEffect(() => {
     console.log(idTema);
@@ -81,8 +96,16 @@ function PersonalitzarTest() {
         <h1>Preguntes del Test</h1>
 
         <div className={styles.questionsList}>
-          {testPreguntes.map((pregunta) => (
-            <div key={pregunta.id_pregunta} className={styles.questionCard}>
+          {testPreguntes.map((pregunta, index) => (
+            <div
+              key={pregunta.id_pregunta}
+              className={styles.questionCard}
+              draggable
+              onDragStart={() => (dragPregunta.current = index)}
+              onDragEnter={() => (dragOverPregunta.current = index)}
+              onDragEnd={handleSort}
+              onDragOver={(e) => e.preventDefault()}
+            >
               <div className={styles.questionDetails}>
                 <p>
                   <strong>Pregunta:</strong> {pregunta.pregunta}
