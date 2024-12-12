@@ -323,7 +323,7 @@
   padding: 20px;
   background-color: white;
   font-family: Arial, sans-serif;
-  
+
   margin-top: 150px;
  
   width: 100vw;
@@ -338,7 +338,8 @@
 }
 
 .temesLista {
-  margin-top: 20px;
+
+  margin-top: 10px;
 }
 
 .temaItem {
@@ -364,8 +365,12 @@
 }
 
 hr {
-  border: 1px solid #ccc;
+  border: 1px solid black;
   margin-top: 10px;
+}
+
+.lineCustom{
+  border: 1px solid black;
 }
 
 .temaContent {
@@ -520,7 +525,15 @@ hr {
 
 }
 
-
-
-
 /*FI SECCIÓ TEST PROFESSOR*/
+
+
+/*SECCIO CUSTOM TEST*/
+
+.customBody{
+  margin-top: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100vw;
+}

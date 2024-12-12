@@ -93,8 +93,7 @@ function PersonalitzarTest() {
       </header>
 
       <div className={styles.customBody}>
-        <h1>Preguntes del Test</h1>
-
+        <h1>Ordre Preguntes del Test</h1>
         <div className={styles.questionsList}>
           {testPreguntes.map((pregunta, index) => (
             <div
@@ -127,6 +126,7 @@ function PersonalitzarTest() {
           ))}
         </div>
 
+        <hr className={styles.lineCustom}></hr>
         <h1>Banc de Preguntes {idTema}</h1>
         <div className={styles.questionsList}>
           {bancPreguntes.map((pregunta) => (
