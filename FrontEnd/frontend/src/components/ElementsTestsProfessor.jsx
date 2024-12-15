@@ -26,7 +26,7 @@ function ElementsTests({}) {
       })
       .then((response) => {
         setPreguntes(response.data);
-        setFilteredPreguntes(response.data); // Inicializa con todas las preguntas
+        setFilteredPreguntes(response.data);
       })
       .catch((error) => {
         console.error("Error al recuperar les preguntes:", error);
@@ -68,10 +68,17 @@ function ElementsTests({}) {
         alert("Test creat correctament!");
         const idTest = parseInt(response.data.id_test);
 
+        const orderedQuestions = selectedQuestions.map(
+          (id_pregunta, index) => ({
+            id_pregunta,
+            posicio: index + 1,
+          })
+        );
+
         axios
           .post("http://localhost:8081/insertQuestionsTest", {
             id_test: idTest,
-            questions: selectedQuestions,
+            questions: orderedQuestions,
           })
           .then(() => {
             history(-1);
@@ -106,7 +113,7 @@ function ElementsTests({}) {
 
   const handleResetFilters = () => {
     setFilters({ dificultat: "", nom_tema: "" });
-    setFilteredPreguntes(preguntes); // Restaura todas las preguntas
+    setFilteredPreguntes(preguntes);
   };
 
   useEffect(() => {
@@ -158,7 +165,7 @@ function ElementsTests({}) {
           className={styles.randomSelectButton}
           onClick={handleRandomSelection}
         >
-          Seleccionar 5 preguntes aleatòries
+          Selecciona 5 preguntes aleatòries
         </button>
         <div className={styles.questionsList}>
           {filteredPreguntes.length === 0 ? (

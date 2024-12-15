@@ -152,11 +152,13 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                 <div className={styles.temaContent}>
                   <div className={styles.contingut}>
                     <h3 className={styles.temaSubtitle}>
-                      <strong>Contingut</strong>
+                      <strong>Test de Pràctica</strong>
                     </h3>
                     <hr />
                     {Role_User === "professor" && (
-                      <button>Afegir contingut pel {tema.nom_tema}</button>
+                      <button>
+                        Afegir Test de Pràctica pel {tema.nom_tema}
+                      </button>
                     )}
                   </div>
                   <div className={styles.tests}>
@@ -197,7 +199,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                             });
                           }}
                         >
-                          Afegir test
+                          Afegir Test Avaluatiu pel tema {tema.nom_tema}
                         </button>
                       )}
                     </div>

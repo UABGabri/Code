@@ -381,7 +381,11 @@ app.post('/recoverSubjects', (req, res) => {
 
     if(roleUser === "professor"){
 
-        const sql = 'SELECT a.id_assignatura, a.nom_assignatura FROM assignatures a JOIN professors_assignatures pa ON a.id_assignatura = pa.id_assignatura WHERE pa.id_professor = ?';
+        const sql = `SELECT a.id_assignatura, a.nom_assignatura 
+        FROM assignatures a 
+        JOIN professors_assignatures pa 
+        ON a.id_assignatura = pa.id_assignatura 
+        WHERE pa.id_professor = ?`;
 
         db.query(sql, [id_User], (error, result) => {
             if (error) {
@@ -396,7 +400,10 @@ app.post('/recoverSubjects', (req, res) => {
     else if (roleUser === "alumne"){
         console.log("hahdhas")
 
-        const sql = 'SELECT a.id_assignatura, a.nom_assignatura FROM assignatures a JOIN alumnes_assignatures pa ON a.id_assignatura = pa.id_assignatura WHERE pa.id_alumne = ?';
+        const sql = `SELECT a.id_assignatura, a.nom_assignatura 
+        FROM assignatures a 
+        JOIN alumnes_assignatures pa ON a.id_assignatura = pa.id_assignatura 
+        WHERE pa.id_alumne = ?`;
 
         db.query(sql, [id_User], (error, result) => {
             if (error) {
@@ -492,9 +499,8 @@ app.post('/addQuestion', async (req, res) => {
             conceptIds.push(conceptId);
         }
 
-        // Associar conceptos amb la pregunta
-        const conceptQuestionSql = `
-            INSERT INTO preguntes_conceptes (id_pregunta, id_concepte) VALUES (?, ?)`;
+        // Associar conceptes amb la pregunta
+        const conceptQuestionSql = `INSERT INTO preguntes_conceptes (id_pregunta, id_concepte) VALUES (?, ?)`;
         for (const conceptId of conceptIds) {
             await dbQuery(conceptQuestionSql, [questionId, conceptId]);
         }
@@ -555,7 +561,9 @@ app.get('/recoverQuestions', (req, res)=>{
     const id_assignatura = req.query.Id_Assignatura;
     parseInt(id_assignatura);
     
-    const sql = `SELECT * FROM preguntes JOIN temes ON preguntes.id_tema = temes.id_tema WHERE preguntes.estat = 'pendent' AND temes.id_assignatura = ?`;
+    const sql = `SELECT * FROM preguntes 
+    JOIN temes ON preguntes.id_tema = temes.id_tema 
+    WHERE preguntes.estat = 'pendent' AND temes.id_assignatura = ?`;
 
     db.query(sql,[id_assignatura], (error, result)=>{
 
@@ -763,12 +771,12 @@ app.get('/recoverElementsTest', (req, res) => {
     parseInt(id_assignatura,10);
 
     const sql = `SELECT t.id_tema, t.nom_tema AS tema, GROUP_CONCAT(c.nom_concepte SEPARATOR ', ') AS tots_els_conceptes
-FROM temes t
-LEFT JOIN preguntes p ON t.id_tema = p.id_tema AND p.estat = 'acceptada'
-LEFT JOIN preguntes_conceptes pc ON p.id_pregunta = pc.id_pregunta
-LEFT JOIN conceptes c ON pc.id_concepte = c.id_concepte
-WHERE t.id_assignatura = ?
-GROUP BY t.id_tema, t.nom_tema
+    FROM temes t
+    LEFT JOIN preguntes p ON t.id_tema = p.id_tema AND p.estat = 'acceptada'
+    LEFT JOIN preguntes_conceptes pc ON p.id_pregunta = pc.id_pregunta
+    LEFT JOIN conceptes c ON pc.id_concepte = c.id_concepte
+    WHERE t.id_assignatura = ?
+    GROUP BY t.id_tema, t.nom_tema
 
     `;
 
@@ -880,9 +888,6 @@ app.get('/recoverRandomTestQuestions', async (req, res) => {
 
 
 
-
-
-
     const getConcepteId = () => {
         return new Promise((resolve, reject) => {
             db.query(sqlGetConcepteId, [concepte], (err, result) => {
@@ -927,31 +932,34 @@ app.get('/recoverRandomTestQuestions', async (req, res) => {
 });
 
 
+//Funció de recuperació de les preguntes dels tests (utilitzats en tests avaluatius)
 
-
-app.get('/recoverSelectedTestWithKeyQuestions', (req, res) =>{
-
+app.get('/recoverSelectedTestWithKeyQuestions', (req, res) => {
 
     const idTest = parseInt(req.query.idTest);
- 
     
-    const sql = 'SELECT p.id_pregunta,p.pregunta,p.solucio_correcta,solucio_erronia1,solucio_erronia2, solucio_erronia3 FROM test_preguntes pt JOIN preguntes p ON pt.id_pregunta = p.id_pregunta WHERE pt.id_test = ?';
-    
-    
+    const sql = `
+        SELECT p.id_pregunta, p.pregunta, p.solucio_correcta, p.solucio_erronia1, p.solucio_erronia2, p.solucio_erronia3, pt.posicio_test 
+        FROM test_preguntes pt 
+        JOIN preguntes p ON pt.id_pregunta = p.id_pregunta 
+        WHERE pt.id_test = ?
+        ORDER BY pt.posicio_test
+    `;
 
     db.query(sql, [idTest], (error, result) => {
         if (error) {
             console.error("Error a la consulta:", error);
             return res.json({ status: "Failed", error });
         }
-        res.json({ status: "Success", Preguntes:result });
+        res.json({ status: "Success", Preguntes: result });
     });
 
+});
 
-})
 
-
+//Funció de recuperació de les preguntes segons el tema
 app.get('/recoverPreguntesTema', (req, res) => {
+
     const idTema = req.query.id_tema;
 
     if (!idTema) {
@@ -1010,18 +1018,32 @@ app.post('/insertQuestionsTest', (req, res) => {
     parseInt(idTest);
     const preguntesTest = req.body.questions;
 
-    const sql = 'INSERT INTO test_preguntes (id_test, id_pregunta) VALUES ?';
+    
+    const sql = 'INSERT INTO test_preguntes (id_test, id_pregunta, posicio_test) VALUES (?, ?, ?)';
 
-    const values = preguntesTest.map((idPregunta) => [idTest, idPregunta]);
-
-    db.query(sql, [values], (error, result) => {
-        if (error) {
-            console.error("Error a la consulta:", error);
-            return res.status(500).json({ status: "Failed" });
-        } else {
-            return res.json({ status: "Success", result });
-        }
+    const values = preguntesTest.map((pregunta) => [idTest, pregunta.id_pregunta, pregunta.posicio]);
+    const promises = values.map((value) => {
+        return new Promise((resolve, reject) => {
+            db.query(sql, value, (error, result) => {
+                if (error) {
+                    console.error("Error al insertar la pregunta:", value, error);
+                    return reject(error);
+                }
+                resolve(result);
+            });
+        });
     });
+
+
+    Promise.all(promises)
+        .then((results) => {
+            return res.json({ status: "Success", results });
+        })
+        .catch((error) => {
+            console.error("Error durante el proceso de inserción:", error);
+            return res.json({ status: "Failed", message: "Database error" });
+        });
+    
 });
 
 
@@ -1068,6 +1090,47 @@ app.post('/validateTestAccess', (req, res) => {
 });
 
 
+//Funció per guardar els canvis efectuats dins un test avaluatiu, ja sigui posició, eliminació o afegir preguntes
+app.post("/updateTestQuestions", (req, res) => {
+    const { idTest, questions } = req.body;
+  
+    if (!idTest || !questions) {
+      return res.send("Dades incompletes: idTest o questions no rebut.");
+    }
+  
+    const deleteQuery = "DELETE FROM test_preguntes WHERE id_test = ?";
+
+    db.query(deleteQuery, [idTest], (err, result) => {
+      if (err) {
+        console.error("Error eliminant preguntes anteriors:", err);
+        return res.send("Error eliminant les preguntes actuals.");
+      }
+  
+      const insertQuery = `INSERT INTO test_preguntes (id_test, id_pregunta, posicio_test) VALUES (?, ?, ?)`;
+  
+      const insertPromises = questions.map((question) => {
+        return new Promise((resolve, reject) => {
+          db.query(
+            insertQuery,
+            [idTest, question.id_pregunta, question.posicio],
+            (err, result) => {
+              if (err) reject(err);
+              else resolve(result);
+            }
+          );
+        });
+      });
+  
+      Promise.all(insertPromises)
+        .then(() => {
+          res.send("Les preguntes del test s'han actualitzat correctament.");
+        })
+        .catch((err) => {
+          console.error("Error inserint les noves preguntes:", err);
+          res.send("Error actualitzant les preguntes del test.");
+        });
+    });
+  });
 
 //Funció d'escolta del servidor 
 app.listen(8081, () => {
