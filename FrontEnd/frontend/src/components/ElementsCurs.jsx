@@ -103,8 +103,17 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
       });
     } else {
       // Mostrar modal en cas de no ser professor
-      setSelectedTest(test);
-      setShowModal(true);
+
+      if (test.tipus == "avaluatiu") {
+        setSelectedTest(test);
+        setShowModal(true);
+      } else {
+        setSelectedTest(test);
+
+        navigate("/realitzartest", {
+          state: { idTest: selectedTest.id_test },
+        });
+      }
     }
   };
 
