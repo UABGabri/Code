@@ -3,11 +3,12 @@ import axios from "axios";
 import styles from "./StyleComponents/Elements.module.css";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
-import { FaChevronDown, FaChevronUp } from "react-icons/fa"; // Iconos de flecha
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
   const [temes, setTemes] = useState([]);
-  const [tests, setTests] = useState({});
+  const [testsAvaluatius, setTestsAvaluatius] = useState({});
+  const [testsPractica, setTestsPractica] = useState({});
   const [newTemaName, setNewTemaName] = useState("");
   const [selectedTest, setSelectedTest] = useState(null);
   const [accessKey, setAccessKey] = useState("");
@@ -37,7 +38,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
         })
         .then((response) => {
           if (response.data.status === "Success") {
-            setTests((prevTests) => ({
+            setTestsAvaluatius((prevTests) => ({
               ...prevTests,
               [tema.id_tema]: response.data.result,
             }));
@@ -148,6 +149,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                 </button>
               </div>
               <hr />
+
               {openTema[tema.id_tema] && (
                 <div className={styles.temaContent}>
                   <div className={styles.contingut}>
@@ -156,20 +158,35 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                     </h3>
                     <hr />
                     {Role_User === "professor" && (
-                      <button>
+                      <button
+                        onClick={() => {
+                          console.log("Id del tema enviat: ", tema.id_tema);
+                          navigate("/professorparametres", {
+                            //navegació al CrearTestProfessor amb tipus practica
+                            state: {
+                              idTema: tema.id_tema,
+                              id_assignatura: Id_Assignatura,
+                              id_professor: Id_User,
+                              tipus: "practica",
+                            },
+                          });
+                        }}
+                      >
                         Afegir Test de Pràctica pel {tema.nom_tema}
                       </button>
                     )}
                   </div>
+
                   <div className={styles.tests}>
                     <h3 className={styles.temaSubtitle}>
                       <strong>Tests Avaluatius</strong>
                     </h3>
                     <hr />
                     <div className={styles.testList}>
-                      {tests[tema.id_tema] && tests[tema.id_tema].length > 0 ? (
+                      {testsAvaluatius[tema.id_tema] &&
+                      testsAvaluatius[tema.id_tema].length > 0 ? (
                         <ul>
-                          {tests[tema.id_tema].map((test) => (
+                          {testsAvaluatius[tema.id_tema].map((test) => (
                             <li
                               key={test.id_test}
                               className={styles.testItem}
@@ -195,6 +212,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                                 idTema: tema.id_tema,
                                 id_assignatura: Id_Assignatura,
                                 id_professor: Id_User,
+                                tipus: "avaluatiu",
                               },
                             });
                           }}

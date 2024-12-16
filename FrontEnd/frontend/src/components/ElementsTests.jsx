@@ -4,6 +4,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
+//Creació de tests randoms -> futur creació tests intel·ligents
 function ElementsTests({ idAssignatura }) {
   const navigate = useNavigate();
   const [temes, setTemes] = useState([]);
@@ -67,7 +68,6 @@ function ElementsTests({ idAssignatura }) {
   }, [idAssignatura]);
 
   const handleSubmit = (e) => {
-    console.log("hOLAAAAAAAA");
     e.preventDefault();
     const { tema, concepte, dificultat } = parametersTest;
 

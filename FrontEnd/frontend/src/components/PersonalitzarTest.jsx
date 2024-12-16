@@ -5,6 +5,7 @@ import Headercap from "./Headercap";
 import styles from "./StyleComponents/Elements.module.css";
 import axios from "axios";
 
+//Component de personalització del test avaluatiu
 function PersonalitzarTest() {
   const navigate = useNavigate();
   const location = useLocation();

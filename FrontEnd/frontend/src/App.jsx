@@ -9,7 +9,7 @@ import Profile from "./components/Profile";
 import AssignaturaLayout from "./components/AssignaturaLayout";
 import AfegirPregunta from "./components/AfegirPregunta";
 import TestLayout from "./components/TestLayout";
-import ElementsTestsProfessor from "./components/ElementsTestsProfessor";
+import CrearTestProfessor from "./components/CrearTestProfessor";
 import TestWithKey from "./components/TestWithKey";
 import PersonalitzarTest from "./components/PersonalitzarTest";
 
@@ -38,7 +38,7 @@ function App() {
         <Route path="/testlayout" element={<TestLayout />}></Route>
         <Route
           path="/professorparametres"
-          element={<ElementsTestsProfessor />}
+          element={<CrearTestProfessor />}
         ></Route>
 
         <Route path="/realitzartest" element={<TestWithKey />}></Route>

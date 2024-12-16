@@ -6,17 +6,19 @@ import { useNavigate } from "react-router-dom";
 import Headercap from "./Headercap";
 import { BiArrowBack } from "react-icons/bi";
 
-function ElementsTests({}) {
+//Desde elements curs va aquí per crear el test amb clau.
+function CrearTestProfessor() {
   const location = useLocation();
   const idTema = location.state?.idTema;
   const idProfessor = location.state?.id_professor;
   const idAssignatura = location.state?.id_assignatura;
+  const tipus = location.state?.tipus;
 
   const [preguntes, setPreguntes] = useState([]);
   const [filteredPreguntes, setFilteredPreguntes] = useState([]);
   const [selectedQuestions, setSelectedQuestions] = useState([]);
   const [filters, setFilters] = useState({ dificultat: "", nom_tema: "" });
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const history = useNavigate();
 
   useEffect(() => {
@@ -63,6 +65,7 @@ function ElementsTests({}) {
         id_creador,
         id_assignatura,
         idTema,
+        tipus,
       })
       .then((response) => {
         alert("Test creat correctament!");
@@ -207,4 +210,4 @@ function ElementsTests({}) {
   );
 }
 
-export default ElementsTests;
+export default CrearTestProfessor;

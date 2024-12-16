@@ -3,9 +3,9 @@ import styles from "./StyleComponents/TestLayout.module.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
+//Creació layout del Test amb clau
 function TestWithKey() {
   const location = useLocation();
-  //const navigate = useNavigate();
   const history = useNavigate();
   const [preguntes, setPreguntes] = useState([]);
   const [respostesBarrejades, setRespostesBarrejades] = useState([]);
@@ -22,7 +22,10 @@ function TestWithKey() {
         params: { idTest },
       })
       .then((response) => {
-        setPreguntes(response.data.Preguntes);
+        const sortedPreguntes = response.data.Preguntes.sort(
+          (a, b) => a.posicio - b.posicio
+        );
+        setPreguntes(sortedPreguntes);
         setRespostesBarrejades(
           response.data.Preguntes.map((pregunta) => barrejarRespostes(pregunta))
         );

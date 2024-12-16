@@ -989,7 +989,7 @@ app.get('/recoverPreguntesTema', (req, res) => {
 //Funció creació de test pel professor
 
 app.post('/createTest', async (req, res) => {
-    const { nom_test, id_creador, id_assignatura, idTema} = req.body;
+    const { nom_test, id_creador, id_assignatura, idTema, tipus} = req.body;
     const clau_acces = Math.random().toString(36).substr(2, 8);
     const data_creacio = new Date();
 
@@ -997,9 +997,9 @@ app.post('/createTest', async (req, res) => {
     parseInt(id_assignatura,10)
     parseInt(idTema,10)
    
-    const sql = ' INSERT INTO tests (nom_test, data_creacio, clau_acces, id_creador, id_assignatura, id_tema) VALUES (?, ?, ?, ?, ?, ?)';
+    const sql = ' INSERT INTO tests (nom_test, data_creacio, clau_acces, id_creador, id_assignatura, id_tema, tipus) VALUES (?, ?, ?, ?, ?, ?, ?)';
 
-    db.query(sql, [nom_test, data_creacio, clau_acces, id_creador, id_assignatura, idTema ], (error, result) => {
+    db.query(sql, [nom_test, data_creacio, clau_acces, id_creador, id_assignatura, idTema, tipus ], (error, result) => {
         if (error) {
             console.error("Error en la consulta:", error);
             return res.json({ Status: "Failed" });
