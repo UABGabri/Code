@@ -1053,7 +1053,7 @@ app.get('/recoverTestsTema', (req, res) =>{
 const idTema = req.query.id_tema;
 
 parseInt(idTema, 10);
-const sql = 'SELECT id_test, nom_test FROM tests WHERE id_tema = ?'
+const sql = 'SELECT id_test, nom_test, tipus FROM tests WHERE id_tema = ?'
 
 db.query(sql, [idTema], (error, result) => {
     if (error) {

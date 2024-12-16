@@ -165,29 +165,49 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
 
               {openTema[tema.id_tema] && (
                 <div className={styles.temaContent}>
-                  <div className={styles.contingut}>
+                  <div className={styles.tests}>
                     <h3 className={styles.temaSubtitle}>
                       <strong>Test de Pràctica</strong>
                     </h3>
                     <hr />
-                    {Role_User === "professor" && (
-                      <button
-                        onClick={() => {
-                          console.log("Id del tema enviat: ", tema.id_tema);
-                          navigate("/professorparametres", {
-                            //navegació al CrearTestProfessor amb tipus practica
-                            state: {
-                              idTema: tema.id_tema,
-                              id_assignatura: Id_Assignatura,
-                              id_professor: Id_User,
-                              tipus: "practica",
-                            },
-                          });
-                        }}
-                      >
-                        Afegir Test de Pràctica pel {tema.nom_tema}
-                      </button>
-                    )}
+                    <div className={styles.testList}>
+                      {testsPractica[tema.id_tema] &&
+                      testsPractica[tema.id_tema].length > 0 ? (
+                        <ul>
+                          {testsPractica[tema.id_tema].map((test) => (
+                            <li
+                              key={test.id_test}
+                              className={styles.testItem}
+                              onClick={() =>
+                                handleTestClick(test, tema.id_tema)
+                              }
+                            >
+                              {test.nom_test}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p>No hi ha tests de pràctica per aquest tema.</p>
+                      )}
+
+                      {Role_User === "professor" && (
+                        <button
+                          className={styles.buttonAddTest}
+                          onClick={() => {
+                            navigate("/professorparametres", {
+                              state: {
+                                idTema: tema.id_tema,
+                                id_assignatura: Id_Assignatura,
+                                id_professor: Id_User,
+                                tipus: "practica",
+                              },
+                            });
+                          }}
+                        >
+                          Afegir Test de Pràctica pel tema {tema.nom_tema}
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <div className={styles.tests}>
@@ -212,14 +232,13 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                           ))}
                         </ul>
                       ) : (
-                        <p>No hi ha tests per aquest tema.</p>
+                        <p>No hi ha tests avaluatius per aquest tema.</p>
                       )}
 
                       {Role_User === "professor" && (
                         <button
                           className={styles.buttonAddTest}
                           onClick={() => {
-                            console.log("ID del tema enviado:", tema.id_tema);
                             navigate("/professorparametres", {
                               state: {
                                 idTema: tema.id_tema,
