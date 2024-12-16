@@ -38,9 +38,22 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
         })
         .then((response) => {
           if (response.data.status === "Success") {
+            const testsAvaluatius = response.data.result.filter(
+              (test) => test.tipus === "avaluatiu"
+            );
+
             setTestsAvaluatius((prevTests) => ({
               ...prevTests,
-              [tema.id_tema]: response.data.result,
+              [tema.id_tema]: testsAvaluatius,
+            }));
+
+            const testsPractica = response.data.result.filter(
+              (test) => test.tipus === "practica"
+            );
+
+            setTestsPractica((prevTests) => ({
+              ...prevTests,
+              [tema.id_tema]: testsPractica,
             }));
           }
         })
