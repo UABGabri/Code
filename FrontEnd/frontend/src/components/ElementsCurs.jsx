@@ -117,6 +117,21 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
     }
   };
 
+  const handleDeleteTheme = (id_tema) => {
+    const idTema = id_tema;
+
+    axios
+      .delete("http://localhost:8081/deleteTheme", { data: { id_tema } })
+      .then((response) => {
+        alert("Tema eliminat amb èxit!");
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.error("Error eliminant el tema", error);
+        alert("Hi ha hagut un error al eliminar el tema.");
+      });
+  };
+
   const handleAccessKeySubmit = () => {
     axios
       .post("http://localhost:8081/validateTestAccess", {
@@ -263,6 +278,15 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                       )}
                     </div>
                   </div>
+
+                  {Role_User === "professor" && (
+                    <button
+                      className={styles.deleteTheme}
+                      onClick={() => handleDeleteTheme(tema.id_tema)}
+                    >
+                      Eliminar
+                    </button>
+                  )}
                 </div>
               )}
             </div>

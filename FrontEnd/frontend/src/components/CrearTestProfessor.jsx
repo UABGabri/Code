@@ -18,7 +18,6 @@ function CrearTestProfessor() {
   const [filteredPreguntes, setFilteredPreguntes] = useState([]);
   const [selectedQuestions, setSelectedQuestions] = useState([]);
   const [filters, setFilters] = useState({ dificultat: "", nom_tema: "" });
-  //const navigate = useNavigate();
   const history = useNavigate();
 
   useEffect(() => {

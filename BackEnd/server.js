@@ -372,6 +372,27 @@ app.post('/createTema', (req,res) => {
 
 })
 
+app.delete('/deleteTheme', (req, res)=>{
+
+
+
+    const id_tema = parseInt(req.body.id_tema);
+
+
+    const sql= "DELETE FROM temes WHERE id_tema = ?";
+
+    db.query(sql, [id_tema], (error, result) => {
+        if (error) {
+          console.error("Error al eliminar el tema", error);
+          return res.json({ success: false, message: "Error en eliminar el tema" });
+        }
+    
+        return res.json({ success: true, message: "Tema eliminat amb èxit" });
+      });
+
+
+})
+
 //Funció de recuperació de les materies associades a un professor en concret
 app.post('/recoverSubjects', (req, res) => { 
 
@@ -518,7 +539,7 @@ app.delete('/deleteQuestion', (req,res)=>{
 
     const id_Pregunta = req.query.idPregunta;
 
-    //console.log(id_Pregunta);
+
 
     const sql = 'DELETE FROM preguntes WHERE id_pregunta = ?'
 

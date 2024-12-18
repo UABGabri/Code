@@ -338,8 +338,11 @@
 }
 
 .temesLista {
-
   margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+
+
 }
 
 .temaItem {
@@ -376,7 +379,32 @@ hr {
 .temaContent {
   margin-top: 10px;
   padding-left: 20px;
+  gap: 20px;
+  display: flex;
+  flex-direction: row;
+  position: relative;
+ 
 }
+
+.deleteTheme {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: white;
+  color: red;
+  border: 1px solid red;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.deleteTheme:hover {
+  background-color: red;
+  color: white;
+}
+
+
 
 .temaSubtitle {
   font-size: 1.25rem;
