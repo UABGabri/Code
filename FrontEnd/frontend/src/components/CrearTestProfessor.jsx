@@ -55,6 +55,25 @@ function CrearTestProfessor() {
       return;
     }
 
+    let endDate;
+    while (true) {
+      endDate = prompt(
+        "Introdueix la data de finalització del test (format YYYY-MM-DD):"
+      );
+      if (!endDate) {
+        alert("Has de proporcionar una data de finalització.");
+        continue;
+      }
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/; // Validar formato YYYY-MM-DD
+      if (!dateRegex.test(endDate)) {
+        alert(
+          "Format de data incorrecte. Assegura't d'introduir la data en format YYYY-MM-DD."
+        );
+        continue;
+      }
+      break; // Salir del bucle si el formato es correcto
+    }
+
     const id_creador = idProfessor;
     const id_assignatura = idAssignatura;
 
@@ -65,6 +84,7 @@ function CrearTestProfessor() {
         id_assignatura,
         idTema,
         tipus,
+        data_finalitzacio: endDate,
       })
       .then((response) => {
         alert("Test creat correctament!");

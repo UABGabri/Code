@@ -1027,27 +1027,41 @@ app.get('/recoverPreguntesTema', (req, res) => {
 //Funció creació de test pel professor
 
 app.post('/createTest', async (req, res) => {
-    const { nom_test, id_creador, id_assignatura, idTema, tipus} = req.body;
+    const { nom_test, id_creador, id_assignatura, idTema, tipus, data_finalitzacio } = req.body;
+
+    // Validar data finalització
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/; // Formato YYYY-MM-DD
+    if (!data_finalitzacio || !dateRegex.test(data_finalitzacio)) {
+        return res.json({ Status: "Failed", Message: "Data finalització no vàlida. Usa el format YYYY-MM-DD." });
+    }
+
     const clau_acces = Math.random().toString(36).substr(2, 8);
-    const data_creacio = new Date();
+    
 
-    parseInt(id_creador,10)
-    parseInt(id_assignatura,10)
-    parseInt(idTema,10)
-   
-    const sql = ' INSERT INTO tests (nom_test, data_creacio, clau_acces, id_creador, id_assignatura, id_tema, tipus) VALUES (?, ?, ?, ?, ?, ?, ?)';
+    const idCreador = parseInt(id_creador, 10);
+    const idAssignatura = parseInt(id_assignatura, 10);
+    const idTemaParsed = parseInt(idTema, 10);
 
-    db.query(sql, [nom_test, data_creacio, clau_acces, id_creador, id_assignatura, idTema, tipus ], (error, result) => {
-        if (error) {
-            console.error("Error en la consulta:", error);
-            return res.json({ Status: "Failed" });
-        } else {
-            return res.json({success: true, id_test: result.insertId} );
+    const sql = `
+        INSERT INTO tests 
+        (nom_test,  data_final, clau_acces, id_creador, id_assignatura, id_tema, tipus) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    db.query(
+        sql,
+        [nom_test, data_finalitzacio, clau_acces, idCreador, idAssignatura, idTemaParsed, tipus],
+        (error, result) => {
+            if (error) {
+                console.error("Error en la consulta:", error);
+                return res.json({ Status: "Failed" });
+            } else {
+                return res.json({ success: true, id_test: result.insertId });
+            }
         }
-    });
-
-   
+    );
 });
+
 
 
 app.post('/insertQuestionsTest', (req, res) => {
