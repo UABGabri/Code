@@ -7,6 +7,7 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
   const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [newNiu, setNewNiu] = useState("");
+  const [csvFile, setCsvFile] = useState(null);
 
   useEffect(() => {
     axios
@@ -41,6 +42,36 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
       .catch((err) => {
         console.error("Error a la sol·licitud:", err);
       });
+  };
+
+  const handleCsvUpload = async () => {
+    if (!csvFile) return alert("Selecciona un fitxer CSV primer!");
+
+    const formData = new FormData();
+    formData.append("file", csvFile);
+
+    const idAssignatura = Id_Assignatura;
+    formData.append("Id_Assignatura", idAssignatura);
+    console.log(formData);
+    try {
+      const response = await axios.post(
+        "http://localhost:8081/import-csv",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      if (response.data.status === "success") {
+        alert("Importació completada correctament!");
+        setUsers(response.data.data); // Actualitzar la llista d'usuaris amb les noves dades
+        window.location.reload();
+      } else {
+        alert("Error a la importació: " + response.data.message);
+      }
+    } catch (err) {
+      console.error("Error a la importació del fitxer CSV:", err);
+      alert("Hi ha hagut un error a la importació del fitxer.");
+    }
   };
 
   const handleAddParticipant = () => {
@@ -140,12 +171,28 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
         ))}
 
         {Role_User !== "alumne" && (
-          <button
-            onClick={() => setShowModal(true)}
-            className={styles.addParticipantButton}
-          >
-            Afegir participant
-          </button>
+          <>
+            <div>
+              <h2>Importar usuaris amb fitxer CSV</h2>
+              <input
+                type="file"
+                accept=".csv"
+                onChange={(e) => setCsvFile(e.target.files[0])}
+              />
+              <button
+                onClick={handleCsvUpload}
+                className={styles.addParticipantButton}
+              >
+                Importar CSV
+              </button>
+            </div>
+            <button
+              onClick={() => setShowModal(true)}
+              className={styles.addParticipantButton}
+            >
+              Afegir participant
+            </button>
+          </>
         )}
       </div>
 

@@ -119,7 +119,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
   };
 
   const handleDeleteTheme = (id_tema) => {
-    const idTema = id_tema;
+    //const idTema = id_tema;
 
     axios
       .delete("http://localhost:8081/deleteTheme", { data: { id_tema } })

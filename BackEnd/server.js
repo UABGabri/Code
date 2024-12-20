@@ -4,8 +4,16 @@ import cors from "cors";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import cookieParser from "cookie-parser";
+import multer from "multer";
+import fs from 'fs';
+import csvParser from 'csv-parser';
+
+
 
 const salt = 10;
+const saltRounds = 10;
+
+const upload = multer({ dest: "uploads/" });
 
 const app = express();
 app.use(express.json());
@@ -480,7 +488,8 @@ app.post('/addQuestion', async (req, res) => {
         const questionSql = `
             INSERT INTO preguntes 
             (pregunta, solucio_correcta, solucio_erronia1, solucio_erronia2, solucio_erronia3, dificultat, estat, id_creador, id_tema) 
-            VALUES (?, ?, ?, ?, ?, ?, 'pendent', ?, ?)`;
+            VALUES (?, ?, ?, ?, ?, ?, 'pendent', ?, ?)
+        `;
 
         const questionResult = await dbQuery(questionSql, [
             pregunta,
@@ -527,12 +536,19 @@ app.post('/addQuestion', async (req, res) => {
             await dbQuery(conceptQuestionSql, [questionId, conceptId]);
         }
 
+    
+        const conceptTemaSql = `INSERT INTO conceptes_temes (id_concepte, id_tema) VALUES (?, ?)`;
+        for (const conceptId of conceptIds) {
+            await dbQuery(conceptTemaSql, [conceptId, id_tema]);
+        }
+
         return res.json({ Status: "Success", Message: "Pregunta afegida correctament!" });
     } catch (error) {
         console.error("Error al processar la pregunta:", error);
         return res.json({ Status: "Failed", Message: "Error en el servidor." });
     }
 });
+
 
 
 
@@ -1156,12 +1172,168 @@ app.post("/updateTestQuestions", (req, res) => {
 
 
 //Funció de recuperació de 10 preguntes per test amb probabilitats.
-app.post('/recoverTestQuestionsByProbability', (req, res) =>{
+app.post('/recoverPreguntaByTema', (req, res) =>{
 
+    const id_tema = req.query.temaSeleccionat;
 
+   
+    const sql = "SELECT * FROM preguntes WHERE id_tema = ? ORDER BY RAND() LIMIT 1"
 
+    db.query(sql, [id_tema], (err, result) => {
+        if (err) {
+          console.error("Error obtenint pregunta", err);
+          return res.send("Error obtenint la pregunta");
+        }
+
+        if (results.length > 0) {
+            return res.json({ status: "Success", message: "Pregunta obtinguda" });
+        } 
+    });
 
 })
+
+
+app.post("/import-csv", upload.single("file"), (req, res) => {
+    const filePath = req.file.path;
+    const results = [];
+  
+    fs.createReadStream(filePath)
+      .pipe(csvParser({ separator: ';', quote: '"' }))  // Ús del separador adequat
+      .on('data', (data) => {
+        results.push(data);
+      })
+      .on('end', async () => {
+        fs.unlinkSync(filePath); // Elimina el fitxer temporal després de processar-lo
+  
+        try {
+          const errors = [];  // Llista d'errors que es generen
+          const newUsers = []; // Llista de nous usuaris creats
+          const niusInFile = new Set();  // Set per evitar NIUs duplicats
+  
+          // Per evitar la resposta múltiple, inicialitzem una llista de promeses
+          const promises = [];
+  
+          for (const row of results) {
+            const { NIU, username, email, password, role } = row;
+  
+            console.log(NIU, username, email, password, role);
+  
+            // Validacions dels camps
+            if (!NIU || !username || !email || !password || !role) {
+              errors.push(`Fila amb NIU ${NIU || "desconegut"}: Camps incomplets.`);
+              continue;
+            }
+  
+            if (!/^\d{7}$/.test(NIU)) {
+              errors.push(`Fila amb NIU ${NIU}: El NIU ha de ser un número de 7 dígits.`);
+              continue;
+            }
+  
+            if (niusInFile.has(NIU)) {
+              errors.push(`Fila amb NIU ${NIU}: Duplicat al fitxer.`);
+              continue;
+            }
+            niusInFile.add(NIU);
+  
+            if (!/^[^\s@]+@[^\s@]+\.com$/.test(email)) {
+              errors.push(`Fila amb NIU ${NIU}: L'email no té un format vàlid.`);
+              continue;
+            }
+  
+            if (role !== "alumne" && role !== "professor") {
+              errors.push(`Fila amb NIU ${NIU}: El rol ha de ser 'alumne' o 'professor'.`);
+              continue;
+            }
+  
+            // Comprovació si l'usuari ja existeix a la base de dades
+            const checkNiuSql = "SELECT * FROM usuaris WHERE niu = ?";
+            const userExists = await new Promise((resolve, reject) => {
+              db.query(checkNiuSql, [NIU], (err, result) => {
+                if (err) {
+                  reject(err);
+                } else {
+                  resolve(result);
+                }
+              });
+            });
+  
+            if (userExists.length > 0) {
+              errors.push(`Fila amb NIU ${NIU}: L'usuari ja existeix.`);
+              continue; // No inserir si ja existeix
+            }
+  
+            // Encriptar la contrasenya
+            const hashedPassword = await bcrypt.hash(password, saltRounds);
+  
+            // Inserir l'usuari a la base de dades
+            const insertUserSql = "INSERT INTO usuaris (niu, username, password, role, email) VALUES (?, ?, ?, ?, ?)";
+            const insertUserPromise = new Promise((resolve, reject) => {
+              db.query(insertUserSql, [NIU, username, hashedPassword, role, email], (err) => {
+                if (err) {
+                  reject(err);
+                } else {
+                  resolve();
+                }
+              });
+            });
+  
+            promises.push(insertUserPromise);
+  
+            newUsers.push({ NIU, username, email, role });
+  
+            const subjectId = req.body.Id_Assignatura;
+  
+            parseInt(NIU);
+            parseInt(subjectId);
+            console.log(subjectId)
+
+            // Inserir a la taula corresponent segons el rol
+            if (role === "alumne") {
+                console.log("Alumne fins aqui")
+              const insertStudentSql = "INSERT INTO alumnes_assignatures (id_alumne, id_assignatura) VALUES (?, ?)";
+              const insertStudentPromise = new Promise((resolve, reject) => {
+                db.query(insertStudentSql, [NIU, subjectId], (err) => {
+                  if (err) {
+                    reject(err);
+                  } else {
+                    resolve();
+                  }
+                });
+              });
+              promises.push(insertStudentPromise);
+            } else if (role === "professor") {
+              const insertTeacherSql = "INSERT INTO professors_assignatures (id_professor, id_assignatura) VALUES (?, ?)";
+              const insertTeacherPromise = new Promise((resolve, reject) => {
+                db.query(insertTeacherSql, [NIU, subjectId], (err) => {
+                  if (err) {
+                    reject(err);
+                  } else {
+                    resolve();
+                  }
+                });
+              });
+              promises.push(insertTeacherPromise);
+            }
+          }
+  
+          // Esperem que totes les promeses es compleixin abans de respondre
+          await Promise.all(promises);
+  
+          // Resposta final
+          res.json({
+            status: "success",
+            message: "Importació completada",
+            newUsers,
+            errors,
+          });
+  
+        } catch (error) {
+          console.error("Error processant el fitxer CSV:", error);
+          res.json({ status: "error", message: "Error intern del servidor." });
+        }
+      });
+  });
+  
 
 
 

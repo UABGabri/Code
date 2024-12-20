@@ -6,15 +6,14 @@ import styles from "./StyleComponents/TestLayout.module.css";
 function TestIALayout() {
   const location = useLocation();
   const { Id_Assignatura } = location.state || {};
-  const [preguntes, setPreguntes] = useState([]);
+  const [preguntaActual, setPreguntaActual] = useState(null);
   const [respostesBarrejades, setRespostesBarrejades] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState({});
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [feedback, setFeedback] = useState(null);
   const [probabilities, setProbabilities] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // Inicialitza les probabilitats per tema
+  // Inicialitza les probabilitats per tema basant-se en els temes recuperats
   useEffect(() => {
     axios
       .get("http://localhost:8081/recoverTemasAssignatura", {
@@ -22,75 +21,59 @@ function TestIALayout() {
       })
       .then((response) => {
         const temesProbability = response.data.map((tema) => tema.id_tema);
+        // Assigna probabilitats inicials iguals a tots els temes
         const initialProbabilities = temesProbability.reduce((acc, tema) => {
           acc[tema] = 1 / temesProbability.length;
           return acc;
         }, {});
         setProbabilities(initialProbabilities);
-
-        console.log(probabilities);
+        fetchNextQuestion(initialProbabilities); // Carrega la primera pregunta
       })
       .catch((error) => console.error("Error al carregar els temes:", error));
   }, [Id_Assignatura]);
 
-  // Recupera preguntes en lots de 10
-  const fetchQuestions = () => {
-    setLoading(true);
+  // Selecciona un tema aleatòriament segons les probabilitats actuals
+  const seleccionarTemaPorProbabilidad = (probabilities) => {
+    const random = Math.random(); // Valor entre 0 i 1
+    let acumulat = 0;
+
+    for (const [tema, prob] of Object.entries(probabilities)) {
+      acumulat += prob;
+      if (random <= acumulat) {
+        return tema; // Retorna el tema seleccionat
+      }
+    }
+    return null; // Per defecte (no hauria de passar)
+  };
+
+  // Obté la següent pregunta basada en el tema seleccionat
+  const fetchNextQuestion = (currentProbabilities) => {
+    setLoading(true); // Mostra l'estat de càrrega
+    const temaSeleccionat =
+      seleccionarTemaPorProbabilidad(currentProbabilities);
+
+    console.log(temaSeleccionat);
     axios
-      .post("http://localhost:8081/recoverTestQuestionsByProbability", {
-        probabilities,
-        batchSize: 10,
+      .get("http://localhost:8081/recoverPreguntaByTema", {
+        params: { temaSeleccionat },
       })
       .then((response) => {
-        const novesPreguntes = response.data.Preguntes;
-        setPreguntes((prevPreguntes) => [...prevPreguntes, ...novesPreguntes]);
-        setRespostesBarrejades((prev) => [
-          ...prev,
-          ...novesPreguntes.map((pregunta) => barrejarRespostes(pregunta)),
-        ]);
-        setLoading(false);
+        const pregunta = response.data;
+        setPreguntaActual(pregunta); // Actualitza la pregunta actual
+        setRespostesBarrejades(barrejarRespostes(pregunta)); // Barreja les respostes
+        setLoading(false); // Finalitza l'estat de càrrega
       })
       .catch((error) => {
-        console.error("Error al recuperar preguntes:", error);
+        console.error("Error al recuperar la pregunta:", error);
         setLoading(false);
       });
   };
 
-  useEffect(() => {
-    fetchQuestions();
-  }, [probabilities]);
-
-  // Barreja les respostes de manera aleatòria
-  const barrejarRespostes = (pregunta) => {
-    const respostes = [
-      pregunta.solucio_correcta,
-      pregunta.solucio_erronia1,
-      pregunta.solucio_erronia2,
-      pregunta.solucio_erronia3,
-    ];
-    return respostes.sort(() => Math.random() - 0.5);
-  };
-
-  // Registra la resposta seleccionada i aplica feedback immediat
-  const seleccionarResposta = (respostaUnica, esCorrecta) => {
-    if (feedback) return; // No permetre més seleccions fins a la següent pregunta
-
-    setSelectedAnswers({ ...selectedAnswers, [currentIndex]: respostaUnica });
-
-    if (esCorrecta) {
-      setFeedback({ correct: true });
-    } else {
-      setFeedback({ correct: false });
-      const preguntaFallada = preguntes[currentIndex];
-      ajustarProbabilitats(preguntaFallada);
-    }
-  };
-
-  // Ajusta les probabilitats augmentant la del tema de la pregunta fallada
-  const ajustarProbabilitats = (preguntaFallada) => {
-    const temaFallat = preguntaFallada.tema; // Suposem que "tema" està definit
+  // Ajusta les probabilitats després de respondre una pregunta
+  const ajustarProbabilitats = (temaFallat) => {
     const novesProbabilitats = { ...probabilities };
 
+    // Augmenta la probabilitat del tema fallat
     novesProbabilitats[temaFallat] = Math.min(
       novesProbabilitats[temaFallat] + 0.1,
       1
@@ -105,25 +88,38 @@ function TestIALayout() {
       novesProbabilitats[tema] /= totalProbabilitats;
     });
 
-    setProbabilities(novesProbabilitats);
+    setProbabilities(novesProbabilitats); // Actualitza les probabilitats
+    fetchNextQuestion(novesProbabilitats); // Carrega la següent pregunta
   };
 
-  // Carrega la següent pregunta
-  const següentPregunta = () => {
-    if (currentIndex === preguntes.length - 1) {
-      fetchQuestions(); // Si hem arribat al final, demana més preguntes
+  // Registra la resposta seleccionada i mostra el feedback
+  const seleccionarResposta = (respostaUnica, esCorrecta) => {
+    if (feedback) return; // No permetre més seleccions fins a la següent pregunta
+
+    setSelectedAnswer(respostaUnica);
+
+    if (esCorrecta) {
+      setFeedback({ correct: true }); // Feedback positiu
     } else {
-      setCurrentIndex(currentIndex + 1);
+      setFeedback({ correct: false }); // Feedback negatiu
+      ajustarProbabilitats(preguntaActual.id_tema); // Incrementa la probabilitat del tema fallat
     }
-    setFeedback(null);
+  };
+
+  // Barreja les respostes de manera aleatòria
+  const barrejarRespostes = (pregunta) => {
+    const respostes = [
+      pregunta.solucio_correcta,
+      pregunta.solucio_erronia1,
+      pregunta.solucio_erronia2,
+      pregunta.solucio_erronia3,
+    ];
+    return respostes.sort(() => Math.random() - 0.5);
   };
 
   if (loading) {
-    return <p>Carregant preguntes... </p>;
+    return <p>Carregant pregunta... </p>;
   }
-
-  const preguntaActual = preguntes[currentIndex];
-  const respostesActuals = respostesBarrejades[currentIndex];
 
   return (
     <div className={styles.containerQuizz}>
@@ -131,15 +127,16 @@ function TestIALayout() {
         <h1>Qüestionari Infinit</h1>
 
         <p className={styles.pregunta}>{preguntaActual.pregunta}</p>
+
         <ul className={styles.llistaRespostes}>
-          {respostesActuals.map((resposta, index) => (
+          {respostesBarrejades.map((resposta, index) => (
             <li
               key={index}
               className={
                 feedback &&
                 ((resposta === preguntaActual.solucio_correcta &&
                   styles.correct) ||
-                  (selectedAnswers[currentIndex] === resposta &&
+                  (selectedAnswer === resposta &&
                     !feedback.correct &&
                     styles.incorrect))
               }
@@ -153,7 +150,7 @@ function TestIALayout() {
               <label>
                 <input
                   type="radio"
-                  name={`pregunta-${currentIndex}`}
+                  name="resposta"
                   value={resposta}
                   disabled={!!feedback}
                 />
@@ -162,6 +159,7 @@ function TestIALayout() {
             </li>
           ))}
         </ul>
+
         {feedback && (
           <p
             className={
@@ -175,7 +173,13 @@ function TestIALayout() {
               : `Incorrecte. La resposta correcta era: ${preguntaActual.solucio_correcta}`}
           </p>
         )}
-        <button onClick={següentPregunta}>Següent</button>
+
+        <button
+          onClick={() => fetchNextQuestion(probabilities)}
+          disabled={!feedback}
+        >
+          Següent
+        </button>
       </div>
     </div>
   );
