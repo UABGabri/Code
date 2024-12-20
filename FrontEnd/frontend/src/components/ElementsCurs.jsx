@@ -69,6 +69,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
       return;
     }
 
+    console.log(Id_Assignatura, newTemaName);
     axios
       .post("http://localhost:8081/createTema", {
         Id_Assignatura,

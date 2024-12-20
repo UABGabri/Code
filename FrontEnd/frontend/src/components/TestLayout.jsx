@@ -5,7 +5,6 @@ import styles from "./StyleComponents/TestLayout.module.css";
 
 function TestLayout() {
   const location = useLocation();
-
   const history = useNavigate();
   const [preguntes, setPreguntes] = useState([]);
   const [respostesBarrejades, setRespostesBarrejades] = useState([]);

@@ -12,6 +12,7 @@ import TestLayout from "./components/TestLayout";
 import CrearTestProfessor from "./components/CrearTestProfessor";
 import TestWithKey from "./components/TestWithKey";
 import PersonalitzarTest from "./components/PersonalitzarTest";
+import TestIALayout from "./components/TestIALayout";
 
 function App() {
   return (
@@ -43,6 +44,8 @@ function App() {
 
         <Route path="/realitzartest" element={<TestWithKey />}></Route>
         <Route path="/personalitzarTest" element={<PersonalitzarTest />} />
+
+        <Route path="/testIA" element={<TestIALayout />} />
       </Routes>
     </BrowserRouter>
   );

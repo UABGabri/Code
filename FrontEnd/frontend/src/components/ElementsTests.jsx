@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 //Creació de tests randoms -> futur creació tests intel·ligents
 function ElementsTests({ idAssignatura }) {
+  const Id_Assignatura = idAssignatura;
   const navigate = useNavigate();
   const [temes, setTemes] = useState([]);
   const [selectedTema, setSelectedTema] = useState("");
@@ -73,12 +74,15 @@ function ElementsTests({ idAssignatura }) {
 
     if (!tema || !concepte || !dificultat) {
       setFormError("Sisplau, emplena tots els camps per continuar");
-
       return;
     }
 
     setFormError("");
     navigate("/testlayout", { state: { parametersTest } });
+  };
+
+  const handleTestIA = () => {
+    navigate("/testIA", { state: { Id_Assignatura } });
   };
 
   return (
@@ -155,6 +159,10 @@ function ElementsTests({ idAssignatura }) {
 
           <button type="submit">Generar Test</button>
         </form>
+
+        <button style={{ background: "red" }} onClick={handleTestIA}>
+          Generar Test IA
+        </button>
       </div>
     </div>
   );

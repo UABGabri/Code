@@ -331,10 +331,12 @@ app.post('/registerSubject', async (req, res) => {
 //Funció de recuperació dels temes associats a una assignatura pel curs
 
 app.get('/recoverTemesAssignatura', (req, res) => {
+
     const idAssignatura = parseInt(req.query.Id_Assignatura, 10); 
+    console.log(idAssignatura)
 
     if (!idAssignatura) {
-        return res.json({ success: false, message: "Id_Assignatura no proporcionado o inválido" });
+        return res.json({ success: false, message: "Id_Assignatura no proporcionat o inválid" });
     }
 
     const sql = "SELECT * FROM temes WHERE id_assignatura = ?";
@@ -352,7 +354,8 @@ app.get('/recoverTemesAssignatura', (req, res) => {
 //Funció creació d'un tema per una assignatura
 
 app.post('/createTema', (req,res) => {
-    const { idAssignatura, name } = req.body;
+
+    const { Id_Assignatura, name } = req.body;
 
     console.log(typeof(idAssignatura));
 
@@ -361,7 +364,7 @@ app.post('/createTema', (req,res) => {
     }
   
     const sql = "INSERT INTO temes (id_assignatura, nom_tema) VALUES (?, ?)";
-    db.query(sql, [idAssignatura, name], (error, result) => {
+    db.query(sql, [Id_Assignatura, name], (error, result) => {
       if (error) {
         console.error("Error al inserir el tema:", error);
         return res.json({ success: false, message: "Error en crear el tema" });
@@ -373,8 +376,6 @@ app.post('/createTema', (req,res) => {
 })
 
 app.delete('/deleteTheme', (req, res)=>{
-
-
 
     const id_tema = parseInt(req.body.id_tema);
 
@@ -1152,6 +1153,17 @@ app.post("/updateTestQuestions", (req, res) => {
         });
     });
   });
+
+
+//Funció de recuperació de 10 preguntes per test amb probabilitats.
+app.post('/recoverTestQuestionsByProbability', (req, res) =>{
+
+
+
+
+})
+
+
 
 //Funció d'escolta del servidor 
 app.listen(8081, () => {
