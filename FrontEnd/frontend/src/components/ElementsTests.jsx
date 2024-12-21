@@ -15,7 +15,6 @@ function ElementsTests({ idAssignatura }) {
   const [parametersTest, setParametersTest] = useState({
     tema: "",
     concepte: "",
-    dificultat: "",
     id_Assignatura: idAssignatura,
   });
   const [formError, setFormError] = useState("");
@@ -70,9 +69,9 @@ function ElementsTests({ idAssignatura }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const { tema, concepte, dificultat } = parametersTest;
+    const { tema, concepte } = parametersTest;
 
-    if (!tema || !concepte || !dificultat) {
+    if (!tema || !concepte) {
       setFormError("Sisplau, emplena tots els camps per continuar");
       return;
     }
@@ -133,25 +132,6 @@ function ElementsTests({ idAssignatura }) {
                   {concepte}
                 </option>
               ))}
-            </select>
-
-            <label htmlFor="dificultat">Dificultat:</label>
-            <select
-              id="dificultat"
-              name="dificultat"
-              value={parametersTest.dificultat}
-              onChange={(e) => {
-                const dificultat = e.target.value;
-                setParametersTest((prevState) => ({
-                  ...prevState,
-                  dificultat: dificultat,
-                }));
-              }}
-            >
-              <option value="">Selecciona una dificultat</option>
-              <option value="Fàcil">Fàcil</option>
-              <option value="Mitjà">Mitjà</option>
-              <option value="Difícil">Difícil</option>
             </select>
           </div>
 

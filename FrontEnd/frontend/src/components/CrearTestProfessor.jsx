@@ -19,7 +19,7 @@ function CrearTestProfessor() {
   const [selectedQuestions, setSelectedQuestions] = useState([]);
   const [filters, setFilters] = useState({ dificultat: "", nom_tema: "" });
   const history = useNavigate();
-
+  /*
   useEffect(() => {
     axios
       .get("http://localhost:8081/recoverPreguntesTema", {
@@ -28,6 +28,20 @@ function CrearTestProfessor() {
       .then((response) => {
         setPreguntes(response.data);
         setFilteredPreguntes(response.data);
+      })
+      .catch((error) => {
+        console.error("Error al recuperar les preguntes:", error);
+        alert("Error al recuperar les preguntes.");
+      });
+  }, []);*/
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:8081/recoverPreguntes")
+      .then((response) => {
+        setPreguntes(response.data);
+        setFilteredPreguntes(response.data);
+        console.log(response.data);
       })
       .catch((error) => {
         console.error("Error al recuperar les preguntes:", error);

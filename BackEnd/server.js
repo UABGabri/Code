@@ -888,10 +888,9 @@ app.post('/generarTest', (req, res) => {
 app.get('/recoverRandomTestQuestions', async (req, res) => { 
     const tema = req.query.tema;
     const concepte = req.query.concepte;
-    const dificultat = req.query.dificultat;
     const idAssignatura = req.query.idAssignatura;
 
-    if (!tema || !concepte || !dificultat) {
+    if (!tema || !concepte) {
         return res.json({ Status: "Failed", Message: "Falten paràmetres requerits: tema, concepte o dificultat." });
     }
 
@@ -902,7 +901,6 @@ app.get('/recoverRandomTestQuestions', async (req, res) => {
         INNER JOIN preguntes_conceptes pc ON p.id_pregunta = pc.id_pregunta
         WHERE p.id_tema = ? 
         AND pc.id_concepte = ? 
-        AND p.dificultat = ? 
         AND p.estat = 'acceptada'
         ORDER BY RAND() LIMIT 10
     `;
@@ -942,7 +940,7 @@ app.get('/recoverRandomTestQuestions', async (req, res) => {
 
     const getQuestions = (idTema, idConcepte) => {
         return new Promise((resolve, reject) => {
-            db.query(sqlGetQuestions, [idTema, idConcepte, dificultat], (err, result) => {
+            db.query(sqlGetQuestions, [idTema, idConcepte], (err, result) => {
                 if (err || result.length === 0) {
                     errors.push("No s'han trobat preguntes que coincideixin amb els criteris.");
                     reject();
@@ -994,6 +992,22 @@ app.get('/recoverSelectedTestWithKeyQuestions', (req, res) => {
 
 });
 
+
+//Funció de recuperació de totes les preguntes
+app.get('/recoverPreguntes', (req, res) => {
+
+
+    const sql = "SELECT p.*, t.nom_tema FROM preguntes p JOIN temes t ON p.id_tema = t.id_tema";
+
+    db.query(sql, (error, result) => {
+        if (error) {
+            console.error("Error a la consulta:", error);
+            return res.json({ Status: "Failed" });
+        } else {
+            return res.json(result);
+        }
+    });
+});
 
 //Funció de recuperació de les preguntes segons el tema
 app.get('/recoverPreguntesTema', (req, res) => {
@@ -1350,6 +1364,7 @@ app.post("/import-csv", upload.single("file"), (req, res) => {
   
 
 
+  
 
 //Funció d'escolta del servidor 
 app.listen(8081, () => {
