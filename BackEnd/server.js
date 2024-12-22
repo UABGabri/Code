@@ -801,12 +801,10 @@ app.delete('/eliminateTeacher', (req, res) => {
 });
 
 app.get('/recuperarPreguntesPerConceptes', (req, res) => {
-    const { conceptesSeleccionats } = req.query; // Un array dels IDs dels conceptes seleccionats
+    const { conceptesSeleccionats } = req.query; 
   
-    // Assegura't de convertir els IDs a enters
     const conceptesIds = conceptesSeleccionats.map(id => parseInt(id, 10));
   
-    // Fer la consulta per obtenir les preguntes associades als conceptes
     const query = `
       SELECT p.*
       FROM preguntes p
