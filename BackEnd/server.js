@@ -800,18 +800,43 @@ app.delete('/eliminateTeacher', (req, res) => {
     });
 });
 
+app.get('/recuperarPreguntesPerConceptes', (req, res) => {
+    const { conceptesSeleccionats } = req.query; // Un array dels IDs dels conceptes seleccionats
+  
+    // Assegura't de convertir els IDs a enters
+    const conceptesIds = conceptesSeleccionats.map(id => parseInt(id, 10));
+  
+    // Fer la consulta per obtenir les preguntes associades als conceptes
+    const query = `
+      SELECT p.*
+      FROM preguntes p
+      INNER JOIN preguntes_conceptes cp ON p.id_pregunta = cp.id_pregunta
+      WHERE cp.id_concepte IN (?)`;
+  
+
+    db.query(query, [conceptesIds], (err, results) => {
+      if (err) {
+        console.error("Error en recuperar les preguntes:", err);
+        return res.status(500).send("Error en recuperar les preguntes.");
+      }
+      res.json({ Preguntes: results });
+    });
+  });
+
 
 
 //Funció de recuperació dels temes de la assignatura i conceptes per poder crear tests
 app.get('/recoverElementsTest', (req, res) => {
-
     const id_assignatura = req.query.idAssignatura;
-    parseInt(id_assignatura,10);
 
-    const sql = `SELECT 
-            temes.id_tema, 
-            temes.nom_tema, 
-            GROUP_CONCAT(conceptes.nom_concepte) AS tots_els_conceptes
+    
+    const idAssignatura = parseInt(id_assignatura, 10);
+
+   
+    const sql = `
+        SELECT 
+            conceptes.id_concepte, 
+            conceptes.nom_concepte
         FROM 
             temes
         LEFT JOIN 
@@ -820,18 +845,29 @@ app.get('/recoverElementsTest', (req, res) => {
             conceptes ON conceptes_temes.id_concepte = conceptes.id_concepte
         WHERE 
             temes.id_assignatura = ?
-        GROUP BY 
-            temes.id_tema, temes.nom_tema; `;
+        ORDER BY 
+            conceptes.nom_concepte;
+    `;
 
-    db.query(sql, [id_assignatura], (error, result) => {
+    // Ejecutar la consulta en la base de datos
+    db.query(sql, [idAssignatura], (error, result) => {
         if (error) {
             console.error("Error en la consulta:", error);
-            return res.json({ Status: "Failed" });
-        } else {
-            return res.json(result);
+            return res.json({ Status: "Failed", error: "Error en la consulta de la base de datos" });
         }
+
+        
+        const conceptes = result.map(row => ({
+            value: row.id_concepte, 
+            label: row.nom_concepte 
+        }));
+
+      
+        res.json(conceptes);
     });
 });
+
+
 
 //Funció de creació de test professors
 app.post('/generarTest', (req, res) => {

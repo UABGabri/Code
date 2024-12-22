@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -7,13 +7,11 @@ import styles from "./StyleComponents/Elements.module.css";
 
 function ElementsTests({ idAssignatura }) {
   const navigate = useNavigate();
-  const [temes, setTemes] = useState([]);
-  const [temesSeleccionats, setTemesSeleccionats] = useState([]);
   const [conceptes, setConceptes] = useState([]);
   const [conceptesSeleccionats, setConceptesSeleccionats] = useState([]);
   const [errorFormulari, setErrorFormulari] = useState("");
 
-  // Recuperar temes i conceptes associats a l'assignatura
+  // Recuperar només els conceptes associats a l'assignatura
   useEffect(() => {
     if (idAssignatura) {
       axios
@@ -21,58 +19,40 @@ function ElementsTests({ idAssignatura }) {
           params: { idAssignatura },
         })
         .then((res) => {
-          const temesRecuperats = res.data.map((tema) => ({
-            value: tema.id_tema,
-            label: tema.nom_tema,
-            conceptes: tema.tots_els_conceptes
-              ? tema.tots_els_conceptes.split(",").map((c) => c.trim())
-              : [],
-          }));
-          setTemes(temesRecuperats);
+          setConceptes(res.data);
         })
-        .catch((err) => console.error("Error en recuperar els temes:", err));
+        .catch((err) =>
+          console.error("Error al recuperar los conceptos:", err)
+        );
     }
   }, [idAssignatura]);
 
-  // Actualitzar conceptes en funció dels temes seleccionats
-  useEffect(() => {
-    // Filtrar els conceptes associats als temes seleccionats
-    const nousConceptes = temesSeleccionats
-      .flatMap((tema) => tema.conceptes)
-      .filter((value, index, self) => self.indexOf(value) === index);
-
-    // Actualitzar el estat dels conceptes amb els nous conceptes associats als temes seleccionats
-    setConceptes(nousConceptes);
-
-    // Filtrar els conceptes seleccionats que encara estiguin associats als temes seleccionats
-    const conceptesFiltrats = conceptesSeleccionats.filter((concepte) =>
-      nousConceptes.includes(concepte.value)
-    );
-
-    // Actualitzar els conceptes seleccionats, només aquells que encara estiguin disponibles
-    setConceptesSeleccionats(conceptesFiltrats);
-  }, [temesSeleccionats]);
-
-  // Enviar formulari
+  // Enviar formulario
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validar que sempre hi hagi un tema seleccionat
-    if (temesSeleccionats.length === 0) {
-      setErrorFormulari("Selecciona almenys un tema.");
+    if (conceptesSeleccionats.length === 0) {
+      setErrorFormulari("Selecciona almenys un concepte.");
       return;
     }
 
     setErrorFormulari("");
+
+    const conceptesSeleccionatsIds = conceptesSeleccionats.map(
+      (concepte) => concepte.value
+    );
+
     const parametersTest = {
-      temes: temesSeleccionats.map((tema) => tema.value),
-      conceptes: conceptesSeleccionats.map((concepte) => concepte.value),
-      idAssignatura,
+      conceptesSeleccionats: conceptesSeleccionatsIds,
+      //idAssignatura,
     };
+
+    console.log("Parámetros para el test: ", parametersTest);
 
     navigate("/testlayout", { state: { parametersTest } });
   };
 
+  // Generar test amb IA
   const handleTestIA = () => {
     navigate("/testIA", { state: { idAssignatura } });
   };
@@ -83,24 +63,11 @@ function ElementsTests({ idAssignatura }) {
       <div className={styles.quizzContainerBody}>
         <form className={styles.formRandom} onSubmit={handleSubmit}>
           <div className={styles.parametersQuizz}>
-            <label htmlFor="temes">Tema:</label>
-            <Select
-              id="temes"
-              name="temes"
-              options={temes}
-              isMulti
-              onChange={(seleccionats) =>
-                setTemesSeleccionats(seleccionats || [])
-              }
-              className={styles.select}
-              placeholder="Selecciona un tema"
-            />
-
             <label htmlFor="conceptes">Conceptes:</label>
             <Select
               id="conceptes"
               name="conceptes"
-              options={conceptes.map((c) => ({ value: c, label: c }))}
+              options={conceptes}
               isMulti
               onChange={(seleccionats) =>
                 setConceptesSeleccionats(seleccionats || [])
@@ -108,9 +75,6 @@ function ElementsTests({ idAssignatura }) {
               value={conceptesSeleccionats}
               className={styles.select}
               placeholder="Selecciona un concepte"
-              isDisabled={
-                temesSeleccionats.length === 0 || conceptes.length === 0
-              }
             />
           </div>
 
