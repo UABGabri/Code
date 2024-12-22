@@ -1,87 +1,80 @@
-import styles from "./StyleComponents/Elements.module.css";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Select from "react-select";
+import styles from "./StyleComponents/Elements.module.css";
 
-//Creació de tests randoms -> futur creació tests intel·ligents
 function ElementsTests({ idAssignatura }) {
-  const Id_Assignatura = idAssignatura;
   const navigate = useNavigate();
   const [temes, setTemes] = useState([]);
-  const [selectedTema, setSelectedTema] = useState("");
+  const [temesSeleccionats, setTemesSeleccionats] = useState([]);
   const [conceptes, setConceptes] = useState([]);
-  const [selectedConcepte, setSelectedConcepte] = useState("");
-  const [parametersTest, setParametersTest] = useState({
-    tema: "",
-    concepte: "",
-    id_Assignatura: idAssignatura,
-  });
-  const [formError, setFormError] = useState("");
+  const [conceptesSeleccionats, setConceptesSeleccionats] = useState([]);
+  const [errorFormulari, setErrorFormulari] = useState("");
 
-  // Recupera temes i conceptes
-  const recoverTemasAssignatura = () => {
-    axios
-      .get("http://localhost:8081/recoverElementsTest", {
-        params: { idAssignatura },
-      })
-      .then((res) => {
-        const temas = res.data.map((item) => ({
-          id_tema: item.id_tema,
-          nom_tema: item.tema,
-          tots_els_conceptes: item.tots_els_conceptes
-            ? [
-                ...new Set(
-                  item.tots_els_conceptes
-                    .split(",")
-                    .map((concepto) => concepto.trim())
-                ),
-              ]
-            : [], // Si tots_els_conceptes es null o undefined, asigna un array buit per evitar la seva creació
-        }));
-        setTemes(temas);
-      })
-      .catch((error) => {
-        console.error("Error al recuperar els temes:", error);
-      });
-  };
-
-  // Actualitza els conceptes disponibles en seleccionar un tema
-  useEffect(() => {
-    if (selectedTema) {
-      const temaSeleccionado = temes.find(
-        (tema) => tema.nom_tema === selectedTema
-      );
-      if (temaSeleccionado) {
-        setConceptes(temaSeleccionado.tots_els_conceptes);
-      }
-    } else {
-      setConceptes([]);
-    }
-  }, [selectedTema, temes]);
-
-  // Recupera els temes en carregar el component
+  // Recuperar temes i conceptes associats a l'assignatura
   useEffect(() => {
     if (idAssignatura) {
-      recoverTemasAssignatura();
+      axios
+        .get("http://localhost:8081/recoverElementsTest", {
+          params: { idAssignatura },
+        })
+        .then((res) => {
+          const temesRecuperats = res.data.map((tema) => ({
+            value: tema.id_tema,
+            label: tema.nom_tema,
+            conceptes: tema.tots_els_conceptes
+              ? tema.tots_els_conceptes.split(",").map((c) => c.trim())
+              : [],
+          }));
+          setTemes(temesRecuperats);
+        })
+        .catch((err) => console.error("Error en recuperar els temes:", err));
     }
   }, [idAssignatura]);
 
+  // Actualitzar conceptes en funció dels temes seleccionats
+  useEffect(() => {
+    // Filtrar els conceptes associats als temes seleccionats
+    const nousConceptes = temesSeleccionats
+      .flatMap((tema) => tema.conceptes)
+      .filter((value, index, self) => self.indexOf(value) === index);
+
+    // Actualitzar el estat dels conceptes amb els nous conceptes associats als temes seleccionats
+    setConceptes(nousConceptes);
+
+    // Filtrar els conceptes seleccionats que encara estiguin associats als temes seleccionats
+    const conceptesFiltrats = conceptesSeleccionats.filter((concepte) =>
+      nousConceptes.includes(concepte.value)
+    );
+
+    // Actualitzar els conceptes seleccionats, només aquells que encara estiguin disponibles
+    setConceptesSeleccionats(conceptesFiltrats);
+  }, [temesSeleccionats]);
+
+  // Enviar formulari
   const handleSubmit = (e) => {
     e.preventDefault();
-    const { tema, concepte } = parametersTest;
 
-    if (!tema || !concepte) {
-      setFormError("Sisplau, emplena tots els camps per continuar");
+    // Validar que sempre hi hagi un tema seleccionat
+    if (temesSeleccionats.length === 0) {
+      setErrorFormulari("Selecciona almenys un tema.");
       return;
     }
 
-    setFormError("");
+    setErrorFormulari("");
+    const parametersTest = {
+      temes: temesSeleccionats.map((tema) => tema.value),
+      conceptes: conceptesSeleccionats.map((concepte) => concepte.value),
+      idAssignatura,
+    };
+
     navigate("/testlayout", { state: { parametersTest } });
   };
 
   const handleTestIA = () => {
-    navigate("/testIA", { state: { Id_Assignatura } });
+    navigate("/testIA", { state: { idAssignatura } });
   };
 
   return (
@@ -90,57 +83,49 @@ function ElementsTests({ idAssignatura }) {
       <div className={styles.quizzContainerBody}>
         <form className={styles.formRandom} onSubmit={handleSubmit}>
           <div className={styles.parametersQuizz}>
-            <label htmlFor="tema">Tema:</label>
-            <select
-              id="tema"
-              name="id_tema"
-              value={selectedTema}
-              onChange={(e) => {
-                const tema = e.target.value;
-                setSelectedTema(tema);
-                setParametersTest((prevState) => ({
-                  ...prevState,
-                  tema: tema,
-                }));
-              }}
-            >
-              <option value="">Selecciona un tema</option>
-              {temes.map((tema) => (
-                <option key={tema.id_tema} value={tema.nom_tema}>
-                  {tema.nom_tema}
-                </option>
-              ))}
-            </select>
+            <label htmlFor="temes">Tema:</label>
+            <Select
+              id="temes"
+              name="temes"
+              options={temes}
+              isMulti
+              onChange={(seleccionats) =>
+                setTemesSeleccionats(seleccionats || [])
+              }
+              className={styles.select}
+              placeholder="Selecciona un tema"
+            />
 
             <label htmlFor="conceptes">Conceptes:</label>
-            <select
+            <Select
               id="conceptes"
               name="conceptes"
-              value={selectedConcepte}
-              onChange={(e) => {
-                const concepte = e.target.value;
-                setSelectedConcepte(concepte);
-                setParametersTest((prevState) => ({
-                  ...prevState,
-                  concepte: concepte,
-                }));
-              }}
-            >
-              <option value="">Selecciona un concepte</option>
-              {conceptes.map((concepte, index) => (
-                <option key={index} value={concepte}>
-                  {concepte}
-                </option>
-              ))}
-            </select>
+              options={conceptes.map((c) => ({ value: c, label: c }))}
+              isMulti
+              onChange={(seleccionats) =>
+                setConceptesSeleccionats(seleccionats || [])
+              }
+              value={conceptesSeleccionats}
+              className={styles.select}
+              placeholder="Selecciona un concepte"
+              isDisabled={
+                temesSeleccionats.length === 0 || conceptes.length === 0
+              }
+            />
           </div>
 
-          {formError && <p className={styles.error}>{formError}</p>}
+          {errorFormulari && <p className={styles.error}>{errorFormulari}</p>}
 
-          <button type="submit">Generar Test</button>
+          <button type="submit" className={styles.buttonSubmit}>
+            Generar Test
+          </button>
         </form>
 
-        <button style={{ background: "red" }} onClick={handleTestIA}>
+        <button
+          type="button"
+          className={styles.buttonIA}
+          onClick={handleTestIA}
+        >
           Generar Test IA
         </button>
       </div>

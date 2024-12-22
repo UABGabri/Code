@@ -249,6 +249,13 @@
   width: 100vw;
 }
 
+.parametersQuizz{
+
+  .select{
+    width: 500px;
+  }
+}
+
 .titleGenerator {
   font-size: 2rem;
   text-align: center;
@@ -315,7 +322,7 @@
   font-size: 0.9rem;
 }
 
-/*FI SECCIO QUIZZ*/
+/*FI SECCIO QUIZZ ALUMNE*/
 
 
 /*SECCIÓ CURS*/

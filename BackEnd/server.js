@@ -808,15 +808,20 @@ app.get('/recoverElementsTest', (req, res) => {
     const id_assignatura = req.query.idAssignatura;
     parseInt(id_assignatura,10);
 
-    const sql = `SELECT t.id_tema, t.nom_tema AS tema, GROUP_CONCAT(c.nom_concepte SEPARATOR ', ') AS tots_els_conceptes
-    FROM temes t
-    LEFT JOIN preguntes p ON t.id_tema = p.id_tema AND p.estat = 'acceptada'
-    LEFT JOIN preguntes_conceptes pc ON p.id_pregunta = pc.id_pregunta
-    LEFT JOIN conceptes c ON pc.id_concepte = c.id_concepte
-    WHERE t.id_assignatura = ?
-    GROUP BY t.id_tema, t.nom_tema
-
-    `;
+    const sql = `SELECT 
+            temes.id_tema, 
+            temes.nom_tema, 
+            GROUP_CONCAT(conceptes.nom_concepte) AS tots_els_conceptes
+        FROM 
+            temes
+        LEFT JOIN 
+            conceptes_temes ON temes.id_tema = conceptes_temes.id_tema
+        LEFT JOIN 
+            conceptes ON conceptes_temes.id_concepte = conceptes.id_concepte
+        WHERE 
+            temes.id_assignatura = ?
+        GROUP BY 
+            temes.id_tema, temes.nom_tema; `;
 
     db.query(sql, [id_assignatura], (error, result) => {
         if (error) {
@@ -884,87 +889,26 @@ app.post('/generarTest', (req, res) => {
   
 
 
-//Funció de recuperació de deu preguntes random segons el paràmetres establerts per l'usuari
+//Funció de recuperació de les preguntes segons els paràmetres definits per l'usuari
 app.get('/recoverRandomTestQuestions', async (req, res) => { 
-    const tema = req.query.tema;
-    const concepte = req.query.concepte;
-    const idAssignatura = req.query.idAssignatura;
+   
 
-    if (!tema || !concepte) {
-        return res.json({ Status: "Failed", Message: "Falten paràmetres requerits: tema, concepte o dificultat." });
-    }
+    const temes = req.query.temes;
+    const conceptes = req.query.conceptes;
 
-    const sqlGetTemaId = "SELECT id_tema FROM temes WHERE nom_tema = ?";
-    const sqlGetConcepteId = "SELECT id_concepte FROM conceptes WHERE nom_concepte = ?";
-    const sqlGetQuestions = `
-        SELECT p.* FROM preguntes p
-        INNER JOIN preguntes_conceptes pc ON p.id_pregunta = pc.id_pregunta
-        WHERE p.id_tema = ? 
-        AND pc.id_concepte = ? 
-        AND p.estat = 'acceptada'
-        ORDER BY RAND() LIMIT 10
-    `;
+    console.log(temes, conceptes)
 
-    const errors = [];
-    const success = [];
+    const sql = `SELECT * FROM preguntes WHERE (tema_id IN (:temes) OR :temes IS NULL) AND (concepte_id IN (:conceptes) OR :conceptes IS NULL);`
 
-    const getTemaId = () => {
-        return new Promise((resolve, reject) => {
-            db.query(sqlGetTemaId, [tema], (err, result) => {
-                if (err || result.length === 0) {
-                    errors.push("El tema proporcionat no existeix.");
-                    reject();
-                } else {
-                    success.push("ID del tema recuperat correctament.");
-                    resolve(result[0].id_tema);
-                }
-            });
-        });
-    };
-
-
-
-    const getConcepteId = () => {
-        return new Promise((resolve, reject) => {
-            db.query(sqlGetConcepteId, [concepte], (err, result) => {
-                if (err || result.length === 0) {
-                    errors.push("El concepte proporcionat no existeix.");
-                    reject();
-                } else {
-                    success.push("ID del concepte recuperat correctament.");
-                    resolve(result[0].id_concepte);
-                }
-            });
-        });
-    };
-
-    const getQuestions = (idTema, idConcepte) => {
-        return new Promise((resolve, reject) => {
-            db.query(sqlGetQuestions, [idTema, idConcepte], (err, result) => {
-                if (err || result.length === 0) {
-                    errors.push("No s'han trobat preguntes que coincideixin amb els criteris.");
-                    reject();
-                } else {
-                    success.push("Preguntes recuperades correctament.");
-                    resolve(result);
-                }
-            });
-        });
-    };
-
-    try {
-        const idTema = await getTemaId();
-        const idConcepte = await getConcepteId();
-        const preguntes = await getQuestions(idTema, idConcepte);
-
-        if (errors.length > 0) {
-            return res.json({ Status: "Partial Success", Messages: errors, Preguntes: preguntes || [] });
-        } else {
-            return res.json({ Status: "Success", Messages: success, Preguntes: preguntes });
+    db.query(sql, (error, result) => {
+        if (error) {
+            console.error("Error a la consulta:", error);
+            return res.json({ status: "Failed", error });
         }
-    } catch (error) {
-        return res.json({ Status: "Failed", Messages: errors });
-    }
+        res.json({ status: "Success", Preguntes: result });
+    });
+
+
 });
 
 

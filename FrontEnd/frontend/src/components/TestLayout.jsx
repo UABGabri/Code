@@ -5,6 +5,8 @@ import styles from "./StyleComponents/TestLayout.module.css";
 
 function TestLayout() {
   const location = useLocation();
+  const { temes, conceptes, idAssignatura } = location.state.parametersTest;
+
   const history = useNavigate();
   const [preguntes, setPreguntes] = useState([]);
   const [respostesBarrejades, setRespostesBarrejades] = useState([]);
@@ -13,16 +15,19 @@ function TestLayout() {
   const [loading, setLoading] = useState(true);
   const [showResults, setShowResults] = useState(false);
 
-  const { tema, concepte, id_Assignatura } = location.state.parametersTest;
-
   useEffect(() => {
+    console.log("Tema: ", temes, "Conceptes: ", conceptes);
+
     axios
       .get("http://localhost:8081/recoverRandomTestQuestions", {
-        params: { tema, concepte, id_Assignatura },
+        params: {
+          temes: temes, // Array dels IDs de temes
+          conceptes: conceptes, // Array dels IDs de conceptes
+          //idAssignatura,
+        },
       })
       .then((response) => {
         setPreguntes(response.data.Preguntes);
-        console.log(response.data);
         setRespostesBarrejades(
           response.data.Preguntes.map((pregunta) => barrejarRespostes(pregunta))
         );
@@ -32,7 +37,7 @@ function TestLayout() {
         console.error("Error al recuperar les preguntes:", error);
         setLoading(false);
       });
-  }, [tema, concepte, id_Assignatura]);
+  }, [temes, conceptes, idAssignatura]);
 
   const barrejarRespostes = (pregunta) => {
     const respostes = [
