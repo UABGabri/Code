@@ -33,32 +33,47 @@ const db = mysql.createConnection({
 });
 
 
-//Funció per registrar usuaris a la taula MySQl users
+//Funció per registrar usuaris a la taula MySQl users. Valida si existeix NIU i Email.
 app.post('/register', (req, res) => {
     const { niu, username, password, role, gmail } = req.body;
 
+    // Verificar que todos los campos estén presentes
     if (!niu || !username || !password || !role || !gmail) {
         return res.json({ error: "Tots els camps es requereixen" });
     }
 
+    // Verificar si el NIU ya existe
     const checkNiuSql = "SELECT * FROM usuaris WHERE niu = ?";
     db.query(checkNiuSql, [niu], (err, result) => {
         if (err) return res.json({ Error: err.message });
+
 
         if (result.length > 0) {
             return res.json({ error: "El NIU ja existeix" });
         }
 
-        const sql = "INSERT INTO usuaris (niu, username, password, role, email) VALUES (?)";
+ 
+        const checkEmailSql = "SELECT * FROM usuaris WHERE email = ?";
+        db.query(checkEmailSql, [gmail], (err, result) => {
+            if (err) return res.json({ Error: err.message });
 
-        //Funció guardat amb hash de la password
-        bcrypt.hash(password.toString(), salt, (err, hash) => {
-            if (err) return res.json({ Error: "Error hashing password" });
+          
+            if (result.length > 0) {
+                return res.json({ error: "El correu electrònic ja està registrat" });
+            }
 
-            const values = [niu, username, hash, role, gmail];
-            db.query(sql, [values], (err, result) => {
-                if (err) return res.json({ Error: err.message });
-                return res.json({ Status: "Succeeded" });
+       
+            const sql = "INSERT INTO usuaris (niu, username, password, role, email) VALUES (?)";
+
+    
+            bcrypt.hash(password.toString(), salt, (err, hash) => {
+                if (err) return res.json({ Error: "Error hashing password" });
+
+                const values = [niu, username, hash, role, gmail];
+                db.query(sql, [values], (err, result) => {
+                    if (err) return res.json({ Error: err.message });
+                    return res.json({ Status: "Succeeded" });
+                });
             });
         });
     });
@@ -80,7 +95,7 @@ app.post('/login', (req, res) => {
     db.query(sql, [req.body.niu], (err, data) => {
 
         if (err) {
-            return res.json({ Error: "Error al iniciar sesión" });
+            return res.json({ Error: "Error al iniciar sessió" });
         }
 
         if (data.length > 0) {
@@ -99,7 +114,8 @@ app.post('/login', (req, res) => {
                     res.json({ Status: "Success" });
 
                 } else {
-                    res.json({ Status: "Contrasenya incorrecta" });
+                    // Retornant error en cas de contrasenya incorrecta
+                    return res.json({ Error: "Contrasenya incorrecta" });
                 }
             });
         } else {
@@ -107,6 +123,7 @@ app.post('/login', (req, res) => {
         }
     });
 });
+
 
 //Funció de verificació existencia de user gràcies a les cookies
 const verifyUser = (req, res, next) => { 
@@ -1178,25 +1195,32 @@ app.post("/updateTestQuestions", (req, res) => {
 
 
 //Funció de recuperació de 10 preguntes per test amb probabilitats.
-app.post('/recoverPreguntaByTema', (req, res) =>{
+app.get("/recoverPreguntaRandom", (req, res) => {
 
-    const id_tema = req.query.temaSeleccionat;
+    const id_tema = parseInt(req.query.temaSeleccionat);
 
-   
-    const sql = "SELECT * FROM preguntes WHERE id_tema = ? ORDER BY RAND() LIMIT 1"
+    if (!id_tema) {
+        return res.json({ status: "Error", message: "Id de tema no vàlid" });
+    }
+
+    //console.log("Recuperant pregunta per al tema:", id_tema);
+
+    const sql = 'SELECT * FROM preguntes WHERE id_tema = ? ORDER BY RAND() LIMIT 1';
 
     db.query(sql, [id_tema], (err, result) => {
         if (err) {
-          console.error("Error obtenint pregunta", err);
-          return res.send("Error obtenint la pregunta");
+            console.error("Error obtenint pregunta:", err);
+            return res.json({ status: "Error", message: "Error del servidor" });
         }
 
-        if (results.length > 0) {
-            return res.json({ status: "Success", message: "Pregunta obtinguda" });
-        } 
+        if (result.length > 0) {
+            return res.json(result);
+        } else {
+            return res.json({ status: "Error", message: "No s'ha trobat cap pregunta" });
+        }
     });
+});
 
-})
 
 
 app.post("/import-csv", upload.single("file"), (req, res) => {

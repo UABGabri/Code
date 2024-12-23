@@ -5,7 +5,7 @@ import styles from "./StyleComponents/TestLayout.module.css";
 
 function TestIALayout() {
   const location = useLocation();
-  const { Id_Assignatura } = location.state || {};
+  const { idAssignatura } = location.state || {};
   const [preguntaActual, setPreguntaActual] = useState(null);
   const [respostesBarrejades, setRespostesBarrejades] = useState([]);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -13,55 +13,54 @@ function TestIALayout() {
   const [probabilities, setProbabilities] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // Inicialitza les probabilitats per tema basant-se en els temes recuperats
+  // Carrega temes i probabilitats
   useEffect(() => {
+    const Id_Assignatura = parseInt(idAssignatura);
     axios
       .get("http://localhost:8081/recoverTemasAssignatura", {
         params: { Id_Assignatura },
       })
       .then((response) => {
         const temesProbability = response.data.map((tema) => tema.id_tema);
-        // Assigna probabilitats inicials iguals a tots els temes
         const initialProbabilities = temesProbability.reduce((acc, tema) => {
           acc[tema] = 1 / temesProbability.length;
           return acc;
         }, {});
         setProbabilities(initialProbabilities);
-        fetchNextQuestion(initialProbabilities); // Carrega la primera pregunta
+        fetchNextQuestion(initialProbabilities); // Carregar pregunta inicial
       })
       .catch((error) => console.error("Error al carregar els temes:", error));
-  }, [Id_Assignatura]);
+  }, [idAssignatura]);
 
-  // Selecciona un tema aleatòriament segons les probabilitats actuals
-  const seleccionarTemaPorProbabilidad = (probabilities) => {
-    const random = Math.random(); // Valor entre 0 i 1
+  // Seleccionar un tema segons les probabilitats
+  const seleccionarTemaPerProbabilitat = (probabilities) => {
+    const random = Math.random();
     let acumulat = 0;
 
     for (const [tema, prob] of Object.entries(probabilities)) {
       acumulat += prob;
       if (random <= acumulat) {
-        return tema; // Retorna el tema seleccionat
+        return tema;
       }
     }
-    return null; // Per defecte (no hauria de passar)
+    return null;
   };
 
-  // Obté la següent pregunta basada en el tema seleccionat
+  // Obté la següent pregunta
   const fetchNextQuestion = (currentProbabilities) => {
-    setLoading(true); // Mostra l'estat de càrrega
+    setLoading(true);
     const temaSeleccionat =
-      seleccionarTemaPorProbabilidad(currentProbabilities);
+      seleccionarTemaPerProbabilitat(currentProbabilities);
 
-    console.log(temaSeleccionat);
     axios
-      .get("http://localhost:8081/recoverPreguntaByTema", {
+      .get("http://localhost:8081/recoverPreguntaRandom", {
         params: { temaSeleccionat },
       })
       .then((response) => {
-        const pregunta = response.data;
-        setPreguntaActual(pregunta); // Actualitza la pregunta actual
-        setRespostesBarrejades(barrejarRespostes(pregunta)); // Barreja les respostes
-        setLoading(false); // Finalitza l'estat de càrrega
+        const pregunta = response.data[0];
+        setPreguntaActual(pregunta);
+        setRespostesBarrejades(barrejarRespostes(pregunta));
+        setLoading(false);
       })
       .catch((error) => {
         console.error("Error al recuperar la pregunta:", error);
@@ -69,17 +68,16 @@ function TestIALayout() {
       });
   };
 
-  // Ajusta les probabilitats després de respondre una pregunta
+  // Ajusta les probabilitats després de la resposta
   const ajustarProbabilitats = (temaFallat) => {
     const novesProbabilitats = { ...probabilities };
-
-    // Augmenta la probabilitat del tema fallat
     novesProbabilitats[temaFallat] = Math.min(
       novesProbabilitats[temaFallat] + 0.1,
       1
     );
 
-    // Normalitza les probabilitats perquè la suma sigui 1
+    console.log(probabilities);
+
     const totalProbabilitats = Object.values(novesProbabilitats).reduce(
       (acc, prob) => acc + prob,
       0
@@ -88,25 +86,11 @@ function TestIALayout() {
       novesProbabilitats[tema] /= totalProbabilitats;
     });
 
-    setProbabilities(novesProbabilitats); // Actualitza les probabilitats
-    fetchNextQuestion(novesProbabilitats); // Carrega la següent pregunta
+    setProbabilities(novesProbabilitats);
+    fetchNextQuestion(novesProbabilitats); // Cargar següent pregunta
   };
 
-  // Registra la resposta seleccionada i mostra el feedback
-  const seleccionarResposta = (respostaUnica, esCorrecta) => {
-    if (feedback) return; // No permetre més seleccions fins a la següent pregunta
-
-    setSelectedAnswer(respostaUnica);
-
-    if (esCorrecta) {
-      setFeedback({ correct: true }); // Feedback positiu
-    } else {
-      setFeedback({ correct: false }); // Feedback negatiu
-      ajustarProbabilitats(preguntaActual.id_tema); // Incrementa la probabilitat del tema fallat
-    }
-  };
-
-  // Barreja les respostes de manera aleatòria
+  // Barreja les respostes
   const barrejarRespostes = (pregunta) => {
     const respostes = [
       pregunta.solucio_correcta,
@@ -118,8 +102,28 @@ function TestIALayout() {
   };
 
   if (loading) {
-    return <p>Carregant pregunta... </p>;
+    return <p>Carregant pregunta...</p>;
   }
+
+  // Selecciona la resposta
+  const seleccionarResposta = (respostaUnica, esCorrecta) => {
+    if (feedback) return; // No permetre nova selecció fins a la següent pregunta
+
+    setSelectedAnswer(respostaUnica);
+    if (esCorrecta) {
+      setFeedback({ correct: true });
+    } else {
+      setFeedback({ correct: false });
+      ajustarProbabilitats(preguntaActual.id_tema);
+    }
+  };
+
+  // Passar a la següent pregunta
+  const handleNextQuestion = () => {
+    setFeedback(null); // Netejar feedback
+    setSelectedAnswer(null); // Netejar selecció
+    fetchNextQuestion(probabilities); // Carregar nova pregunta
+  };
 
   return (
     <div className={styles.containerQuizz}>
@@ -133,12 +137,13 @@ function TestIALayout() {
             <li
               key={index}
               className={
-                feedback &&
-                ((resposta === preguntaActual.solucio_correcta &&
-                  styles.correct) ||
-                  (selectedAnswer === resposta &&
-                    !feedback.correct &&
-                    styles.incorrect))
+                feedback
+                  ? resposta === preguntaActual.solucio_correcta
+                    ? styles.correctAnswer
+                    : selectedAnswer === resposta && !feedback.correct
+                    ? styles.incorrectAnswer
+                    : undefined
+                  : undefined
               }
               onClick={() =>
                 seleccionarResposta(
@@ -174,10 +179,7 @@ function TestIALayout() {
           </p>
         )}
 
-        <button
-          onClick={() => fetchNextQuestion(probabilities)}
-          disabled={!feedback}
-        >
+        <button onClick={handleNextQuestion} disabled={!feedback}>
           Següent
         </button>
       </div>
