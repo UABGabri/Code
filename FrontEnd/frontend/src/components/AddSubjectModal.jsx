@@ -40,10 +40,10 @@ function AddSubjectModal({ id_User, onClose }) {
   return (
     <div className={styles.modalOver} onClick={onClose}>
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-        <h2 className={styles.modalTitle}>Afegir Assignatura</h2>
+        <h2 className={styles.modalTitle}>Add Subject</h2>
         <form onSubmit={handleSubmit} className={styles.modalForm}>
           <div className={styles.formGroup}>
-            <label>ID de l'assignatura:</label>
+            <label>Subject ID:</label>
             <input
               type="text"
               value={id_Subject}
@@ -51,17 +51,17 @@ function AddSubjectModal({ id_User, onClose }) {
               placeholder="Ex: 1234"
               required
               pattern="^\d{4}$"
-              title="L'ID ha de contenir 4 dígits"
+              title="ID needs 4 digits"
               minLength={4}
             />
           </div>
           <div className={styles.formGroup}>
-            <label>Nom de l'assignatura:</label>
+            <label>Name of the Subject:</label>
             <input
               type="text"
               value={subject_Name}
               onChange={(e) => setSubject_Name(e.target.value)}
-              placeholder="Ex: Matemàtiques"
+              placeholder="Ex: Math"
               required
               pattern="^[A-Za-zÀ-ÿ\s]+$"
             />
@@ -76,14 +76,14 @@ function AddSubjectModal({ id_User, onClose }) {
 
           <div className={styles.buttonGroup}>
             <button type="submit" className={styles.addButtonModal}>
-              Afegir Assignatura
+              Add Subject
             </button>
             <button
               type="button"
               className={styles.cancelButtonModal}
               onClick={onClose}
             >
-              Cancel·lar
+              Cancel
             </button>
           </div>
         </form>
