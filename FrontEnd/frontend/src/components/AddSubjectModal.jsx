@@ -18,7 +18,6 @@ function AddSubjectModal({ id_User, onClose }) {
       subject_Name,
     };
 
-    console.log(values);
     // Enviament de la sol·licitud per registrar l'assignatura
     axios
       .post("http://localhost:8081/registerSubject", values)
