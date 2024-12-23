@@ -13,6 +13,7 @@ import CrearTestProfessor from "./components/CrearTestProfessor";
 import TestWithKey from "./components/TestWithKey";
 import PersonalitzarTest from "./components/PersonalitzarTest";
 import TestIALayout from "./components/TestIALayout";
+import Dashboard from "./components/Dashboard";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path="/modules" element={<Modules />}>
           {" "}
         </Route>
+        <Route path="/dashboard" element={<Dashboard />}></Route>
         <Route path="/profile" element={<Profile />}>
           {" "}
         </Route>

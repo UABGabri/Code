@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
-import AddAssignaturaModal from "./AddAssignaturaModal";
+import AddSubjectModal from "./AddSubjectModal";
 import styles from "./StyleComponents/ProfessorDashboard.module.css";
 import Headercap from "./Headercap";
 import axios from "axios";
 
-function ProfessorDashboard({ id_User, role_User }) {
+function Dashboard({ id_User, role_User }) {
   const [assignatures, setAssignatures] = useState([]);
   const [modal, setModal] = useState(false);
   const navigate = useNavigate();
 
-  // Función para recuperar asignaturas dependiendo del rol
   const fetchAssignatures = async () => {
     try {
       const res = await axios.post("http://localhost:8081/recoverSubjects", {
@@ -20,21 +19,21 @@ function ProfessorDashboard({ id_User, role_User }) {
       });
       return res.data;
     } catch (err) {
-      console.error("Error a la solicitud:", err);
+      console.error("Error in request:", err);
       return [];
     }
   };
 
-  // Recuperar asignaturas al cargar el componente
   useEffect(() => {
     if (id_User && role_User) {
       fetchAssignatures().then((data) => {
         setAssignatures(data);
       });
+    } else {
+      console.error("id_User o role_User no està definit");
     }
   }, [id_User, role_User]);
 
-  // Abrir y cerrar el modal de añadir asignatura
   const openModal = () => {
     setModal(true);
   };
@@ -43,12 +42,10 @@ function ProfessorDashboard({ id_User, role_User }) {
     setModal(false);
   };
 
-  // Navegar a una asignatura seleccionada
   const handleSelectAssignatura = (id, name) => {
     navigate(`/assignatura/${id}`, { state: { name, id, id_User, role_User } });
   };
 
-  // Dividir las asignaturas en columnas
   const leftColumn = assignatures.filter((_, index) => index % 2 === 0);
   const rightColumn = assignatures.filter((_, index) => index % 2 !== 0);
 
@@ -56,7 +53,7 @@ function ProfessorDashboard({ id_User, role_User }) {
     <div>
       <Headercap />
       <div className={styles.title}>
-        <h1>ELS TEUS CURSOS</h1>
+        <h1>YOUR COURSES</h1>
       </div>
 
       <div className={styles.container}>
@@ -78,7 +75,7 @@ function ProfessorDashboard({ id_User, role_User }) {
           ))}
           {role_User === "professor" && (
             <button onClick={openModal} className={styles.addButton}>
-              Afegir Assignatura
+              Add Subject
             </button>
           )}
         </div>
@@ -102,14 +99,14 @@ function ProfessorDashboard({ id_User, role_User }) {
         </div>
       </div>
 
-      {modal && <AddAssignaturaModal id_user={id_User} onClose={closeModal} />}
+      {modal && <AddSubjectModal id_User={id_User} onClose={closeModal} />}
     </div>
   );
 }
 
-ProfessorDashboard.propTypes = {
-  id_User: PropTypes.number,
-  role_User: PropTypes.string,
+Dashboard.propTypes = {
+  id_User: PropTypes.number.isRequired,
+  role_User: PropTypes.string.isRequired,
 };
 
-export default ProfessorDashboard;
+export default Dashboard;

@@ -252,80 +252,68 @@ app.put('/updateUser', (req, res) => {
 });
 
 //Funció que serveix per la inserció i associació amb els professors i alumnes de una materia a la base de dades
-app.post('/registerSubject', async (req, res) => { 
-/*
-    const db = mysql.createConnection({
-        host: "localhost",
-        user: "root",
-        password: "Ga21012002",
-        database: "web_examen_tfg"
-    });
-*/
-    const id_proper = req.body.idPropietari;
-    const id = req.body.idAssignatura;
-    const nomAssignatura = req.body.nomAssignatura;
-    const niuProfessors = req.body.niuArrayProfessors;
-    const niuAlumnes = req.body.niuArrayAlumnes;
+app.post('/registerSubject', async (req, res) => {
+    const id_User = req.body.id_User;
+    const id_Subject = req.body.id_Subject;
+    const subject_Name = req.body.subject_Name;
 
-    const sql = "INSERT INTO assignatures (id_assignatura, nom_assignatura) VALUES (?, ?)";
-    const sqlComprobant = "SELECT * FROM usuaris WHERE niu = ?";
+    console.log(id_User, id_Subject, subject_Name)
+
+    
+    const sqlInsert = "INSERT INTO assignatures (id_assignatura, nom_assignatura) VALUES (?, ?)";
+    const sqlCheckExistence = "SELECT * FROM assignatures WHERE id_assignatura = ?"; // Consulta per comprovar si ja existeix l'ID de l'assignatura
+    const sqlComprobant = "SELECT * FROM usuaris WHERE niu = ?"; // Consulta per comprovar si el professor existeix
 
     const errors = [];
     const success = [];
 
-    //Funció per insertar una assignatura a la taula Assignatures de la base de dades
-    const insertSubject = () => {
-        return new Promise((resolve, reject) => { 
-            db.query(sql, [id, nomAssignatura], (err) => {
+    // Funció per comprovar si ja existeix l'ID de l'assignatura
+    const checkIfSubjectExists = () => {
+        return new Promise((resolve, reject) => {
+            db.query(sqlCheckExistence, [id_Subject], (err, result) => {
                 if (err) {
-                    errors.push("Error insertar Asignatura");
+                    errors.push("Error al comprovar la existència de l'assignatura");
+                    reject();
+                } else if (result.length > 0) {
+                    errors.push("Error: Ja existeix una assignatura amb aquest ID.");
                     reject();
                 } else {
-                    success.push("Success insertar Asignatura");
                     resolve();
                 }
             });
         });
     };
 
-    //Funció per insertar alumne a la taula alumnes_assignatura de la base de dades
-    const checkAndInsertAlumne = (niu) => {
+    // Funció per insertar l'assignatura a la base de dades
+    const insertSubject = () => {
         return new Promise((resolve, reject) => {
-            db.query(sqlComprobant, [niu], (err, result) => { //comprobació existencia alumne
-                if (err || result.length === 0) {
-                    errors.push("Error, un usuari alumne no existent: " + niu);
+            db.query(sqlInsert, [id_Subject, subject_Name], (err) => {
+                if (err) {
+                    errors.push("Error en inserir l'assignatura");
                     reject();
                 } else {
-                    const sqlAlumneInsert = "INSERT INTO alumnes_assignatures (id_alumne, id_assignatura) VALUES (?, ?)";
-                    db.query(sqlAlumneInsert, [niu, id], (err) => { //inserció alumne
-                        if (err) {
-                            errors.push("Error, usuari alumne no afegit a la taula alumnes_assignatures: " + niu);
-                            reject();
-                        } else {
-                            success.push("Alumne insertat: " + niu);
-                            resolve();
-                        }
-                    });
+                    success.push("Assignatura inserida correctament");
+                    resolve();
                 }
             });
         });
     };
 
-    //Funció per insertar els professors a la taula professors_assignatura de la base de dades
-    const checkAndInsertProfessor = (niu) => { 
+    // Funció per afegir el professor a la taula professors_assignatures
+    const checkAndInsertProfessor = (niu) => {
         return new Promise((resolve, reject) => {
-            db.query(sqlComprobant, [niu], (err, result) => { //comprobació existencia professor
+            db.query(sqlComprobant, [id_User, id_Subject], (err, result) => {
                 if (err || result.length === 0) {
-                    errors.push("Error, un usuari professor no existent: " + niu);
+                    errors.push("Error, usuari professor no existent: " + niu);
                     reject();
                 } else {
                     const sqlProfessorInsert = "INSERT INTO professors_assignatures (id_professor, id_assignatura) VALUES (?, ?)";
-                    db.query(sqlProfessorInsert, [niu, id], (err) => { //inserció professor
+                    db.query(sqlProfessorInsert, [id_User, id_Subject], (err) => {
                         if (err) {
-                            errors.push("Error, usuari professor no afegit a la taula professors_assignatures: " + niu);
+                            errors.push("Error, professor no afegit a la taula professors_assignatures: " + niu);
                             reject();
                         } else {
-                            success.push("Professor insertat: " + niu);
+                            success.push("Professor inserit correctament: " + niu);
                             resolve();
                         }
                     });
@@ -334,13 +322,15 @@ app.post('/registerSubject', async (req, res) => {
         });
     };
 
-    //Estructura ideada per esperar a que les insercions es compleixin de forma asíncrona i es torni un resultat 
     try {
+        // Primer, comprovem si l'assignatura ja existeix
+        await checkIfSubjectExists();
+
+        // Insertar l'assignatura a la taula assignatures
         await insertSubject();
 
-        //Es realitza una inserció per cada NIU d'alumne i professor separat per comes
-        await Promise.all(niuAlumnes.map(checkAndInsertAlumne));
-        await Promise.all(niuProfessors.map(checkAndInsertProfessor));
+        // Afegir el professor a la taula professors_assignatures
+        await Promise.all(checkAndInsertProfessor (id_User));
 
         if (errors.length > 0) {
             return res.json({ Status: "Failed", Messages: errors });
@@ -349,8 +339,10 @@ app.post('/registerSubject', async (req, res) => {
         }
     } catch (error) {
         return res.json({ Status: "Failed", Messages: errors });
-    } 
+    }
 });
+
+
 
 
 //Funció de recuperació dels temes associats a una assignatura pel curs
@@ -423,10 +415,10 @@ app.delete('/deleteTheme', (req, res)=>{
 app.post('/recoverSubjects', (req, res) => { 
 
     const id_User = req.body.idUser;
-    const roleUser = req.body.roleUser;
+    const role_User = req.body.roleUser;
 
 
-    if(roleUser === "professor"){
+    if(role_User === "professor"){
 
         const sql = `SELECT a.id_assignatura, a.nom_assignatura 
         FROM assignatures a 
@@ -444,7 +436,7 @@ app.post('/recoverSubjects', (req, res) => {
           });
 
     }
-    else if (roleUser === "alumne"){
+    else if (role_User === "alumne"){
         console.log("hahdhas")
 
         const sql = `SELECT a.id_assignatura, a.nom_assignatura 
