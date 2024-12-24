@@ -33,12 +33,12 @@ function Login() {
         .then((res) => {
           if (res.data.Status === "Success") {
             navigate("/modules");
-          } else {
-            alert("Error. L'usuari no està registrat a la base de dades.");
+          } else if (res.data.Error === "Contrasenya incorrecta") {
+            setError("Error. Contrasenya Incorrecta.");
           }
         })
         .catch((err) => {
-          console.error("Error a la solicitud:", err);
+          console.error("Error a la sol·licitud:", err);
         });
     }
   };
@@ -66,6 +66,8 @@ function Login() {
                   onChange={(e) =>
                     setValues({ ...values, niu: e.target.value })
                   }
+                  pattern="^\d{7}$"
+                  title="El NIU ha de ser un número de 7 dígits"
                 />
               </div>
               <div className="mb-3">
@@ -79,6 +81,8 @@ function Login() {
                   onChange={(e) =>
                     setValues({ ...values, password: e.target.value })
                   }
+                  minLength={8}
+                  title="La contrasenya ha de tenir 8 caràcters mínims"
                 />
               </div>
 

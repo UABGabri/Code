@@ -38,9 +38,22 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
         })
         .then((response) => {
           if (response.data.status === "Success") {
+            const testsAvaluatius = response.data.result.filter(
+              (test) => test.tipus === "avaluatiu"
+            );
+
             setTestsAvaluatius((prevTests) => ({
               ...prevTests,
-              [tema.id_tema]: response.data.result,
+              [tema.id_tema]: testsAvaluatius,
+            }));
+
+            const testsPractica = response.data.result.filter(
+              (test) => test.tipus === "practica"
+            );
+
+            setTestsPractica((prevTests) => ({
+              ...prevTests,
+              [tema.id_tema]: testsPractica,
             }));
           }
         })
@@ -56,6 +69,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
       return;
     }
 
+    console.log(Id_Assignatura, newTemaName);
     axios
       .post("http://localhost:8081/createTema", {
         Id_Assignatura,
@@ -90,9 +104,33 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
       });
     } else {
       // Mostrar modal en cas de no ser professor
-      setSelectedTest(test);
-      setShowModal(true);
+
+      if (test.tipus == "avaluatiu") {
+        setSelectedTest(test);
+        setShowModal(true);
+      } else {
+        setSelectedTest(test);
+
+        navigate("/realitzartest", {
+          state: { idTest: selectedTest.id_test },
+        });
+      }
     }
+  };
+
+  const handleDeleteTheme = (id_tema) => {
+    //const idTema = id_tema;
+
+    axios
+      .delete("http://localhost:8081/deleteTheme", { data: { id_tema } })
+      .then((response) => {
+        alert("Tema eliminat amb èxit!");
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.error("Error eliminant el tema", error);
+        alert("Hi ha hagut un error al eliminar el tema.");
+      });
   };
 
   const handleAccessKeySubmit = () => {
@@ -129,11 +167,11 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
   return (
     <div className={styles.elementsCursContainer}>
       <h1 className={styles.elementsCursHeader}>
-        <strong>GESTIÓ DE TEMES</strong>
+        <strong>TOPIC MANAGEMENT</strong>
       </h1>
       <div className={styles.temesLista}>
         {temes.length === 0 ? (
-          <p className={styles.noTemes}>No hi ha temes creats</p>
+          <p className={styles.noTemes}>No topics created</p>
         ) : (
           temes.map((tema) => (
             <div key={tema.id_tema} className={styles.temaItem}>
@@ -152,34 +190,54 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
 
               {openTema[tema.id_tema] && (
                 <div className={styles.temaContent}>
-                  <div className={styles.contingut}>
+                  <div className={styles.tests}>
                     <h3 className={styles.temaSubtitle}>
-                      <strong>Test de Pràctica</strong>
+                      <strong>Practice Tests</strong>
                     </h3>
                     <hr />
-                    {Role_User === "professor" && (
-                      <button
-                        onClick={() => {
-                          console.log("Id del tema enviat: ", tema.id_tema);
-                          navigate("/professorparametres", {
-                            //navegació al CrearTestProfessor amb tipus practica
-                            state: {
-                              idTema: tema.id_tema,
-                              id_assignatura: Id_Assignatura,
-                              id_professor: Id_User,
-                              tipus: "practica",
-                            },
-                          });
-                        }}
-                      >
-                        Afegir Test de Pràctica pel {tema.nom_tema}
-                      </button>
-                    )}
+                    <div className={styles.testList}>
+                      {testsPractica[tema.id_tema] &&
+                      testsPractica[tema.id_tema].length > 0 ? (
+                        <ul>
+                          {testsPractica[tema.id_tema].map((test) => (
+                            <li
+                              key={test.id_test}
+                              className={styles.testItem}
+                              onClick={() =>
+                                handleTestClick(test, tema.id_tema)
+                              }
+                            >
+                              {test.nom_test}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p>No practice tests available for this topic.</p>
+                      )}
+
+                      {Role_User === "professor" && (
+                        <button
+                          className={styles.buttonAddTest}
+                          onClick={() => {
+                            navigate("/professorparametres", {
+                              state: {
+                                idTema: tema.id_tema,
+                                id_assignatura: Id_Assignatura,
+                                id_professor: Id_User,
+                                tipus: "practica",
+                              },
+                            });
+                          }}
+                        >
+                          Add Practice Test for topic {tema.nom_tema}
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <div className={styles.tests}>
                     <h3 className={styles.temaSubtitle}>
-                      <strong>Tests Avaluatius</strong>
+                      <strong>Evaluation Tests</strong>
                     </h3>
                     <hr />
                     <div className={styles.testList}>
@@ -199,14 +257,13 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                           ))}
                         </ul>
                       ) : (
-                        <p>No hi ha tests per aquest tema.</p>
+                        <p>No evaluation tests available for this topic.</p>
                       )}
 
                       {Role_User === "professor" && (
                         <button
                           className={styles.buttonAddTest}
                           onClick={() => {
-                            console.log("ID del tema enviado:", tema.id_tema);
                             navigate("/professorparametres", {
                               state: {
                                 idTema: tema.id_tema,
@@ -217,11 +274,20 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                             });
                           }}
                         >
-                          Afegir Test Avaluatiu pel tema {tema.nom_tema}
+                          Add Evaluation Test for topic {tema.nom_tema}
                         </button>
                       )}
                     </div>
                   </div>
+
+                  {Role_User === "professor" && (
+                    <button
+                      className={styles.deleteTheme}
+                      onClick={() => handleDeleteTheme(tema.id_tema)}
+                    >
+                      Delete
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -234,11 +300,11 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
               type="text"
               value={newTemaName}
               onChange={(e) => setNewTemaName(e.target.value)}
-              placeholder="Nom del tema"
+              placeholder="Topic name"
               className={styles.temaInput}
             />
             <button onClick={handleCreateTema} className={styles.temaButton}>
-              Afegir Tema
+              Add Topic
             </button>
           </div>
         )}
@@ -247,26 +313,26 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
       {showModal && (
         <div className={styles.modal}>
           <div className={styles.modalContent}>
-            <h2>Introdueix la clau accés</h2>
+            <h2>Enter Access Key</h2>
             <input
               type="password"
               value={accessKey}
               onChange={(e) => setAccessKey(e.target.value)}
               className={styles.modalInput}
-              placeholder="Clau d'accés"
+              placeholder="Access key"
             />
             <div className={styles.modalActions}>
               <button
                 onClick={handleAccessKeySubmit}
                 className={styles.modalButton}
               >
-                Validar
+                Validate
               </button>
               <button
                 onClick={handleCloseModal}
                 className={styles.modalButtonCancel}
               >
-                Cancel·lar
+                Cancel
               </button>
             </div>
           </div>

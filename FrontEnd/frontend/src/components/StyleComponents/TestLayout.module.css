@@ -148,3 +148,12 @@
    cursor: not-allowed;
  }
  
+
+ .correctAnswer{
+background-color: rgb(90, 192, 90);
+ }
+
+ .incorrectAnswer{
+
+  background-color: rgb(228, 67, 67);
+ }

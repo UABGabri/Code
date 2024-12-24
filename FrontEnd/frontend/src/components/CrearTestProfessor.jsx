@@ -18,9 +18,8 @@ function CrearTestProfessor() {
   const [filteredPreguntes, setFilteredPreguntes] = useState([]);
   const [selectedQuestions, setSelectedQuestions] = useState([]);
   const [filters, setFilters] = useState({ dificultat: "", nom_tema: "" });
-  //const navigate = useNavigate();
   const history = useNavigate();
-
+  /*
   useEffect(() => {
     axios
       .get("http://localhost:8081/recoverPreguntesTema", {
@@ -29,6 +28,20 @@ function CrearTestProfessor() {
       .then((response) => {
         setPreguntes(response.data);
         setFilteredPreguntes(response.data);
+      })
+      .catch((error) => {
+        console.error("Error al recuperar les preguntes:", error);
+        alert("Error al recuperar les preguntes.");
+      });
+  }, []);*/
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:8081/recoverPreguntes")
+      .then((response) => {
+        setPreguntes(response.data);
+        setFilteredPreguntes(response.data);
+        console.log(response.data);
       })
       .catch((error) => {
         console.error("Error al recuperar les preguntes:", error);
@@ -56,6 +69,25 @@ function CrearTestProfessor() {
       return;
     }
 
+    let endDate;
+    while (true) {
+      endDate = prompt(
+        "Introdueix la data de finalització del test (format YYYY-MM-DD):"
+      );
+      if (!endDate) {
+        alert("Has de proporcionar una data de finalització.");
+        continue;
+      }
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/; // Validar formato YYYY-MM-DD
+      if (!dateRegex.test(endDate)) {
+        alert(
+          "Format de data incorrecte. Assegura't d'introduir la data en format YYYY-MM-DD."
+        );
+        continue;
+      }
+      break; // Salir del bucle si el formato es correcto
+    }
+
     const id_creador = idProfessor;
     const id_assignatura = idAssignatura;
 
@@ -66,6 +98,7 @@ function CrearTestProfessor() {
         id_assignatura,
         idTema,
         tipus,
+        data_finalitzacio: endDate,
       })
       .then((response) => {
         alert("Test creat correctament!");

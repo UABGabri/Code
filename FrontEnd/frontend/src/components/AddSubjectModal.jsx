@@ -25,7 +25,7 @@ function AddSubjectModal({ id_User, onClose }) {
         if (res.data.Status === "Failed") {
           setErrorMessage(res.data.Messages.join(", ")); // Mostrar missatges d'error
         } else {
-          window.location.reload(); // Si tot va bé, recarregar la pàgina
+          window.location.reload(); // Si tot va bé, recarregar
         }
       })
       .catch((err) => {

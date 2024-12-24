@@ -5,6 +5,7 @@ import styles from "./StyleComponents/TestLayout.module.css";
 
 function TestLayout() {
   const location = useLocation();
+  const { conceptesSeleccionats } = location.state.parametersTest;
 
   const history = useNavigate();
   const [preguntes, setPreguntes] = useState([]);
@@ -14,13 +15,12 @@ function TestLayout() {
   const [loading, setLoading] = useState(true);
   const [showResults, setShowResults] = useState(false);
 
-  const { tema, concepte, dificultat, id_Assignatura } =
-    location.state.parametersTest;
-
   useEffect(() => {
+    console.log("Conceptes seleccionats: ", conceptesSeleccionats);
+
     axios
-      .get("http://localhost:8081/recoverRandomTestQuestions", {
-        params: { tema, concepte, dificultat, id_Assignatura },
+      .get("http://localhost:8081/recuperarPreguntesPerConceptes", {
+        params: { conceptesSeleccionats }, // Enviar l'array dels conceptes seleccionats
       })
       .then((response) => {
         setPreguntes(response.data.Preguntes);
@@ -33,7 +33,7 @@ function TestLayout() {
         console.error("Error al recuperar les preguntes:", error);
         setLoading(false);
       });
-  }, [tema, concepte, dificultat, id_Assignatura]);
+  }, [conceptesSeleccionats]); // Quan canviïn els conceptes seleccionats, s'actualitza
 
   const barrejarRespostes = (pregunta) => {
     const respostes = [
@@ -88,7 +88,7 @@ function TestLayout() {
           <h1>Resultats</h1>
           <p>Correctes: {correctes}</p>
           <p>Incorrectes: {incorrectes}</p>
-          <p>Nota: {percentatge}%</p>{" "}
+          <p>Nota: {percentatge}%</p>
           <div className={styles.resultButtons}>
             <button onClick={() => window.location.reload()}>Reiniciar</button>
             <button onClick={() => history(-1)}>
@@ -119,30 +119,17 @@ function TestLayout() {
               }
               onClick={() => seleccionarResposta(`${resposta}-${index}`)}
             >
-              <label>
-                <input
-                  type="radio"
-                  name={`pregunta-${currentIndex}`}
-                  value={`${resposta}-${index}`}
-                  checked={
-                    selectedAnswers[currentIndex] === `${resposta}-${index}`
-                  }
-                  onChange={() => seleccionarResposta(`${resposta}-${index}`)}
-                />
-                {resposta}
-              </label>
+              {resposta}
             </li>
           ))}
         </ul>
-        <p className={styles.contadorPreguntes}>
-          Pregunta {currentIndex + 1} de {preguntes.length}
-        </p>
-        <div className={styles.botonsAccio}>
-          <button onClick={anarAnterior} disabled={currentIndex === 0}>
-            Anterior
-          </button>
+
+        <div className={styles.botoAnterior}>
+          <button onClick={anarAnterior}>Anterior</button>
           <button onClick={anarSeguent}>
-            {currentIndex === preguntes.length - 1 ? "Entregar" : "Següent"}
+            {currentIndex === preguntes.length - 1
+              ? "Veure resultats"
+              : "Següent"}
           </button>
         </div>
       </div>

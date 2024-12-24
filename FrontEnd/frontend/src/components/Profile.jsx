@@ -52,9 +52,7 @@ function Profile() {
         .put("http://localhost:8081/updateUser", values, {
           withCredentials: true,
         })
-        .then((response) => {
-          console.log(response);
-        })
+        .then((response) => {})
         .catch((err) => {
           console.error(err);
         });
@@ -67,7 +65,7 @@ function Profile() {
     <div>
       <Headercap />
       <div className={styles.maindisplay}>
-        <h1>Editar Perfil</h1>
+        <h1>Edit Profile</h1>
 
         <form onSubmit={handleSubmit} className={styles.formProfile}>
           <div>
@@ -90,7 +88,7 @@ function Profile() {
               onChange={handleInputChange}
               required
               pattern="^[A-Za-zÀ-ÿ\s]+$"
-              title="El nom només ha de tenir lletres de l'abecedari"
+              title="Name with letters from the alfabet "
               className={styles.inputProfile}
               placeholder="Nom del usuari"
             />
@@ -104,7 +102,7 @@ function Profile() {
               value={values.email}
               onChange={handleInputChange}
               required
-              title="Introdueix un email vàlid"
+              title="Input a valid email"
               className={styles.inputProfile}
               placeholder="Email"
             />
@@ -119,22 +117,22 @@ function Profile() {
               required
               id="password"
               minLength={8}
-              title="La contrasenya ha de tenir 8 carácters min"
+              title="Needs 8 characters min"
               className={styles.inputProfile}
-              placeholder="Nova contrasenya"
+              placeholder="New Password"
             />
           </div>
 
           <div>
             <label htmlFor="confirmPassword" className="form-label">
-              Confirmar contraseña
+              Confirm password
             </label>
             <input
               type="password"
               onChange={(e) => setConfirmPassword(e.target.value)}
               className={styles.inputProfile}
               id="confirmPassword"
-              placeholder="Confirma la contrasenya"
+              placeholder="Confirm password"
             />
           </div>
 
@@ -150,7 +148,7 @@ function Profile() {
           </div>
 
           <button type="submit" className={styles.saveButton}>
-            Guardar Cambis
+            Save Changes
           </button>
         </form>
       </div>
