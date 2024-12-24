@@ -13,12 +13,14 @@ function CrearTestProfessor() {
   const idProfessor = location.state?.id_professor;
   const idAssignatura = location.state?.id_assignatura;
   const tipus = location.state?.tipus;
-
+  const [showModal, setShowModal] = useState(false);
   const [preguntes, setPreguntes] = useState([]);
   const [filteredPreguntes, setFilteredPreguntes] = useState([]);
   const [selectedQuestions, setSelectedQuestions] = useState([]);
   const [filters, setFilters] = useState({ dificultat: "", nom_tema: "" });
   const history = useNavigate();
+
+  const [tema, setTema] = useState([]);
   /*
   useEffect(() => {
     axios
@@ -41,7 +43,6 @@ function CrearTestProfessor() {
       .then((response) => {
         setPreguntes(response.data);
         setFilteredPreguntes(response.data);
-        console.log(response.data);
       })
       .catch((error) => {
         console.error("Error al recuperar les preguntes:", error);
@@ -130,19 +131,6 @@ function CrearTestProfessor() {
       });
   };
 
-  const handleRandomSelection = () => {
-    const availableQuestions = preguntes.filter(
-      (q) => !selectedQuestions.includes(q.id_pregunta)
-    );
-    const randomQuestions = availableQuestions
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 5);
-    setSelectedQuestions((prevSelected) => [
-      ...prevSelected,
-      ...randomQuestions.map((q) => q.id_pregunta),
-    ]);
-  };
-
   const handleFilterChange = (key, value) => {
     setFilters({ ...filters, [key]: value });
   };
@@ -163,6 +151,48 @@ function CrearTestProfessor() {
     });
     setFilteredPreguntes(filtered);
   }, [filters, preguntes]);
+
+  const handleShowModal = () => {
+    console.log(idAssignatura);
+    axios
+      .get("http://localhost:8081/recoverTemesAssignatura", {
+        params: { idAssignatura },
+      })
+      .then((response) => {
+        console.log(response);
+        setTema(response.data);
+        setShowModal(true);
+      })
+      .catch((error) => {
+        alert("Error recuperando los temas.");
+      });
+  };
+
+  if (showModal) {
+    return (
+      <div className={styles.modalContainer}>
+        <div className={styles.modalContent}>
+          <h3>Selecciona un tema pel test test:</h3>
+          <div className={styles.temasList}>
+            {tema.map((t, index) => (
+              <div key={index} className={styles.temaItem}>
+                <span>{t.nom_tema}</span>
+                <span>{t.numPreguntas} preguntas</span>
+              </div>
+            ))}
+          </div>
+          <div className={styles.modalActions}>
+            <button
+              onClick={() => setShowModal(false)}
+              className={styles.closeButton}
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -197,14 +227,9 @@ function CrearTestProfessor() {
         >
           Crear Test
         </button>
-        <button
-          className={styles.randomSelectButton}
-          onClick={handleRandomSelection}
-        >
-          Selecciona 5 preguntes aleatòries
-        </button>
 
-        <button>Crear Test Intel·ligent</button>
+        <button onClick={handleShowModal}>Crear Test Intel·ligent</button>
+
         <div className={styles.questionsList}>
           {filteredPreguntes.length === 0 ? (
             <p>No hi ha preguntes disponibles segons els filtres.</p>
