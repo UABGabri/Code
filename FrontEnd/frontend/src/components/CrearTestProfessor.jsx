@@ -203,6 +203,8 @@ function CrearTestProfessor() {
         >
           Selecciona 5 preguntes aleatòries
         </button>
+
+        <button>Crear Test Intel·ligent</button>
         <div className={styles.questionsList}>
           {filteredPreguntes.length === 0 ? (
             <p>No hi ha preguntes disponibles segons els filtres.</p>
