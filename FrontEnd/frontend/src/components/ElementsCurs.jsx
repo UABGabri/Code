@@ -167,11 +167,11 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
   return (
     <div className={styles.elementsCursContainer}>
       <h1 className={styles.elementsCursHeader}>
-        <strong>GESTIÓ DE TEMES</strong>
+        <strong>TOPIC MANAGEMENT</strong>
       </h1>
       <div className={styles.temesLista}>
         {temes.length === 0 ? (
-          <p className={styles.noTemes}>No hi ha temes creats</p>
+          <p className={styles.noTemes}>No topics created</p>
         ) : (
           temes.map((tema) => (
             <div key={tema.id_tema} className={styles.temaItem}>
@@ -192,7 +192,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                 <div className={styles.temaContent}>
                   <div className={styles.tests}>
                     <h3 className={styles.temaSubtitle}>
-                      <strong>Test de Pràctica</strong>
+                      <strong>Practice Tests</strong>
                     </h3>
                     <hr />
                     <div className={styles.testList}>
@@ -212,7 +212,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                           ))}
                         </ul>
                       ) : (
-                        <p>No hi ha tests de pràctica per aquest tema.</p>
+                        <p>No practice tests available for this topic.</p>
                       )}
 
                       {Role_User === "professor" && (
@@ -229,7 +229,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                             });
                           }}
                         >
-                          Afegir Test de Pràctica pel tema {tema.nom_tema}
+                          Add Practice Test for topic {tema.nom_tema}
                         </button>
                       )}
                     </div>
@@ -237,7 +237,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
 
                   <div className={styles.tests}>
                     <h3 className={styles.temaSubtitle}>
-                      <strong>Tests Avaluatius</strong>
+                      <strong>Evaluation Tests</strong>
                     </h3>
                     <hr />
                     <div className={styles.testList}>
@@ -257,7 +257,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                           ))}
                         </ul>
                       ) : (
-                        <p>No hi ha tests avaluatius per aquest tema.</p>
+                        <p>No evaluation tests available for this topic.</p>
                       )}
 
                       {Role_User === "professor" && (
@@ -274,7 +274,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                             });
                           }}
                         >
-                          Afegir Test Avaluatiu pel tema {tema.nom_tema}
+                          Add Evaluation Test for topic {tema.nom_tema}
                         </button>
                       )}
                     </div>
@@ -285,7 +285,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                       className={styles.deleteTheme}
                       onClick={() => handleDeleteTheme(tema.id_tema)}
                     >
-                      Eliminar
+                      Delete
                     </button>
                   )}
                 </div>
@@ -300,11 +300,11 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
               type="text"
               value={newTemaName}
               onChange={(e) => setNewTemaName(e.target.value)}
-              placeholder="Nom del tema"
+              placeholder="Topic name"
               className={styles.temaInput}
             />
             <button onClick={handleCreateTema} className={styles.temaButton}>
-              Afegir Tema
+              Add Topic
             </button>
           </div>
         )}
@@ -313,26 +313,26 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
       {showModal && (
         <div className={styles.modal}>
           <div className={styles.modalContent}>
-            <h2>Introdueix la clau accés</h2>
+            <h2>Enter Access Key</h2>
             <input
               type="password"
               value={accessKey}
               onChange={(e) => setAccessKey(e.target.value)}
               className={styles.modalInput}
-              placeholder="Clau d'accés"
+              placeholder="Access key"
             />
             <div className={styles.modalActions}>
               <button
                 onClick={handleAccessKeySubmit}
                 className={styles.modalButton}
               >
-                Validar
+                Validate
               </button>
               <button
                 onClick={handleCloseModal}
                 className={styles.modalButtonCancel}
               >
-                Cancel·lar
+                Cancel
               </button>
             </div>
           </div>

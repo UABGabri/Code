@@ -67,7 +67,6 @@ function AddSubjectModal({ id_User, onClose }) {
             />
           </div>
 
-          {/* Mostrar missatge d'error si existeix */}
           {errorMessage && (
             <div className={styles.errorMessage}>
               <p>{errorMessage}</p>

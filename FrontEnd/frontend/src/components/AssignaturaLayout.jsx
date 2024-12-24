@@ -6,20 +6,23 @@ import { useState } from "react";
 import ElementsCurs from "./ElementsCurs";
 import ElementsPreguntes from "./ElementsPreguntes";
 import ElementsParticipants from "./ElementsParticipants";
-//import ElementsTestsProfessor from "./ElementsTestsProfessor";
 import ElementsTests from "./ElementsTests";
 
 function AssignaturaLayout() {
-  const { id } = useParams(); //id de la ASSIGNATURA
+  const { id } = useParams();
   const location = useLocation();
-  const { name, id_User, role_User } = location.state;
-  const history = useNavigate();
-  const [menuOption, setMenuOption] = useState("CURS");
+  const { name, id_User, role_User, previousMenuOption } = location.state || {};
+  const navigate = useNavigate();
+  const [menuOption, setMenuOption] = useState(previousMenuOption || "COURSE");
 
-  //Estructura per modificar contingut visualitzat sota la capçalera segons la selecció del menu
+  const handleMenuChange = (option) => {
+    setMenuOption(option);
+    navigate(".", { state: { ...location.state, previousMenuOption: option } });
+  };
+
   const render = () => {
     switch (menuOption) {
-      case "CURS":
+      case "COURSE":
         return (
           <ElementsCurs
             Id_User={id_User}
@@ -31,7 +34,7 @@ function AssignaturaLayout() {
         return (
           <ElementsParticipants Id_Assignatura={id} Role_User={role_User} />
         );
-      case "PREGUNTES":
+      case "QUESTIONS":
         return (
           <ElementsPreguntes
             Id_User={id_User}
@@ -47,46 +50,48 @@ function AssignaturaLayout() {
             Role_User={role_User}
           />
         );
+      default:
+        return null;
     }
+  };
+
+  const handleBackClick = () => {
+    navigate(-1, { state: { previousMenuOption: menuOption } });
   };
 
   return (
     <div>
       <Headercap />
       <header className={styles.headerSubject}>
-        <BiArrowBack onClick={() => history(-1)} className={styles.backArrow} />
+        <BiArrowBack onClick={handleBackClick} className={styles.backArrow} />
         <span>{name}</span>
         <span>{id}</span>
       </header>
 
       <div className={styles.mainMenu}>
         <span
-          className={menuOption === "CURS" ? styles.activeTab : ""}
-          key="CURS"
-          onClick={() => setMenuOption("CURS")}
+          className={menuOption === "COURSE" ? styles.activeTab : ""}
+          onClick={() => handleMenuChange("COURSE")}
         >
-          CURS
+          Course
         </span>
         <span
           className={menuOption === "PARTICIPANTS" ? styles.activeTab : ""}
-          key="PARTICIPANTS"
-          onClick={() => setMenuOption("PARTICIPANTS")}
+          onClick={() => handleMenuChange("PARTICIPANTS")}
         >
-          PARTICIPANTS
+          Participants
         </span>
         <span
-          className={menuOption === "PREGUNTES" ? styles.activeTab : ""}
-          key="PREGUNTES"
-          onClick={() => setMenuOption("PREGUNTES")}
+          className={menuOption === "QUESTIONS" ? styles.activeTab : ""}
+          onClick={() => handleMenuChange("QUESTIONS")}
         >
-          PREGUNTES
+          Questions
         </span>
         <span
           className={menuOption === "TESTS" ? styles.activeTab : ""}
-          key="TESTS"
-          onClick={() => setMenuOption("TESTS")}
+          onClick={() => handleMenuChange("TESTS")}
         >
-          TESTS
+          Tests
         </span>
       </div>
 

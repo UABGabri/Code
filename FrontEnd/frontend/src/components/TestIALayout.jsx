@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./StyleComponents/TestLayout.module.css";
 
 function TestIALayout() {
@@ -12,7 +12,7 @@ function TestIALayout() {
   const [feedback, setFeedback] = useState(null);
   const [probabilities, setProbabilities] = useState({});
   const [loading, setLoading] = useState(true);
-
+  const history = useNavigate();
   // Carrega temes i probabilitats
   useEffect(() => {
     const Id_Assignatura = parseInt(idAssignatura);
@@ -26,6 +26,7 @@ function TestIALayout() {
           acc[tema] = 1 / temesProbability.length;
           return acc;
         }, {});
+
         setProbabilities(initialProbabilities);
         fetchNextQuestion(initialProbabilities); // Carregar pregunta inicial
       })
@@ -52,6 +53,7 @@ function TestIALayout() {
     const temaSeleccionat =
       seleccionarTemaPerProbabilitat(currentProbabilities);
 
+    console.log(temaSeleccionat);
     axios
       .get("http://localhost:8081/recoverPreguntaRandom", {
         params: { temaSeleccionat },
@@ -76,8 +78,6 @@ function TestIALayout() {
       1
     );
 
-    console.log(probabilities);
-
     const totalProbabilitats = Object.values(novesProbabilitats).reduce(
       (acc, prob) => acc + prob,
       0
@@ -87,7 +87,6 @@ function TestIALayout() {
     });
 
     setProbabilities(novesProbabilitats);
-    fetchNextQuestion(novesProbabilitats); // Cargar següent pregunta
   };
 
   // Barreja les respostes
@@ -114,7 +113,7 @@ function TestIALayout() {
       setFeedback({ correct: true });
     } else {
       setFeedback({ correct: false });
-      ajustarProbabilitats(preguntaActual.id_tema);
+      ajustarProbabilitats(preguntaActual.id_tema); // Només ajustar probabilidades
     }
   };
 
@@ -182,6 +181,8 @@ function TestIALayout() {
         <button onClick={handleNextQuestion} disabled={!feedback}>
           Següent
         </button>
+
+        <button onClick={() => history(-1)}>Sortir</button>
       </div>
     </div>
   );
