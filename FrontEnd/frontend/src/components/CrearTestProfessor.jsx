@@ -164,7 +164,7 @@ function CrearTestProfessor() {
         setShowModal(true);
       })
       .catch((error) => {
-        alert("Error recuperando los temas.");
+        alert("Error recuperació dels temes");
       });
   };
 

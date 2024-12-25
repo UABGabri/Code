@@ -23,19 +23,18 @@
   
   .addQuestionButton {
     padding: 10px 20px;
-    cursor: pointer;
-    color: white;
-    background-color: green;
-    border: 0;
-    transition: background-color 0.3s, color 0.3s;
-    border-radius: 1rem;
-    font-size: 20px;
-    margin-bottom: 20px;
+  background-color: green;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
   }
   
   .addQuestionButton:hover {
-    background-color: white;
-    color: black;
+    background-color: darkgreen;
+    color: white;
   }
   
   .questionsList {
@@ -336,6 +335,7 @@
   margin-top: 150px;
  
   width: 100vw;
+  
   align-items: center;
 }
 
@@ -356,6 +356,10 @@
 
 .temaItem {
   margin-bottom: 20px;  
+  display: flex;
+  flex-direction: column;
+  margin-left: 100px;
+  margin-right: 100px;
 }
 
 .temaHeader {
@@ -452,18 +456,21 @@ hr {
 }
 
 .temaButton {
-  padding: 8px 16px;
-  background-color: #007bff;
+  padding: 10px 20px;
+  background-color: green;
   color: white;
   border: none;
+  border-radius: 5px;
+  font-size: 1rem;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .temaButton:hover {
-  background-color: #0056b3;
+  background-color: darkgreen;
 }
 
-/* Estilos del modal */
+/* Estils del modal */
 .modal {
   position: fixed;
   top: 0;

@@ -48,21 +48,38 @@ function TestIALayout() {
   };
 
   // Obté la següent pregunta
-  const fetchNextQuestion = (currentProbabilities) => {
+  const fetchNextQuestion = (
+    currentProbabilities,
+    maxRetries = 3,
+    retryCount = 0
+  ) => {
+    //maxRetries i retryCount s'utilitzen per controlar el nombre de reintents en cas de trobar un tema sense pregunta
     setLoading(true);
     const temaSeleccionat =
       seleccionarTemaPerProbabilitat(currentProbabilities);
 
-    console.log(temaSeleccionat);
+    console.log(`Intentant recuperar pregunta per al tema: ${temaSeleccionat}`);
     axios
       .get("http://localhost:8081/recoverPreguntaRandom", {
         params: { temaSeleccionat },
       })
       .then((response) => {
-        const pregunta = response.data[0];
-        setPreguntaActual(pregunta);
-        setRespostesBarrejades(barrejarRespostes(pregunta));
-        setLoading(false);
+        if (response.data.length > 0) {
+          const pregunta = response.data[0];
+          //console.log("Pregunta trobada:", pregunta);
+          setPreguntaActual(pregunta);
+          setRespostesBarrejades(barrejarRespostes(pregunta));
+          setLoading(false);
+        } else {
+          if (retryCount < maxRetries) {
+            fetchNextQuestion(currentProbabilities, maxRetries, retryCount + 1);
+          } else {
+            console.error(
+              "No s'han pogut obtenir preguntes després de diversos intents."
+            );
+            setLoading(false);
+          }
+        }
       })
       .catch((error) => {
         console.error("Error al recuperar la pregunta:", error);
@@ -127,7 +144,7 @@ function TestIALayout() {
   return (
     <div className={styles.containerQuizz}>
       <div className={styles.containerElements}>
-        <h1>Qüestionari Infinit</h1>
+        <h1>Qüestionari IA</h1>
 
         <p className={styles.pregunta}>{preguntaActual.pregunta}</p>
 
