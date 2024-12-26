@@ -14,6 +14,7 @@ import TestWithKey from "./components/TestWithKey";
 import PersonalitzarTest from "./components/PersonalitzarTest";
 import TestIALayout from "./components/TestIALayout";
 import Dashboard from "./components/Dashboard";
+import CreateQuizz from "./components/CreateQuizz";
 
 function App() {
   return (
@@ -39,10 +40,8 @@ function App() {
         <Route path="/assignatura/:id" element={<AssignaturaLayout />} />
         <Route path="/afegirPregunta" element={<AfegirPregunta />}></Route>
         <Route path="/testlayout" element={<TestLayout />}></Route>
-        <Route
-          path="/professorparametres"
-          element={<CrearTestProfessor />}
-        ></Route>
+        <Route path="/professorparametres" element={<CreateQuizz />}></Route>
+        <Route path="/manualTest" element={<CrearTestProfessor />}></Route>
 
         <Route path="/realitzartest" element={<TestWithKey />}></Route>
         <Route path="/personalitzarTest" element={<PersonalitzarTest />} />

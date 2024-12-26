@@ -876,13 +876,14 @@ app.get('/recoverElementsTest', (req, res) => {
 
 
 
+
 //Funció de creació de test professors
 app.post('/generarTest', (req, res) => {
     const { idAssignatura, idTema, idCreador, nombreTest } = req.body;
     const llaveAcceso = Math.random().toString(36).substr(2, 8);
   
     const sqlInsertTest = `
-      INSERT INTO tests (nom_test, data_creacio, clau_acces, id_creador, id_assignatura, id_tema)
+      INSERT INTO tests (nom_test, data_final, clau_acces, id_creador, id_assignatura, id_tema)
       VALUES (?, NOW(), ?, ?, ?, ?)
     `;
   
@@ -1033,7 +1034,7 @@ app.post('/createTest', async (req, res) => {
     // Validar data finalització
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/; // Formato YYYY-MM-DD
     if (!data_finalitzacio || !dateRegex.test(data_finalitzacio)) {
-        return res.json({ Status: "Failed", Message: "Data finalització no vàlida. Usa el format YYYY-MM-DD." });
+        return res.json({ Status: "Failed", Message: "Data finalització no vàlida. Utilitza el format YYYY-MM-DD." });
     }
 
     const clau_acces = Math.random().toString(36).substr(2, 8);
@@ -1062,6 +1063,89 @@ app.post('/createTest', async (req, res) => {
         }
     );
 });
+
+
+
+
+//Funció creació test automàtic
+app.post('/createQuizz', (req, res) => {
+    const { seleccions, nom_test, id_creador, id_assignatura, id_tema, tipus, data_finalitzacio } = req.body;
+
+    console.log(seleccions, nom_test, id_creador, id_assignatura, id_tema, tipus, data_finalitzacio)
+    // Validar la data de finalització
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/; // Format YYYY-MM-DD
+    if (!data_finalitzacio || !dateRegex.test(data_finalitzacio)) {
+        return res.json({ Status: "Failed", Message: "Data finalització no vàlida. Utilitza el format YYYY-MM-DD." });
+    }
+
+    const clau_acces = Math.random().toString(36).substr(2, 8);
+
+    const idCreador = parseInt(id_creador, 10);
+    const idAssignatura = parseInt(id_assignatura, 10);
+
+    const sqlInsertTest = `
+        INSERT INTO tests 
+        (nom_test, data_final, clau_acces, id_creador, id_assignatura, id_tema, tipus) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    db.query(sqlInsertTest, [nom_test, data_finalitzacio, clau_acces, idCreador, idAssignatura, id_tema, tipus], (error, result) => {
+        if (error) {
+            console.error("Error al crear el test:", error);
+            return res.status(500).json({ Status: "Error al crear el test" });
+        }
+
+        const idTest = result.insertId;
+
+        // Generar preguntes per cada tema seleccionat
+        const queries = seleccions.map(({ id, preguntes }) => {
+            return new Promise((resolve, reject) => {
+                const sqlGetQuestions = `
+                    SELECT id_pregunta 
+                    FROM preguntes
+                    WHERE id_tema = ? 
+                    ORDER BY RAND() LIMIT ?
+                `;
+
+                db.query(sqlGetQuestions, [id, preguntes], (error, questions) => {
+                    if (error) {
+                        console.error("Error al obtenir preguntes:", error);
+                        return reject(error);
+                    }
+                    resolve(questions.map(q => [idTest, q.id_pregunta]));
+                });
+            });
+        });
+
+        Promise.all(queries)
+            .then(allQuestions => {
+                const sqlInsertTestQuestions = `
+                    INSERT INTO test_preguntes (id_test, id_pregunta) VALUES ?
+                `;
+
+                const allQuestionsFlattened = allQuestions.flat();
+
+                db.query(sqlInsertTestQuestions, [allQuestionsFlattened], (error) => {
+                    if (error) {
+                        console.error("Error al associar preguntes al test:", error);
+                        return res.json({ Status: "Error al associar preguntes al test" });
+                    }
+
+                    res.json({
+                        Status: "Test creat correctament",
+                        clau_acces,
+                        id_test: idTest,
+                    });
+                });
+            })
+            .catch(error => {
+                console.error("Error al processar les preguntes:", error);
+                res.json({ Status: "Error al processar preguntes" });
+            });
+    });
+});
+
+
 
 
 

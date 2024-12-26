@@ -152,22 +152,6 @@ function CrearTestProfessor() {
     setFilteredPreguntes(filtered);
   }, [filters, preguntes]);
 
-  const handleShowModal = () => {
-    console.log(idAssignatura);
-    axios
-      .get("http://localhost:8081/recoverTemesAssignatura", {
-        params: { idAssignatura },
-      })
-      .then((response) => {
-        console.log(response);
-        setTema(response.data);
-        setShowModal(true);
-      })
-      .catch((error) => {
-        alert("Error recuperació dels temes");
-      });
-  };
-
   if (showModal) {
     return (
       <div className={styles.modalContainer}>
@@ -227,8 +211,6 @@ function CrearTestProfessor() {
         >
           Crear Test
         </button>
-
-        <button onClick={handleShowModal}>Crear Test Intel·ligent</button>
 
         <div className={styles.questionsList}>
           {filteredPreguntes.length === 0 ? (

@@ -221,9 +221,9 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                           onClick={() => {
                             navigate("/professorparametres", {
                               state: {
-                                idTema: tema.id_tema,
                                 id_assignatura: Id_Assignatura,
                                 id_professor: Id_User,
+                                id_tema: tema.id_tema,
                                 tipus: "practica",
                               },
                             });
@@ -266,9 +266,9 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                           onClick={() => {
                             navigate("/professorparametres", {
                               state: {
-                                idTema: tema.id_tema,
                                 id_assignatura: Id_Assignatura,
                                 id_professor: Id_User,
+                                id_tema: tema.id_tema,
                                 tipus: "avaluatiu",
                               },
                             });

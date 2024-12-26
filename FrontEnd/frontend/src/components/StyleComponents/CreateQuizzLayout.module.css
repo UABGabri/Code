@@ -1,0 +1,27 @@
+.content {
+    display: flex;
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .arrowBack {
+    position: absolute;
+    top: 70px;
+    left: 20px;
+    font-size: 30px;
+    cursor: pointer;
+    color: black;
+    transition: transform 0.2s ease; 
+}
+
+.arrowBack:hover {
+    transform: scale(1.2); 
+    color: black;
+}
