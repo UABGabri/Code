@@ -6,36 +6,21 @@ import { useNavigate } from "react-router-dom";
 import Headercap from "./Headercap";
 import { BiArrowBack } from "react-icons/bi";
 
-//Desde elements curs va aquí per crear el test amb clau.
 function CrearTestProfessor() {
   const location = useLocation();
-  const idTema = location.state?.idTema;
+  const idTema = location.state?.id_tema;
   const idProfessor = location.state?.id_professor;
   const idAssignatura = location.state?.id_assignatura;
   const tipus = location.state?.tipus;
-  const [showModal, setShowModal] = useState(false);
   const [preguntes, setPreguntes] = useState([]);
   const [filteredPreguntes, setFilteredPreguntes] = useState([]);
   const [selectedQuestions, setSelectedQuestions] = useState([]);
   const [filters, setFilters] = useState({ dificultat: "", nom_tema: "" });
-  const history = useNavigate();
-
-  const [tema, setTema] = useState([]);
-  /*
-  useEffect(() => {
-    axios
-      .get("http://localhost:8081/recoverPreguntesTema", {
-        params: { id_tema: idTema },
-      })
-      .then((response) => {
-        setPreguntes(response.data);
-        setFilteredPreguntes(response.data);
-      })
-      .catch((error) => {
-        console.error("Error al recuperar les preguntes:", error);
-        alert("Error al recuperar les preguntes.");
-      });
-  }, []);*/
+  const [dataFinalitzacio, setDataFinalitzacio] = useState("");
+  const [testName, setTestName] = useState("");
+  const [currentPage, setCurrentPage] = useState(1); // Página actual
+  const questionsPerPage = 5; // Preguntas por página
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
@@ -64,29 +49,14 @@ function CrearTestProfessor() {
       return;
     }
 
-    const testName = prompt("Introdueix el nom del test:");
     if (!testName) {
       alert("Has de proporcionar un nom per al test.");
       return;
     }
 
-    let endDate;
-    while (true) {
-      endDate = prompt(
-        "Introdueix la data de finalització del test (format YYYY-MM-DD):"
-      );
-      if (!endDate) {
-        alert("Has de proporcionar una data de finalització.");
-        continue;
-      }
-      const dateRegex = /^\d{4}-\d{2}-\d{2}$/; // Validar formato YYYY-MM-DD
-      if (!dateRegex.test(endDate)) {
-        alert(
-          "Format de data incorrecte. Assegura't d'introduir la data en format YYYY-MM-DD."
-        );
-        continue;
-      }
-      break; // Salir del bucle si el formato es correcto
+    if (!dataFinalitzacio) {
+      alert("Has de proporcionar una data de finalització.");
+      return;
     }
 
     const id_creador = idProfessor;
@@ -99,7 +69,7 @@ function CrearTestProfessor() {
         id_assignatura,
         idTema,
         tipus,
-        data_finalitzacio: endDate,
+        data_finalitzacio: dataFinalitzacio,
       })
       .then((response) => {
         alert("Test creat correctament!");
@@ -118,7 +88,7 @@ function CrearTestProfessor() {
             questions: orderedQuestions,
           })
           .then(() => {
-            history(-1);
+            navigate(-1);
           })
           .catch((error) => {
             console.error("Error al insertar les preguntes:", error);
@@ -150,39 +120,36 @@ function CrearTestProfessor() {
       );
     });
     setFilteredPreguntes(filtered);
+    setCurrentPage(1);
   }, [filters, preguntes]);
 
-  if (showModal) {
-    return (
-      <div className={styles.modalContainer}>
-        <div className={styles.modalContent}>
-          <h3>Selecciona un tema pel test test:</h3>
-          <div className={styles.temasList}>
-            {tema.map((t, index) => (
-              <div key={index} className={styles.temaItem}>
-                <span>{t.nom_tema}</span>
-                <span>{t.numPreguntas} preguntas</span>
-              </div>
-            ))}
-          </div>
-          <div className={styles.modalActions}>
-            <button
-              onClick={() => setShowModal(false)}
-              className={styles.closeButton}
-            >
-              Cerrar
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const indexOfLastQuestion = currentPage * questionsPerPage;
+  const indexOfFirstQuestion = indexOfLastQuestion - questionsPerPage;
+  const currentQuestions = filteredPreguntes.slice(
+    indexOfFirstQuestion,
+    indexOfLastQuestion
+  );
+
+  // Caniv pàgina
+  const handlePageChange = (direction) => {
+    if (
+      direction === "next" &&
+      currentPage < Math.ceil(filteredPreguntes.length / questionsPerPage)
+    ) {
+      setCurrentPage(currentPage + 1);
+    } else if (direction === "prev" && currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
   return (
     <div>
       <Headercap />
       <header className={styles.headerSubject}>
-        <BiArrowBack onClick={() => history(-1)} className={styles.backArrow} />
+        <BiArrowBack
+          onClick={() => navigate(-1)}
+          className={styles.backArrow}
+        />
       </header>
 
       <div className={styles.questionsContainerTeacher}>
@@ -204,6 +171,26 @@ function CrearTestProfessor() {
           />
           <button onClick={handleResetFilters}>Resetear filtres</button>
         </div>
+
+        <div className={styles.testDetails}>
+          <label>
+            Nom del Test:
+            <input
+              type="text"
+              value={testName}
+              onChange={(e) => setTestName(e.target.value)}
+            />
+          </label>
+          <label>
+            Data de Finalització:
+            <input
+              type="date"
+              value={dataFinalitzacio}
+              onChange={(e) => setDataFinalitzacio(e.target.value)}
+            />
+          </label>
+        </div>
+
         <button
           className={styles.createTestButton}
           onClick={handleCreateTest}
@@ -213,10 +200,10 @@ function CrearTestProfessor() {
         </button>
 
         <div className={styles.questionsList}>
-          {filteredPreguntes.length === 0 ? (
+          {currentQuestions.length === 0 ? (
             <p>No hi ha preguntes disponibles segons els filtres.</p>
           ) : (
-            filteredPreguntes.map((question) => (
+            currentQuestions.map((question) => (
               <div key={question.id_pregunta} className={styles.questionCard}>
                 <div className={styles.questionDetails}>
                   <p>
@@ -246,6 +233,28 @@ function CrearTestProfessor() {
               </div>
             ))
           )}
+        </div>
+
+        <div className={styles.pagination}>
+          <button
+            onClick={() => handlePageChange("prev")}
+            disabled={currentPage === 1}
+          >
+            Anterior
+          </button>
+          <span>
+            Página {currentPage} de{" "}
+            {Math.ceil(filteredPreguntes.length / questionsPerPage)}
+          </span>
+          <button
+            onClick={() => handlePageChange("next")}
+            disabled={
+              currentPage ===
+              Math.ceil(filteredPreguntes.length / questionsPerPage)
+            }
+          >
+            Següent
+          </button>
         </div>
       </div>
     </div>

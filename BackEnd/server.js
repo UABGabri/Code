@@ -1204,6 +1204,8 @@ db.query(sql, [idTema], (error, result) => {
 })
 
 
+
+
 //Funció per validar clau accés a Test
 app.post('/validateTestAccess', (req, res) => {
 
@@ -1268,6 +1270,32 @@ app.post("/updateTestQuestions", (req, res) => {
         });
     });
   });
+
+
+
+  app.delete("/deleteTest", (req, res) =>{
+
+
+    const id_test = req.query.idTest;
+
+    const sql = "DELETE FROM tests WHERE id_test = ?";
+
+    db.query(sql, [id_test], (err, result) => {
+        if (err) {
+            console.error("Error eliminant test:", err);
+            return res.json({ status: "Error", message: "Error del servidor" });
+        }
+
+        if (result.length > 0) {
+            return res.json(result);
+        } else {
+            return res.json({ status: "Error" });
+        }
+    });
+
+
+  })
+
 
 
 //Funció de recuperació de 10 preguntes per test amb probabilitats.

@@ -5,16 +5,23 @@ import Headercap from "./Headercap";
 import styles from "./StyleComponents/Elements.module.css";
 import axios from "axios";
 
-//Component de personalització del test avaluatiu
 function PersonalitzarTest() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [testPreguntes, setTestPreguntes] = useState([]);
+  const [preguntesTest, setPreguntesTest] = useState([]);
   const [bancPreguntes, setBancPreguntes] = useState([]);
   const { idTest, idTema } = location.state || {};
-  const dragPregunta = useRef(0);
-  const dragOverPregunta = useRef(0);
+  const preguntaArrossegar = useRef(0);
+  const preguntaSobreArrossegar = useRef(0);
 
+  // Estat per a la paginació de les preguntes del test
+  const [paginaActual, setPaginaActual] = useState(1);
+  const preguntesPerPagina = 5;
+
+  // Estat per a gestionar el modal de confirmació de delete
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  // Obtenir les preguntes del test seleccionat
   useEffect(() => {
     axios
       .get("http://localhost:8081/recoverSelectedTestWithKeyQuestions", {
@@ -24,41 +31,41 @@ function PersonalitzarTest() {
         const sortedPreguntes = response.data.Preguntes.sort(
           (a, b) => a.posicio - b.posicio
         );
-        setTestPreguntes(sortedPreguntes);
+        setPreguntesTest(sortedPreguntes);
         fetchRemainingQuestions(sortedPreguntes);
       })
-      .catch(() => alert("Error al recuperar les preguntes del test."));
+      .catch(() => alert("Error fetching the test questions."));
   }, [idTest, idTema]);
 
-  const fetchRemainingQuestions = (preguntasTest) => {
+  // Obtenir les preguntes restants del banc
+  const fetchRemainingQuestions = (preguntesTest) => {
     axios
       .get("http://localhost:8081/recoverPreguntesTema", {
         params: { id_tema: idTema },
       })
       .then((response) => {
         const filteredPreguntes = response.data.filter(
-          (bancPregunta) =>
-            !preguntasTest.some(
-              (testPregunta) =>
-                testPregunta.id_pregunta === bancPregunta.id_pregunta
+          (preguntaBanc) =>
+            !preguntesTest.some(
+              (preguntaTest) =>
+                preguntaTest.id_pregunta === preguntaBanc.id_pregunta
             )
         );
         setBancPreguntes(filteredPreguntes);
       })
-      .catch(() =>
-        alert("Error al recuperar el banc de preguntes disponibles.")
-      );
+      .catch(() => alert("Error fetching the remaining questions."));
   };
 
-  const handleSort = () => {
-    const preguntaClone = [...testPreguntes];
-    const temp = preguntaClone[dragPregunta.current];
-    preguntaClone[dragPregunta.current] =
-      preguntaClone[dragOverPregunta.current];
-    preguntaClone[dragOverPregunta.current] = temp;
+  // Ordenar les preguntes del test
+  const ordenarPreguntes = () => {
+    const preguntaClone = [...preguntesTest];
+    const temp = preguntaClone[preguntaArrossegar.current];
+    preguntaClone[preguntaArrossegar.current] =
+      preguntaClone[preguntaSobreArrossegar.current];
+    preguntaClone[preguntaSobreArrossegar.current] = temp;
 
     preguntaClone.forEach((q, index) => (q.posicio = index + 1));
-    setTestPreguntes(preguntaClone);
+    setPreguntesTest(preguntaClone);
 
     axios
       .post("http://localhost:8081/updateTestQuestions", {
@@ -68,18 +75,17 @@ function PersonalitzarTest() {
           posicio: q.posicio,
         })),
       })
-      .catch(() =>
-        alert("Error al guardar els canvis d'ordre de les preguntes.")
-      );
+      .catch(() => alert("Error saving the order of the questions."));
   };
 
-  const handleAddQuestion = (pregunta) => {
-    const lastPosition = testPreguntes.length + 1;
+  // Afegir una pregunta al test
+  const afegirPregunta = (pregunta) => {
+    const lastPosition = preguntesTest.length + 1;
     const updatedTestPreguntes = [
-      ...testPreguntes,
+      ...preguntesTest,
       { ...pregunta, posicio: lastPosition },
     ];
-    setTestPreguntes(updatedTestPreguntes);
+    setPreguntesTest(updatedTestPreguntes);
 
     axios
       .post("http://localhost:8081/updateTestQuestions", {
@@ -94,15 +100,16 @@ function PersonalitzarTest() {
           prev.filter((q) => q.id_pregunta !== pregunta.id_pregunta)
         )
       )
-      .catch(() => alert("Error al afegir la pregunta al test."));
+      .catch(() => alert("Error adding the question to the test."));
   };
 
-  const handleRemoveQuestion = (pregunta) => {
-    const updatedTestPreguntes = testPreguntes
+  // Eliminar una pregunta del test
+  const eliminarPregunta = (pregunta) => {
+    const updatedTestPreguntes = preguntesTest
       .filter((q) => q.id_pregunta !== pregunta.id_pregunta)
       .map((q, index) => ({ ...q, posicio: index + 1 }));
 
-    setTestPreguntes(updatedTestPreguntes);
+    setPreguntesTest(updatedTestPreguntes);
 
     axios
       .post("http://localhost:8081/updateTestQuestions", {
@@ -113,20 +120,79 @@ function PersonalitzarTest() {
         })),
       })
       .then(() => setBancPreguntes((prev) => [...prev, pregunta]))
-      .catch(() => alert("Error al eliminar la pregunta del test."));
+      .catch(() => alert("Error removing the question from the test."));
   };
 
-  const handleSaveChanges = () => {
+  // Guardar els canvis realitzats en el test
+  const guardarCanvis = () => {
     axios
       .post("http://localhost:8081/updateTestQuestions", {
         idTest,
-        questions: testPreguntes.map((q) => ({
+        questions: preguntesTest.map((q) => ({
           id_pregunta: q.id_pregunta,
           posicio: q.posicio,
         })),
       })
-      .then(() => alert("Canvis guardats correctament."))
-      .catch(() => alert("Error al guardar els canvis."));
+      .then(() => alert("Changes saved successfully."))
+      .catch(() => alert("Error saving the changes."));
+  };
+
+  // Eliminar el test
+  const eliminarTest = () => {
+    axios
+      .delete("http://localhost:8081/deleteTest", {
+        params: { idTest },
+      })
+      .then(() => {
+        alert("Test deleted successfully.");
+        navigate(-1);
+      })
+      .catch(() => alert("Error deleting the test."));
+  };
+
+  // Lògica de la paginació per a les preguntes del test
+  const indexOfLastPregunta = paginaActual * preguntesPerPagina;
+  const indexOfFirstPregunta = indexOfLastPregunta - preguntesPerPagina;
+  const preguntesActualsTest = preguntesTest.slice(
+    indexOfFirstPregunta,
+    indexOfLastPregunta
+  );
+
+  // Funcions de paginació
+  const nextPage = () => {
+    if (paginaActual < Math.ceil(preguntesTest.length / preguntesPerPagina)) {
+      setPaginaActual(paginaActual + 1);
+    }
+  };
+
+  const prevPage = () => {
+    if (paginaActual > 1) {
+      setPaginaActual(paginaActual - 1);
+    }
+  };
+
+  // Paginació del banc de preguntes
+  const [paginaBanc, setPaginaBanc] = useState(1);
+  const preguntesPerPaginaBanc = 5;
+
+  const indexOfLastPreguntaBanc = paginaBanc * preguntesPerPaginaBanc;
+  const indexOfFirstPreguntaBanc =
+    indexOfLastPreguntaBanc - preguntesPerPaginaBanc;
+  const preguntesActualsBanc = bancPreguntes.slice(
+    indexOfFirstPreguntaBanc,
+    indexOfLastPreguntaBanc
+  );
+
+  const nextPageBanc = () => {
+    if (paginaBanc < Math.ceil(bancPreguntes.length / preguntesPerPaginaBanc)) {
+      setPaginaBanc(paginaBanc + 1);
+    }
+  };
+
+  const prevPageBanc = () => {
+    if (paginaBanc > 1) {
+      setPaginaBanc(paginaBanc - 1);
+    }
   };
 
   return (
@@ -137,22 +203,28 @@ function PersonalitzarTest() {
           onClick={() => navigate(-1)}
           className={styles.backArrow}
         />
-        <button onClick={handleSaveChanges} className={styles.saveButton}>
-          Guardar Canvis
+        <button onClick={guardarCanvis} className={styles.saveButton}>
+          Save Changes
+        </button>
+        <button
+          onClick={() => setShowDeleteModal(true)}
+          className={styles.deleteTestButton}
+        >
+          Delete Test
         </button>
       </header>
 
       <div className={styles.customBody}>
-        <h1>Preguntes del Test</h1>
+        <h1>Test Questions</h1>
         <div className={styles.questionsList}>
-          {testPreguntes.map((pregunta, index) => (
+          {preguntesActualsTest.map((pregunta, index) => (
             <div
               key={pregunta.id_pregunta}
               className={styles.questionCard}
               draggable
-              onDragStart={() => (dragPregunta.current = index)}
-              onDragEnter={() => (dragOverPregunta.current = index)}
-              onDragEnd={handleSort}
+              onDragStart={() => (preguntaArrossegar.current = index)}
+              onDragEnter={() => (preguntaSobreArrossegar.current = index)}
+              onDragEnd={ordenarPreguntes}
               onDragOver={(e) => e.preventDefault()}
             >
               <p>
@@ -169,19 +241,35 @@ function PersonalitzarTest() {
               </p>
               <button
                 className={styles.deleteButton}
-                onClick={() => handleRemoveQuestion(pregunta)}
+                onClick={() => eliminarPregunta(pregunta)}
               >
-                Eliminar
+                Delete
               </button>
             </div>
           ))}
         </div>
 
+        <div className={styles.paginationControls}>
+          <button onClick={prevPage} disabled={paginaActual === 1}>
+            Previous
+          </button>
+          <span>Page {paginaActual}</span>
+          <button
+            onClick={nextPage}
+            disabled={
+              paginaActual ===
+              Math.ceil(preguntesTest.length / preguntesPerPagina)
+            }
+          >
+            Next
+          </button>
+        </div>
+
         <hr className={styles.lineCustom}></hr>
 
-        <h1>Banc de Preguntes</h1>
+        <h1>Question Bank</h1>
         <div className={styles.questionsList}>
-          {bancPreguntes.map((pregunta) => (
+          {preguntesActualsBanc.map((pregunta) => (
             <div key={pregunta.id_pregunta} className={styles.questionCard}>
               <p>
                 <strong>Pregunta: </strong>
@@ -196,14 +284,55 @@ function PersonalitzarTest() {
                 {pregunta.id_pregunta}
               </p>
               <button
-                className={styles.addQuestionButton}
-                onClick={() => handleAddQuestion(pregunta)}
+                className={styles.addButton}
+                onClick={() => afegirPregunta(pregunta)}
               >
-                Afegir
+                Add
               </button>
             </div>
           ))}
         </div>
+
+        <div className={styles.paginationControls}>
+          <button onClick={prevPageBanc} disabled={paginaBanc === 1}>
+            Previous
+          </button>
+          <span>Page {paginaBanc}</span>
+          <button
+            onClick={nextPageBanc}
+            disabled={
+              paginaBanc ===
+              Math.ceil(bancPreguntes.length / preguntesPerPaginaBanc)
+            }
+          >
+            Next
+          </button>
+        </div>
+
+        {showDeleteModal && (
+          <div className={styles.modal}>
+            <div className={styles.modalContent}>
+              <h3>Are you sure you want to delete this test?</h3>
+              <div>
+                <button
+                  className={styles.deleteTestConfirmButton}
+                  onClick={() => {
+                    eliminarTest();
+                    setShowDeleteModal(false);
+                  }}
+                >
+                  Yes
+                </button>
+                <button
+                  className={styles.deleteTestCancelButton}
+                  onClick={() => setShowDeleteModal(false)}
+                >
+                  No
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

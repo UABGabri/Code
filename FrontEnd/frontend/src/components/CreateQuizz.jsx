@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import Headercap from "./Headercap";
@@ -68,7 +68,6 @@ function CreateQuizz() {
           alert(
             `Test creat correctament amb clau d'accés: ${response.data.clau_acces}`
           );
-          navigate(-1);
         } else {
           alert("Error al crear el test.");
         }
@@ -84,11 +83,11 @@ function CreateQuizz() {
           onClick={() => navigate(-1)}
           className={styles.arrowBack}
         />
-        <h2>Crear Quizz</h2>
+        <h2>Create Quizz</h2>
 
         <div>
           <label>
-            Data de Finalització:
+            Deadline:
             <input
               type="date"
               value={dataFinalitzacio}
@@ -102,7 +101,7 @@ function CreateQuizz() {
             value={temaSeleccionat}
             onChange={(e) => setTemaSeleccionat(e.target.value)}
           >
-            <option value="">Selecciona un tema</option>
+            <option value="">Select Topics</option>
             {temes
               .filter(
                 (tema) => !seleccions.some((sel) => sel.id === tema.id_tema)
@@ -119,13 +118,13 @@ function CreateQuizz() {
             value={numeroPreguntes}
             onChange={(e) => setNumeroPreguntes(parseInt(e.target.value))}
           />
-          <button onClick={afegirTema}>Afegir</button>
+          <button onClick={afegirTema}>Add</button>
         </div>
 
         <ul className={styles.temesSeleccionats}>
           {seleccions.map((seleccio) => (
             <li key={seleccio.id} className={styles.temaSeleccionat}>
-              <span>{seleccio.nom_tema} - Preguntes:</span>
+              <span>{seleccio.nom_tema} - Questions:</span>
               <input
                 type="number"
                 min="1"
@@ -153,7 +152,17 @@ function CreateQuizz() {
           ))}
         </ul>
 
-        <button onClick={handleCreateQuizz}>Crear Test</button>
+        <button onClick={handleCreateQuizz}>Create Test</button>
+
+        <button
+          onClick={() =>
+            navigate("/manualTest", {
+              state: { id_assignatura, id_professor, id_tema, tipus },
+            })
+          }
+        >
+          Create Manual Test
+        </button>
       </div>
     </div>
   );

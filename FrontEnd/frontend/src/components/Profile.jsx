@@ -6,23 +6,23 @@ import { useNavigate } from "react-router-dom";
 
 function Profile() {
   const [values, setValues] = useState({
-    niu: "", //valor no intercanviable
+    niu: "", // valor no editable
     username: "",
     email: "",
     password: "",
-    role: "", //valor no intercanviable
+    role: "", // valor no editable
   });
 
   const history = useNavigate();
   const [error, setError] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
   useEffect(() => {
     // Recupera les dades de l'usuari en carregar el component
     axios
       .get("http://localhost:8081/user", { withCredentials: true })
       .then((res) => {
         console.log("Resposta del servidor:", res.data);
-
         setValues(res.data.user);
       })
       .catch((err) => {
@@ -39,12 +39,28 @@ function Profile() {
     }));
   };
 
-  // Envia les dades actualitzades al servidor.
+  // Funció per eliminar l'usuari (drop out)
+  const deleteAtendee = (role) => {
+    axios
+      .post("http://localhost:8081/deleteAtendee", {
+        params: { id: values.niu },
+      })
+      .then(() => {
+        alert("You have successfully dropped out.");
+        history("/modules");
+      })
+      .catch((err) => {
+        console.error("Error deleting attendee:", err);
+        alert("An error occurred while trying to drop out.");
+      });
+  };
+
+  // Envia les dades actualitzades al servidor
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (values.password !== confirmPassword) {
-      setError("Sisplau, introdueix contrasenyes iguals");
+      setError("Please enter matching passwords.");
       alert(error);
       return;
     } else {
@@ -52,12 +68,20 @@ function Profile() {
         .put("http://localhost:8081/updateUser", values, {
           withCredentials: true,
         })
-        .then((response) => {})
+        .then(() => {})
         .catch((err) => {
           console.error(err);
         });
 
       history(-1);
+    }
+  };
+
+  // Handler per al botó "Drop out"
+  const handleDropOut = (e) => {
+    e.preventDefault();
+    if (values.role) {
+      deleteAtendee(values.role); // Llama a la funcion para eliminar al asistente con el role
     }
   };
 
@@ -88,9 +112,9 @@ function Profile() {
               onChange={handleInputChange}
               required
               pattern="^[A-Za-zÀ-ÿ\s]+$"
-              title="Name with letters from the alfabet "
+              title="Name with letters from the alphabet"
               className={styles.inputProfile}
-              placeholder="Nom del usuari"
+              placeholder="Username"
             />
           </div>
 
@@ -149,6 +173,10 @@ function Profile() {
 
           <button type="submit" className={styles.saveButton}>
             Save Changes
+          </button>
+
+          <button onClick={handleDropOut} className={styles.dropButton}>
+            Drop out
           </button>
         </form>
       </div>

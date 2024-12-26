@@ -40,7 +40,7 @@ function App() {
         <Route path="/assignatura/:id" element={<AssignaturaLayout />} />
         <Route path="/afegirPregunta" element={<AfegirPregunta />}></Route>
         <Route path="/testlayout" element={<TestLayout />}></Route>
-        <Route path="/professorparametres" element={<CreateQuizz />}></Route>
+        <Route path="/createQuizz" element={<CreateQuizz />}></Route>
         <Route path="/manualTest" element={<CrearTestProfessor />}></Route>
 
         <Route path="/realitzartest" element={<TestWithKey />}></Route>

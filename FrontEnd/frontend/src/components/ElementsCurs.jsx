@@ -219,7 +219,8 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                         <button
                           className={styles.buttonAddTest}
                           onClick={() => {
-                            navigate("/professorparametres", {
+                            //console.log(tema.id_tema);
+                            navigate("/createQuizz", {
                               state: {
                                 id_assignatura: Id_Assignatura,
                                 id_professor: Id_User,
@@ -264,7 +265,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                         <button
                           className={styles.buttonAddTest}
                           onClick={() => {
-                            navigate("/professorparametres", {
+                            navigate("/createQuizz", {
                               state: {
                                 id_assignatura: Id_Assignatura,
                                 id_professor: Id_User,
