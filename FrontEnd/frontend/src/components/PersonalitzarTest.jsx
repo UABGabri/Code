@@ -33,6 +33,7 @@ function PersonalitzarTest() {
         );
         setPreguntesTest(sortedPreguntes);
         fetchRemainingQuestions(sortedPreguntes);
+        console.log(sortedPreguntes);
       })
       .catch(() => alert("Error fetching the test questions."));
   }, [idTest, idTema]);
@@ -238,6 +239,10 @@ function PersonalitzarTest() {
               <p>
                 <strong>Id: </strong>
                 {pregunta.id_pregunta}
+              </p>
+              <p>
+                <strong>Tema: </strong>
+                {pregunta.id_tema}
               </p>
               <button
                 className={styles.deleteButton}

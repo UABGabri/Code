@@ -114,6 +114,7 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
                     setShowModal(false);
                     setNewNiu("");
                     alert("Participant afegit correctament!");
+                    window.location.reload;
                   })
                   .catch((err) => {
                     console.error("Error a l'afegir el participant:", err);
@@ -172,26 +173,28 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
 
         {Role_User !== "alumne" && (
           <>
-            <div>
-              <h2>Importar usuaris amb fitxer CSV</h2>
-              <input
-                type="file"
-                accept=".csv"
-                onChange={(e) => setCsvFile(e.target.files[0])}
-              />
+            <div className={styles.addParticipants}>
+              <div>
+                <h2>Importar usuaris amb fitxer CSV</h2>
+                <input
+                  type="file"
+                  accept=".csv"
+                  onChange={(e) => setCsvFile(e.target.files[0])}
+                />
+                <button
+                  onClick={handleCsvUpload}
+                  className={styles.addParticipantButton}
+                >
+                  Importar CSV
+                </button>
+              </div>
               <button
-                onClick={handleCsvUpload}
+                onClick={() => setShowModal(true)}
                 className={styles.addParticipantButton}
               >
-                Importar CSV
+                Afegir participant
               </button>
             </div>
-            <button
-              onClick={() => setShowModal(true)}
-              className={styles.addParticipantButton}
-            >
-              Afegir participant
-            </button>
           </>
         )}
       </div>

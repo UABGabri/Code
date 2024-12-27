@@ -6,7 +6,7 @@ import Dashboard from "./Dashboard";
 function Modulespage() {
   const [role, setRole] = useState("");
   const [auth, setAuth] = useState(false);
-  const [message, setMessage] = useState(false);
+  const [message, setMessage] = useState("");
   const [niu, setNiu] = useState("");
 
   // Configura axios perquè inclogui les cookies en totes les sol·licituds
@@ -23,26 +23,25 @@ function Modulespage() {
           setNiu(res.data.niu);
         } else {
           setAuth(false);
-          setMessage(res.data.Error);
+          setMessage(res.data.Error || "Unknown error");
         }
       })
       .catch((err) => {
-        alert("Error a la solicitud:", err);
+        console.error("Error a la solicitud:", err);
+        setMessage("Error al recuperar les dades de l'usuari.");
       });
   }, []);
 
-  return (
-    <div>
-      {auth && niu && role ? (
-        <Dashboard id_User={niu} role_User={role} />
-      ) : (
-        <div>
-          <h3>{message}</h3>
-          <Link to="/login">Login</Link>
-        </div>
-      )}
-    </div>
-  );
+  if (!auth || !niu || !role) {
+    return (
+      <div>
+        {message && <h3>{message}</h3>}
+        <Link to="/login">Login</Link>
+      </div>
+    );
+  }
+
+  return <Dashboard id_User={niu} role_User={role} />;
 }
 
 export default Modulespage;

@@ -15,6 +15,7 @@ function CreateQuizz() {
   const [numeroPreguntes, setNumeroPreguntes] = useState(1);
   const [dataFinalitzacio, setDataFinalitzacio] = useState(""); // Nou camp per a la data
   const { id_assignatura, id_professor, id_tema, tipus } = location.state || {};
+  const [errorSelect, setErrorSelect] = useState("");
 
   useEffect(() => {
     axios
@@ -47,6 +48,11 @@ function CreateQuizz() {
   };
 
   const handleCreateQuizz = () => {
+    if (seleccions.length === 0) {
+      setErrorSelect("Selecciona almenys un concepte.");
+      return;
+    }
+
     const nomTest = prompt("Introdueix un nom pel test:");
     if (!nomTest || !dataFinalitzacio) {
       alert("El nom del test i la data de finalització són obligatoris.");
@@ -152,6 +158,7 @@ function CreateQuizz() {
           ))}
         </ul>
 
+        {errorSelect && <p className={styles.error}>{errorSelect}</p>}
         <button onClick={handleCreateQuizz}>Create Test</button>
 
         <button

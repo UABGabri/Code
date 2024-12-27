@@ -3,7 +3,7 @@ import axios from "axios";
 import styles from "./StyleComponents/Elements.module.css";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
-import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { FaChevronDown, FaChevronUp, FaPlus } from "react-icons/fa";
 
 function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
   const [temes, setTemes] = useState([]);
@@ -230,7 +230,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                             });
                           }}
                         >
-                          Add Practice Test for topic {tema.nom_tema}
+                          <FaPlus />
                         </button>
                       )}
                     </div>

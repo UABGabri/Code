@@ -159,6 +159,14 @@
 }
 
 
+.addParticipants{
+
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+
 .addParticipantButton {
   padding: 10px 20px;
   background-color: #4caf50;

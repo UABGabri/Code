@@ -756,14 +756,32 @@ app.post("/addStudentToSubject", async (req, res) => {
     db.query(sql, [niu, Id_Assignatura], (error, result) => {
         if (error) {
             console.error("Error al afegir l'alumne:", error);
-            return res.status(500).json({ success: false });
+            return res.json({ success: false });
         }
         return res.json({ success: true });
     });
 });
 
 
+app.delete('/deleteUser', (req, res) =>{
 
+    const id_user = req.query.values.niu;
+    
+    const deleteSql = 'DELETE FROM usuaris WHERE niu = ?';
+
+    db.query(deleteSql, [id_user], (error, result) => {
+        if (error) {
+            console.error("Error al eliminar a l'alumne:", error);
+            return res.json({ success: false });
+        }
+
+        res.clearCookie('token', { httpOnly: true, secure: true, sameSite: 'None' });
+        return res.json({ success: true });
+    });
+
+ 
+
+})
 
 app.delete('/eliminateStudent', (req, res) => {
     const id_participant = req.query.id;
@@ -963,7 +981,7 @@ app.get('/recoverSelectedTestWithKeyQuestions', (req, res) => {
     const idTest = parseInt(req.query.idTest);
     
     const sql = `
-        SELECT p.id_pregunta, p.pregunta, p.solucio_correcta, p.solucio_erronia1, p.solucio_erronia2, p.solucio_erronia3, pt.posicio_test 
+        SELECT p.id_pregunta, p.pregunta, p.solucio_correcta, p.solucio_erronia1, p.solucio_erronia2, p.solucio_erronia3, pt.posicio_test, p.id_tema
         FROM test_preguntes pt 
         JOIN preguntes p ON pt.id_pregunta = p.id_pregunta 
         WHERE pt.id_test = ?

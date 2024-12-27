@@ -2,12 +2,7 @@ import { useState } from "react";
 import styles from "./StyleComponents/Headercap.module.css";
 import { FaCircleUser } from "react-icons/fa6";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import {
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
-} from "react-bootstrap";
+import { Dropdown } from "react-bootstrap";
 
 import axios from "axios";
 

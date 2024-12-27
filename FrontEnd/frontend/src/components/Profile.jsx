@@ -6,23 +6,23 @@ import { useNavigate } from "react-router-dom";
 
 function Profile() {
   const [values, setValues] = useState({
-    niu: "", // valor no editable
+    niu: "",
     username: "",
     email: "",
     password: "",
-    role: "", // valor no editable
+    role: "",
   });
 
   const history = useNavigate();
   const [error, setError] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    // Recupera les dades de l'usuari en carregar el component
     axios
       .get("http://localhost:8081/user", { withCredentials: true })
       .then((res) => {
-        console.log("Resposta del servidor:", res.data);
+        //console.log("Resposta del servidor:", res.data);
         setValues(res.data.user);
       })
       .catch((err) => {
@@ -30,7 +30,6 @@ function Profile() {
       });
   }, []);
 
-  // Actualitza l'estat amb els canvis introduïts a cada camp
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setValues((prevData) => ({
@@ -39,23 +38,6 @@ function Profile() {
     }));
   };
 
-  // Funció per eliminar l'usuari (drop out)
-  const deleteAtendee = (role) => {
-    axios
-      .post("http://localhost:8081/deleteAtendee", {
-        params: { id: values.niu },
-      })
-      .then(() => {
-        alert("You have successfully dropped out.");
-        history("/modules");
-      })
-      .catch((err) => {
-        console.error("Error deleting attendee:", err);
-        alert("An error occurred while trying to drop out.");
-      });
-  };
-
-  // Envia les dades actualitzades al servidor
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -77,12 +59,30 @@ function Profile() {
     }
   };
 
-  // Handler per al botó "Drop out"
-  const handleDropOut = (e) => {
-    e.preventDefault();
-    if (values.role) {
-      deleteAtendee(values.role); // Llama a la funcion para eliminar al asistente con el role
-    }
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleConfirmDropOut = () => {
+    axios
+      .delete("http://localhost:8081/deleteUser", {
+        params: { values },
+        withCredentials: true,
+      })
+      .then(() => {
+        localStorage.clear();
+        sessionStorage.clear();
+
+        history("/login");
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("An error occurred while trying to drop out.");
+      });
   };
 
   return (
@@ -175,10 +175,33 @@ function Profile() {
             Save Changes
           </button>
 
-          <button onClick={handleDropOut} className={styles.dropButton}>
+          <button
+            type="button"
+            onClick={openModal}
+            className={styles.dropButton}
+          >
             Drop out
           </button>
         </form>
+
+        {isModalOpen && (
+          <div className={styles.modalOver}>
+            <div className={styles.modalContent}>
+              <p>Are you sure? Your account will be eliminated.</p>
+              <div className={styles.modalButtons}>
+                <button
+                  onClick={handleConfirmDropOut}
+                  className={styles.acceptButton}
+                >
+                  Accept
+                </button>
+                <button onClick={closeModal} className={styles.cancelButton}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
