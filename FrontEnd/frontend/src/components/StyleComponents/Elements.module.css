@@ -84,6 +84,7 @@
     background-color: red;
     color: white;
     border: none;
+    transition: background-color 0.3s ease;
   }
   
   .acceptButton:hover {
@@ -588,4 +589,21 @@ hr {
   flex-direction: column;
   align-items: center;
   width: 100vw;
+}
+
+.addButton{
+  padding: 10px 20px;
+  background-color: green;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+
+.addButton:hover{
+  background-color: darkgreen;
+
 }
