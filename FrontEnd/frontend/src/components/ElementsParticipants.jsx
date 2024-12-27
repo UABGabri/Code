@@ -114,7 +114,7 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
                     setShowModal(false);
                     setNewNiu("");
                     alert("Participant afegit correctament!");
-                    window.location.reload;
+                    window.location.reload();
                   })
                   .catch((err) => {
                     console.error("Error a l'afegir el participant:", err);

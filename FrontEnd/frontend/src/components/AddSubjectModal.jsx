@@ -1,5 +1,5 @@
 import { useState } from "react";
-import styles from "./StyleComponents/ProfessorDashboard.module.css";
+import styles from "./StyleComponents/DashboardStyle.module.css";
 import PropTypes from "prop-types";
 import axios from "axios";
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import AddSubjectModal from "./AddSubjectModal";
-import styles from "./StyleComponents/ProfessorDashboard.module.css";
+import styles from "./StyleComponents/DashboardStyle.module.css";
 import Headercap from "./Headercap";
 import axios from "axios";
 
@@ -30,7 +30,7 @@ function Dashboard({ id_User, role_User }) {
         setAssignatures(data);
       });
     } else {
-      console.error("id_User o role_User no està definit");
+      console.error("id_User or role_User is not defined");
     }
   }, [id_User, role_User]);
 
@@ -57,45 +57,51 @@ function Dashboard({ id_User, role_User }) {
       </div>
 
       <div className={styles.container}>
-        <div className={styles.left}>
-          {leftColumn.map((assignatura) => (
-            <div
-              key={assignatura.id_assignatura}
-              className={styles.assignaturaCard}
-              onClick={() =>
-                handleSelectAssignatura(
-                  assignatura.id_assignatura,
-                  assignatura.nom_assignatura
-                )
-              }
-            >
-              <h3>{assignatura.nom_assignatura}</h3>
-              <p>ID: {assignatura.id_assignatura}</p>
-            </div>
-          ))}
+        <div className={styles.columnsContainer}>
+          <div className={styles.left}>
+            {leftColumn.map((assignatura) => (
+              <div
+                key={assignatura.id_assignatura}
+                className={styles.assignaturaCard}
+                onClick={() =>
+                  handleSelectAssignatura(
+                    assignatura.id_assignatura,
+                    assignatura.nom_assignatura
+                  )
+                }
+              >
+                <h3>{assignatura.nom_assignatura}</h3>
+                <p>ID: {assignatura.id_assignatura}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className={styles.right}>
+            {rightColumn.map((assignatura) => (
+              <div
+                key={assignatura.id_assignatura}
+                className={styles.assignaturaCard}
+                onClick={() =>
+                  handleSelectAssignatura(
+                    assignatura.id_assignatura,
+                    assignatura.nom_assignatura
+                  )
+                }
+              >
+                <h3>{assignatura.nom_assignatura}</h3>
+                <p>ID: {assignatura.id_assignatura}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className={styles.buttonsContainer}>
           {role_User === "professor" && (
             <button onClick={openModal} className={styles.addButton}>
               Add Subject
             </button>
           )}
-        </div>
-
-        <div className={styles.right}>
-          {rightColumn.map((assignatura) => (
-            <div
-              key={assignatura.id_assignatura}
-              className={styles.assignaturaCard}
-              onClick={() =>
-                handleSelectAssignatura(
-                  assignatura.id_assignatura,
-                  assignatura.nom_assignatura
-                )
-              }
-            >
-              <h3>{assignatura.nom_assignatura}</h3>
-              <p>ID: {assignatura.id_assignatura}</p>
-            </div>
-          ))}
+          <button className={styles.deleteButton}>Delete Subject</button>
         </div>
       </div>
 
