@@ -61,6 +61,8 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
           console.error("Error al recuperar els tests:", error);
         });
     });
+
+    console.log(testsPractica, "lolo");
   }, [temes]);
 
   const handleCreateTema = () => {
@@ -69,7 +71,6 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
       return;
     }
 
-    console.log(Id_Assignatura, newTemaName);
     axios
       .post("http://localhost:8081/createTema", {
         Id_Assignatura,
@@ -85,6 +86,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
         } else {
           alert("Error en crear el tema");
         }
+        window.location.reload();
       })
       .catch((error) => {
         console.error("Error en crear el tema:", error);
@@ -169,7 +171,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
       <h1 className={styles.elementsCursHeader}>
         <strong>TOPIC MANAGEMENT</strong>
       </h1>
-      <div className={styles.temesLista}>
+      <div className={styles.temesList}>
         {temes.length === 0 ? (
           <p className={styles.noTemes}>No topics created</p>
         ) : (
@@ -198,7 +200,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                     <div className={styles.testList}>
                       {testsPractica[tema.id_tema] &&
                       testsPractica[tema.id_tema].length > 0 ? (
-                        <ul>
+                        <ol>
                           {testsPractica[tema.id_tema].map((test) => (
                             <li
                               key={test.id_test}
@@ -210,7 +212,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                               {test.nom_test}
                             </li>
                           ))}
-                        </ul>
+                        </ol>
                       ) : (
                         <p>No practice tests available for this topic.</p>
                       )}
@@ -244,7 +246,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                     <div className={styles.testList}>
                       {testsAvaluatius[tema.id_tema] &&
                       testsAvaluatius[tema.id_tema].length > 0 ? (
-                        <ul>
+                        <ol>
                           {testsAvaluatius[tema.id_tema].map((test) => (
                             <li
                               key={test.id_test}
@@ -256,7 +258,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                               {test.nom_test}
                             </li>
                           ))}
-                        </ul>
+                        </ol>
                       ) : (
                         <p>No evaluation tests available for this topic.</p>
                       )}
@@ -275,7 +277,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                             });
                           }}
                         >
-                          Add Evaluation Test for topic {tema.nom_tema}
+                          <FaPlus />
                         </button>
                       )}
                     </div>
@@ -296,18 +298,27 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
         )}
 
         {Role_User === "professor" && (
-          <div className={styles.temaCrear}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleCreateTema();
+            }}
+            className={styles.temaCrear}
+          >
             <input
               type="text"
               value={newTemaName}
               onChange={(e) => setNewTemaName(e.target.value)}
               placeholder="Topic name"
               className={styles.temaInput}
+              required
+              pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
+              title="The topic name must contain valid elements."
             />
-            <button onClick={handleCreateTema} className={styles.temaButton}>
+            <button type="submit" className={styles.temaButton}>
               Add Topic
             </button>
-          </div>
+          </form>
         )}
       </div>
 

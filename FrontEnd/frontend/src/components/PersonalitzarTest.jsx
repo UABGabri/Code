@@ -236,10 +236,7 @@ function PersonalitzarTest() {
                 <strong>Solució: </strong>
                 {pregunta.solucio_correcta}
               </p>
-              <p>
-                <strong>Id: </strong>
-                {pregunta.id_pregunta}
-              </p>
+
               <p>
                 <strong>Tema: </strong>
                 {pregunta.id_tema}
@@ -285,8 +282,8 @@ function PersonalitzarTest() {
                 {pregunta.solucio_correcta}
               </p>
               <p>
-                <strong>Id: </strong>
-                {pregunta.id_pregunta}
+                <strong>Tema: </strong>
+                {pregunta.id_tema}
               </p>
               <button
                 className={styles.addButton}

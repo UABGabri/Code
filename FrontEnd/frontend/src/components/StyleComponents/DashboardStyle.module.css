@@ -171,3 +171,13 @@
 .cancelButtonModal:hover {
   background-color: darkred;
 }
+
+
+.buttonDeleteModal{
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+}

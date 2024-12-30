@@ -52,7 +52,7 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
 
     const idAssignatura = Id_Assignatura;
     formData.append("Id_Assignatura", idAssignatura);
-    console.log(formData);
+
     try {
       const response = await axios.post(
         "http://localhost:8081/import-csv",
@@ -62,6 +62,7 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
         }
       );
       if (response.data.status === "success") {
+        console.log(response.data);
         alert("Importació completada correctament!");
         setUsers(response.data.data); // Actualitzar la llista d'usuaris amb les noves dades
         window.location.reload();
