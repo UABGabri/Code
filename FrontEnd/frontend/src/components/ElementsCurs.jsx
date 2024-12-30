@@ -61,8 +61,6 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
           console.error("Error al recuperar els tests:", error);
         });
     });
-
-    console.log(testsPractica, "lolo");
   }, [temes]);
 
   const handleCreateTema = () => {

@@ -64,8 +64,9 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
       if (response.data.status === "success") {
         console.log(response.data);
         alert("Importació completada correctament!");
-        setUsers(response.data.data); // Actualitzar la llista d'usuaris amb les noves dades
-        window.location.reload();
+        setUsers(response.data.participants); // Actualitzar la llista d'usuaris amb les noves dades
+
+        //window.location.reload();
       } else {
         alert("Error a la importació: " + response.data.message);
       }
@@ -111,11 +112,11 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
                     Id_Assignatura,
                   })
                   .then((addRes) => {
-                    setUsers(addRes.data);
+                    console.log(addRes);
+                    setUsers(addRes.data.resultSelect);
                     setShowModal(false);
                     setNewNiu("");
                     alert("Participant afegit correctament!");
-                    window.location.reload();
                   })
                   .catch((err) => {
                     console.error("Error a l'afegir el participant:", err);
@@ -144,33 +145,43 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
   return (
     <div>
       <div className={styles.participantContainer}>
-        <h1>GESTIÓ DE PARTICIPANTS</h1>
-        {users.map((user) => (
-          <div key={user.niu} className={styles.participantCard}>
-            <div className={styles.participantDetails}>
-              <p>
-                <strong>Nom:</strong> {user.username}
-              </p>
-              <p>
-                <strong>NIU:</strong> {user.niu}
-              </p>
-              <p>
-                <strong>Email:</strong> {user.email}
-              </p>
-              <p>
-                <strong>Rol: </strong> {user.role}
-              </p>
-            </div>
-            {Role_User !== "alumne" && (
-              <div
-                className={styles.deleteButtonParticipant}
-                onClick={() => handleEliminateParticipant(user.niu, user.role)}
-              >
-                Eliminar
+        <strong className={styles.elementsCursHeader}>
+          PARTICIPANTS MANAGEMENT
+        </strong>
+        {users.length > 0 ? (
+          users.map((user) => (
+            <div key={user.niu} className={styles.participantCard}>
+              <div className={styles.participantDetails}>
+                <p>
+                  <strong>Nom:</strong> {user.username}
+                </p>
+                <p>
+                  <strong>NIU:</strong> {user.niu}
+                </p>
+                <p>
+                  <strong>Email:</strong> {user.email}
+                </p>
+                <p>
+                  <strong>Rol: </strong> {user.role}
+                </p>
               </div>
-            )}
+              {Role_User !== "alumne" && (
+                <div
+                  className={styles.deleteButtonParticipant}
+                  onClick={() =>
+                    handleEliminateParticipant(user.niu, user.role)
+                  }
+                >
+                  Eliminar
+                </div>
+              )}
+            </div>
+          ))
+        ) : (
+          <div className={styles.noAtendeesMessage}>
+            <p style={{ color: "red" }}>No Atendees :(</p>
           </div>
-        ))}
+        )}
 
         {Role_User !== "alumne" && (
           <>

@@ -76,6 +76,9 @@ function ElementsPreguntes({ Id_User, Id_Assignatura, Role_User }) {
 
   return (
     <div className={styles.questionsContainer}>
+      <strong className={styles.elementsCursHeader}>
+        QUESTIONS MANAGEMENT
+      </strong>
       <div className={styles.questionsList}>
         {questions.map((question) => (
           <div key={question.id_pregunta} className={styles.questionCard}>
