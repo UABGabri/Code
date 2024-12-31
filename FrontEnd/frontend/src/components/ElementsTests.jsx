@@ -27,12 +27,12 @@ function ElementsTests({ idAssignatura }) {
     }
   }, [idAssignatura]);
 
-  // Enviar formulario
+  // Enviar formulari
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (conceptesSeleccionats.length === 0) {
-      setErrorFormulari("Selecciona almenys un concepte.");
+      setErrorFormulari("Select at least one concept.");
       return;
     }
 
@@ -47,7 +47,7 @@ function ElementsTests({ idAssignatura }) {
       //idAssignatura,
     };
 
-    console.log("Parámetros para el test: ", parametersTest);
+    //console.log("Parámetros para el test: ", parametersTest);
 
     navigate("/testlayout", { state: { parametersTest } });
   };
@@ -59,11 +59,11 @@ function ElementsTests({ idAssignatura }) {
 
   return (
     <div className={styles.quizzContainerTitle}>
-      <h1 className={styles.titleGenerator}>GENERADOR DE TESTS</h1>
+      <strong className={styles.titleGenerator}>QUIZZ GENERATOR</strong>
       <div className={styles.quizzContainerBody}>
         <form className={styles.formRandom} onSubmit={handleSubmit}>
           <div className={styles.parametersQuizz}>
-            <label htmlFor="conceptes">Conceptes:</label>
+            <label htmlFor="conceptes">Concepts:</label>
             <Select
               id="conceptes"
               name="conceptes"

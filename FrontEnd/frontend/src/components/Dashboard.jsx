@@ -132,9 +132,12 @@ function Dashboard({ id_User, role_User }) {
               Add Subject
             </button>
           )}
-          <button onClick={openDeleteModal} className={styles.deleteButton}>
-            Delete Subject
-          </button>
+
+          {role_User === "professor" && (
+            <button onClick={openDeleteModal} className={styles.deleteButton}>
+              Delete Subject
+            </button>
+          )}
         </div>
       </div>
 

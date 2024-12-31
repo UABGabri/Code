@@ -152,6 +152,7 @@ function AddQuestion() {
                 placeholder="Insert your question"
                 required
                 pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
+                maxLength={200}
               />
             </div>
           </div>

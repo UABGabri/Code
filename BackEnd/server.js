@@ -218,7 +218,7 @@ app.put('/updateUser', (req, res) => {
     const token = req.cookies.token;
 
     if (!token) {
-        return res.status(401).json({ Error: "No hi ha token, accés denegat" });
+        return res.json({ Error: "No hi ha token, accés denegat" });
     }
 
     jwt.verify(token, "jwt-secret-key", (err, decoded) => {
@@ -585,6 +585,43 @@ app.post('/addQuestion', async (req, res) => {
     }
 });
 
+
+app.put("/updateQuestion", (req, res)=>{
+
+    const id_Question = req.body.id_pregunta;
+    const question = req.body.pregunta;    
+    const answer = req.body.solucio_correcta;
+
+   const sqlUpdate = "UPDATE preguntes SET pregunta = ?, solucio_correcta = ? WHERE id_pregunta = ?"
+   
+    db.query(sqlUpdate,[question, answer, id_Question], (error, result)=>{
+
+        if (error) {
+            
+            console.error("Error a la consulta:", error);
+            return res.json({ Status: "Failed" });
+        }else {
+       
+            const id_assignatura = req.body.Id_Assignatura;
+            parseInt(id_assignatura);
+    
+            const sql = `SELECT * FROM preguntes 
+            JOIN temes ON preguntes.id_tema = temes.id_tema 
+            WHERE preguntes.estat = 'pendent' AND temes.id_assignatura = ?`;
+
+            db.query(sql,[id_assignatura], (error, result)=>{
+
+                if (error) {
+                    console.error("Error en la consulta:", error);
+                    return res.json({ Status: "Failed" });
+                } else {
+                    return res.json(result); 
+                }
+            })                     
+        }
+    })
+        
+})
 
 
 

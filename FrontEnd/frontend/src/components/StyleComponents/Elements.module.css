@@ -59,6 +59,15 @@
   .questionDetails p {
     margin: 5px 0;
   }
+
+  .editInput{
+    width: 800px; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    white-space: nowrap;
+  }
+
+  
   
   .actionButtonsContainer {
     display: flex;
@@ -254,6 +263,7 @@
   justify-content: center;
   align-items: center;
   width: 100vw;
+  
 }
 
 .parametersQuizz{
@@ -264,8 +274,10 @@
 }
 
 .titleGenerator {
-  font-size: 2rem;
+ 
   text-align: center;
+  color: #333;
+  font-size: 2rem;
   margin-bottom: 20px;
 }
 
