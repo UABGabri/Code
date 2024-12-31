@@ -9,6 +9,9 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
   const [questions, setQuestions] = useState([]);
   const [editingQuestionId, setEditingQuestionId] = useState(null);
   const [editedQuestion, setEditedQuestion] = useState({});
+  const [showModal, setShowModal] = useState(false);
+  const [actionType, setActionType] = useState(""); // "delete" or "accept"
+  const [questionIdToAct, setQuestionIdToAct] = useState(null);
 
   const navigate = useNavigate();
 
@@ -126,6 +129,30 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
       });
   };
 
+  // Funció per obrir el modal de confirmació
+  const handleOpenModal = (action, idPregunta) => {
+    setActionType(action);
+    setQuestionIdToAct(idPregunta);
+    setShowModal(true);
+  };
+
+  // Funció per tancar el modal de confirmació
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setActionType("");
+    setQuestionIdToAct(null);
+  };
+
+  // Funció que confirma l'acció
+  const handleConfirmAction = () => {
+    if (actionType === "delete" && questionIdToAct) {
+      handleDelete(questionIdToAct);
+    } else if (actionType === "accept" && questionIdToAct) {
+      handleStatusChange(questionIdToAct, "acceptada");
+    }
+    handleCloseModal();
+  };
+
   return (
     <div className={styles.questionsContainer}>
       <strong className={styles.elementsCursHeader}>
@@ -210,14 +237,16 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                     </button>
                     <button
                       className={styles.deleteButton}
-                      onClick={() => handleDelete(question.id_pregunta)}
+                      onClick={() =>
+                        handleOpenModal("delete", question.id_pregunta)
+                      }
                     >
                       <FaTimes />
                     </button>
                     <button
                       className={styles.acceptButton}
                       onClick={() =>
-                        handleStatusChange(question.id_pregunta, "acceptada")
+                        handleOpenModal("accept", question.id_pregunta)
                       }
                     >
                       <FaCheck />
@@ -235,6 +264,21 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
           Add Question
         </button>
       </div>
+
+      {showModal && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            <h3>
+              Are you sure you want to{" "}
+              {actionType === "delete" ? "delete" : "accept"} this question?
+            </h3>
+            <div className={styles.modalActions}>
+              <button onClick={handleConfirmAction}>Yes</button>
+              <button onClick={handleCloseModal}>No</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
