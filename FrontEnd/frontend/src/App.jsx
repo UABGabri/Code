@@ -7,7 +7,6 @@ import Login from "./components/Login";
 import Modules from "./components/Modulespage";
 import Profile from "./components/Profile";
 import AssignaturaLayout from "./components/AssignaturaLayout";
-import AfegirPregunta from "./components/AfegirPregunta";
 import TestLayout from "./components/TestLayout";
 import CrearTestProfessor from "./components/CrearTestProfessor";
 import TestWithKey from "./components/TestWithKey";
@@ -15,6 +14,7 @@ import PersonalitzarTest from "./components/PersonalitzarTest";
 import TestIALayout from "./components/TestIALayout";
 import Dashboard from "./components/Dashboard";
 import CreateQuizz from "./components/CreateQuizz";
+import AddQuestion from "./components/AddQuestion";
 
 function App() {
   return (
@@ -38,7 +38,7 @@ function App() {
         </Route>
 
         <Route path="/assignatura/:id" element={<AssignaturaLayout />} />
-        <Route path="/afegirPregunta" element={<AfegirPregunta />}></Route>
+        <Route path="/addQuestion" element={<AddQuestion />}></Route>
         <Route path="/testlayout" element={<TestLayout />}></Route>
         <Route path="/createQuizz" element={<CreateQuizz />}></Route>
         <Route path="/manualTest" element={<CrearTestProfessor />}></Route>

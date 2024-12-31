@@ -179,7 +179,7 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
           ))
         ) : (
           <div className={styles.noAtendeesMessage}>
-            <p style={{ color: "red" }}>No Atendees :(</p>
+            <strong style={{ color: "red" }}>No Atendees </strong>
           </div>
         )}
 

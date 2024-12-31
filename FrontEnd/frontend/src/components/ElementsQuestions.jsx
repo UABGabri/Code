@@ -1,19 +1,18 @@
 import { useEffect, useState } from "react";
 import styles from "./StyleComponents/Elements.module.css";
-
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import axios from "axios";
 import { FaCheck, FaTimes } from "react-icons/fa";
 
-function ElementsPreguntes({ Id_User, Id_Assignatura, Role_User }) {
+function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
   const [questions, setQuestions] = useState([]);
 
   const navigate = useNavigate();
 
   //Funció que navega a la secció d'afegir pregunta amb els elements necessaris
   const handleButton = () => {
-    navigate("/afegirPregunta", {
+    navigate("/addQuestion", {
       state: { Id_User, Id_Assignatura },
     });
   };
@@ -84,19 +83,19 @@ function ElementsPreguntes({ Id_User, Id_Assignatura, Role_User }) {
           <div key={question.id_pregunta} className={styles.questionCard}>
             <div className={styles.questionDetails}>
               <p>
-                <strong>Autor:</strong> {question.id_creador}
+                <strong>Author:</strong> {question.id_creador}
               </p>
               <p>
-                <strong>Tema:</strong> {question.nom_tema}
+                <strong>Topic:</strong> {question.nom_tema}
               </p>
               <p>
-                <strong>Dificultat:</strong> {question.dificultat}
+                <strong>Dificulty:</strong> {question.dificultat}
               </p>
               <p>
-                <strong>Pregunta:</strong> {question.pregunta}
+                <strong>Question:</strong> {question.pregunta}
               </p>
               <p>
-                <strong>Solució:</strong> {question.solucio_correcta}
+                <strong>Answer:</strong> {question.solucio_correcta}
               </p>
             </div>
 
@@ -124,17 +123,17 @@ function ElementsPreguntes({ Id_User, Id_Assignatura, Role_User }) {
 
       <div className={styles.addQuestionButtonContainer}>
         <button className={styles.addQuestionButton} onClick={handleButton}>
-          Afegir Pregunta
+          Add Question
         </button>
       </div>
     </div>
   );
 }
 
-ElementsPreguntes.propTypes = {
+ElementsQuestions.propTypes = {
   Id_User: PropTypes.number.isRequired,
   Id_Assignatura: PropTypes.string.isRequired,
   Role_User: PropTypes.string.isRequired,
 };
 
-export default ElementsPreguntes;
+export default ElementsQuestions;

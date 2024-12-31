@@ -4,7 +4,7 @@ import styles from "./StyleComponents/AssignaturaLayout.module.css";
 import { BiArrowBack } from "react-icons/bi";
 import { useState } from "react";
 import ElementsCurs from "./ElementsCurs";
-import ElementsPreguntes from "./ElementsPreguntes";
+import ElementsQuestions from "./ElementsQuestions";
 import ElementsParticipants from "./ElementsParticipants";
 //import ElementsTestsProfessor from "./ElementsTestsProfessor";
 import ElementsTests from "./ElementsTests";
@@ -33,7 +33,7 @@ function AssignaturaLayout() {
         );
       case "PREGUNTES":
         return (
-          <ElementsPreguntes
+          <ElementsQuestions
             Id_User={id_User}
             Id_Assignatura={id}
             Role_User={role_User}
