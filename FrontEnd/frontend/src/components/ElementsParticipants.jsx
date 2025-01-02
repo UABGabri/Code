@@ -24,21 +24,6 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
       });
   }, [Id_Assignatura]);
 
-  useEffect(() => {
-    if (users.length > 0) {
-      axios
-        .get("http://localhost:8081/recoverGrades", {
-          params: { Id_Assignatura, users: users.map((user) => user.niu) },
-        })
-        .then((res) => {
-          setUsersGrades(res.data.grades);
-        })
-        .catch((err) => {
-          console.error("Error a la solicitud:", err);
-        });
-    }
-  }, [users]);
-
   const handleEliminateParticipant = (niu, role) => {
     const endpoint =
       role === "professor"
@@ -170,7 +155,7 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
             <div key={user.niu} className={styles.participantCard}>
               <div className={styles.participantDetails}>
                 <p>
-                  <strong>Nom:</strong> {user.username}
+                  <strong>Name:</strong> {user.username}
                 </p>
                 <p>
                   <strong>NIU:</strong> {user.niu}
@@ -179,7 +164,10 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
                   <strong>Email:</strong> {user.email}
                 </p>
                 <p>
-                  <strong>Rol: </strong> {user.role}
+                  <strong>Role: </strong> {user.role}
+                </p>
+                <p>
+                  <strong>Grade: </strong> {user.notes}
                 </p>
               </div>
 

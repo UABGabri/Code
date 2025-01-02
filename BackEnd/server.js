@@ -719,11 +719,16 @@ app.get('/recoverAtendees', (req, res) => {
     const id_assignatura = parseInt(req.query.Id_Assignatura);
 
     const sql = `
-        SELECT usuaris.*, 'alumne' AS role 
+        SELECT usuaris.niu, 
+               usuaris.username, 
+               usuaris.email, 
+               'alumne' AS role, 
+               AVG(resultats.nota) AS notes
         FROM usuaris 
         JOIN alumnes_assignatures ON usuaris.niu = alumnes_assignatures.id_alumne 
-        WHERE alumnes_assignatures.id_assignatura = ?
-        
+        LEFT JOIN resultats ON usuaris.niu = resultats.id_alumne AND resultats.id_assignatura = 1598407
+        WHERE alumnes_assignatures.id_assignatura = 1598407
+        GROUP BY usuaris.niu
     `;
 
     db.query(sql, [id_assignatura, id_assignatura], (error, result) => {
@@ -735,6 +740,7 @@ app.get('/recoverAtendees', (req, res) => {
     });
 });
 
+
 /*
 //Funció de recuperació i normalització de les notes
 app.get('/recoverGrades', (req, res) => {
@@ -742,7 +748,7 @@ app.get('/recoverGrades', (req, res) => {
     const users = req.query.users;
 
     const getGradesForUser = (userId, assignaturaId) => {
-        return db.query('SELECT grade FROM tests WHERE id_user = ? AND id_assignatura = ?', [userId, assignaturaId])
+        return db.query('SELECT notes FROM resultats WHERE id_alumne = ? AND id_assignatura = ?', [userId, assignaturaId])
             .then(results => {
                 let totalGrade = 0;
                 results.forEach(result => {
@@ -774,8 +780,8 @@ app.get('/recoverGrades', (req, res) => {
         .catch(err => {
             res.send('Error al recuperar les notes.');
         });
-});*/
-
+});
+*/
 
 
 /*REPASSAR AQUÍ PERQUE NO FUNCIONA*/ 
