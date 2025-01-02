@@ -5,6 +5,7 @@ import styles from "./StyleComponents/Elements.module.css";
 
 function ElementsParticipants({ Id_Assignatura, Role_User }) {
   const [users, setUsers] = useState([]);
+  const [usersGrades, setUsersGrades] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [newNiu, setNewNiu] = useState("");
   const [csvFile, setCsvFile] = useState(null);
@@ -15,12 +16,28 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
         params: { Id_Assignatura },
       })
       .then((res) => {
+        console.log(res);
         setUsers(res.data);
       })
       .catch((err) => {
         console.error("Error a la sol·licitud:", err);
       });
   }, [Id_Assignatura]);
+
+  useEffect(() => {
+    if (users.length > 0) {
+      axios
+        .get("http://localhost:8081/recoverGrades", {
+          params: { Id_Assignatura, users: users.map((user) => user.niu) },
+        })
+        .then((res) => {
+          setUsersGrades(res.data.grades);
+        })
+        .catch((err) => {
+          console.error("Error a la solicitud:", err);
+        });
+    }
+  }, [users]);
 
   const handleEliminateParticipant = (niu, role) => {
     const endpoint =
@@ -165,6 +182,7 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
                   <strong>Rol: </strong> {user.role}
                 </p>
               </div>
+
               {Role_User !== "alumne" && (
                 <div
                   className={styles.deleteButtonParticipant}

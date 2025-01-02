@@ -735,6 +735,47 @@ app.get('/recoverAtendees', (req, res) => {
     });
 });
 
+/*
+//Funció de recuperació i normalització de les notes
+app.get('/recoverGrades', (req, res) => {
+    const id_assignatura = parseInt(req.query.Id_Assignatura);
+    const users = req.query.users;
+
+    const getGradesForUser = (userId, assignaturaId) => {
+        return db.query('SELECT grade FROM tests WHERE id_user = ? AND id_assignatura = ?', [userId, assignaturaId])
+            .then(results => {
+                let totalGrade = 0;
+                results.forEach(result => {
+                    totalGrade += result.grade;
+                });
+                const averageGrade = (totalGrade / results.length) * 10;
+                return (averageGrade / 10) * 100;
+            });
+    };
+
+    const gradesPromises = users.map(userId => {
+        return getGradesForUser(userId, id_assignatura)
+            .then(grade => ({
+                userId,
+                grade
+            }))
+            .catch(error => {
+                return {
+                    userId,
+                    grade: null
+                };
+            });
+    });
+
+    Promise.all(gradesPromises)
+        .then(grades => {
+            res.json(grades);
+        })
+        .catch(err => {
+            res.send('Error al recuperar les notes.');
+        });
+});*/
+
 
 
 /*REPASSAR AQUÍ PERQUE NO FUNCIONA*/ 
@@ -761,6 +802,8 @@ app.get("/checkUserExists", async (req, res) => {
         }
     });
 });
+
+
 
 app.get("/checkProfessorInSubject", (req, res) => {
     const { niu, Id_Assignatura } = req.query;
@@ -1059,13 +1102,23 @@ app.get('/recoverSelectedTestWithKeyQuestions', (req, res) => {
     const idTest = parseInt(req.query.idTest);
     
     const sql = `
-        SELECT p.id_pregunta, p.pregunta, p.solucio_correcta, p.solucio_erronia1, p.solucio_erronia2, p.solucio_erronia3, pt.posicio_test, p.id_tema
-        FROM test_preguntes pt 
-        JOIN preguntes p ON pt.id_pregunta = p.id_pregunta 
-        WHERE pt.id_test = ?
-        ORDER BY pt.posicio_test
-    `;
-
+    SELECT 
+        p.id_pregunta, 
+        p.pregunta, 
+        p.solucio_correcta, 
+        p.solucio_erronia1, 
+        p.solucio_erronia2, 
+        p.solucio_erronia3, 
+        pt.posicio_test, 
+        p.id_tema, 
+        t.tipus,
+        t.id_assignatura  
+    FROM test_preguntes pt 
+    JOIN preguntes p ON pt.id_pregunta = p.id_pregunta 
+    JOIN tests t ON pt.id_test = t.id_test  
+    WHERE pt.id_test = ?
+    ORDER BY pt.posicio_test
+`;
     db.query(sql, [idTest], (error, result) => {
         if (error) {
             console.error("Error a la consulta:", error);
@@ -1076,10 +1129,35 @@ app.get('/recoverSelectedTestWithKeyQuestions', (req, res) => {
 
 });
 
+//Funció 
+app.post('/saveResults', (req, res) =>{
+
+    const id_Test = parseInt(req.body.idTest);
+    const grade = parseFloat(req.body.nota);
+    const id_User = req.body.Id_User;
+    const id_Subject = parseInt(req.body.Id_Subject);
+
+    console.log(id_User, id_Test, grade)
+
+    const sql = `INSERT INTO resultats (id_alumne, id_test, nota, id_assignatura) VALUES (?,?,?, ?)`;
+
+    db.query(sql, [id_User, id_Test, grade, id_Subject], (error, result) => {
+        if (error) {
+            console.error("Error a la consulta:", error);
+            return res.json({ status: "Failed", error });
+        }
+        res.json({  Status: "Sucess" });
+    });
+
+})
+
+
+
+
+
 
 //Funció de recuperació de totes les preguntes
 app.get('/recoverPreguntes', (req, res) => {
-
 
     const sql = "SELECT p.*, t.nom_tema FROM preguntes p JOIN temes t ON p.id_tema = t.id_tema";
 
@@ -1088,6 +1166,7 @@ app.get('/recoverPreguntes', (req, res) => {
             console.error("Error a la consulta:", error);
             return res.json({ Status: "Failed" });
         } else {
+           
             return res.json(result);
         }
     });

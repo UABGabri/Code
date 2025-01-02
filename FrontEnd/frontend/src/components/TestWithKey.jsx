@@ -14,8 +14,11 @@ function TestWithKey() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showResults, setShowResults] = useState(false);
-  const { idTest } = location.state || {};
+  const { idTest, Id_User } = location.state || {};
+  const [avaluatiu, setAvaluatiu] = useState(false);
+  const [Id_Subject, setIdSubject] = useState("");
 
+  //La funció useEffect es llança dos cops pel mode dev -> resultats enviats dos cops -> cal aplicar funció de normalització
   useEffect(() => {
     axios
       .get("http://localhost:8081/recoverSelectedTestWithKeyQuestions", {
@@ -29,6 +32,8 @@ function TestWithKey() {
         setRespostesBarrejades(
           response.data.Preguntes.map((pregunta) => barrejarRespostes(pregunta))
         );
+
+        setIdSubject(response.data.Preguntes[0].id_assignatura);
         setLoading(false);
       })
       .catch(() => {
@@ -37,6 +42,14 @@ function TestWithKey() {
       });
   }, [idTest]);
 
+  useEffect(() => {
+    if (showResults && preguntes.length > 0) {
+      if (preguntes[0].tipus === "avaluatiu") {
+        setAvaluatiu(true);
+      }
+    }
+  }, [showResults, preguntes]); // Només quan apareguin els resultats
+
   const barrejarRespostes = (pregunta) => {
     const respostes = [
       pregunta.solucio_correcta,
@@ -44,6 +57,7 @@ function TestWithKey() {
       pregunta.solucio_erronia2,
       pregunta.solucio_erronia3,
     ];
+
     return respostes.sort(() => Math.random() - 0.5);
   };
 
@@ -90,20 +104,56 @@ function TestWithKey() {
     return <p>No han trobat preguntes per aquest test.</p>;
   }
 
+  const enviarResultats = async (resultats) => {
+    console.log(idTest, resultats.percentatge, Id_User, Id_Subject);
+
+    try {
+      await axios.post("http://localhost:8081/saveResults", {
+        idTest,
+        nota: resultats.percentatge,
+        Id_User,
+        Id_Subject,
+      });
+    } catch (error) {
+      console.error("Error al guardar resultats:", error);
+    }
+  };
+
   if (showResults) {
     const { correctes, incorrectes, percentatge } = calcularResultats();
+
+    if (avaluatiu) {
+      console.log("Enviament de resultats");
+      enviarResultats({ percentatge });
+    }
+
     return (
       <div className={styles.containerQuizz}>
         <div className={styles.resultsBox}>
           <h1>Resultats</h1>
           <p>Correctes: {correctes}</p>
           <p>Incorrectes: {incorrectes}</p>
-          <p>Nota: {percentatge}%</p>{" "}
+          <p>Nota: {percentatge}%</p>
           <div className={styles.resultButtons}>
-            <button onClick={() => window.location.reload()}>Reiniciar</button>
-            <button onClick={() => history(-1)}>
-              Tornar a la pàgina principal
-            </button>
+            {avaluatiu ? (
+              <button
+                onClick={() => {
+                  history(-1);
+                }}
+              >
+                Tornar a la pàgina principal
+              </button>
+            ) : (
+              <>
+                <button onClick={() => window.location.reload()}>
+                  Reiniciar
+                </button>
+
+                <button onClick={() => history(-1)}>
+                  Tornar a la pàgina principal
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
