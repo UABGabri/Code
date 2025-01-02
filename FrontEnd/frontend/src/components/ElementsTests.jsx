@@ -19,7 +19,10 @@ function ElementsTests({ idAssignatura }) {
           params: { idAssignatura },
         })
         .then((res) => {
-          setConceptes(res.data);
+          const filteredConceptes = res.data.filter(
+            (concept) => concept.value !== null && concept.label !== null
+          );
+          setConceptes(filteredConceptes);
         })
         .catch((err) =>
           console.error("Error al recuperar los conceptos:", err)

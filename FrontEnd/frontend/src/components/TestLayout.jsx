@@ -89,12 +89,17 @@ function TestLayout() {
           <p>Correctes: {correctes}</p>
           <p>Incorrectes: {incorrectes}</p>
           <p>Nota: {percentatge}%</p>
-          <div className={styles.resultButtons}>
-            <button onClick={() => window.location.reload()}>Reiniciar</button>
-            <button onClick={() => history(-1)}>
-              Tornar a la pàgina principal
+          <div>
+            <button
+              className={styles.endButtons}
+              onClick={() => window.location.reload()}
+            >
+              Reiniciar
             </button>
           </div>
+          <button className={styles.endButtons} onClick={() => history(-1)}>
+            Tornar a la pàgina principal
+          </button>
         </div>
       </div>
     );
@@ -107,7 +112,11 @@ function TestLayout() {
       <div className={styles.containerElements}>
         <h1>Qüestionari de Pràctica</h1>
 
-        <p className={styles.pregunta}>{preguntes[currentIndex].pregunta}</p>
+        <p className={styles.pregunta}>
+          {preguntes[currentIndex].pregunta.length > 100
+            ? preguntes[currentIndex].pregunta.slice(0, 70) + "..."
+            : preguntes[currentIndex].pregunta}
+        </p>
         <ul className={styles.llistaRespostes}>
           {respostesActuals.map((resposta, index) => (
             <li
@@ -132,6 +141,9 @@ function TestLayout() {
               : "Següent"}
           </button>
         </div>
+        <button onClick={() => history(-1)}>
+          Tornar a la pàgina principal
+        </button>
       </div>
     </div>
   );

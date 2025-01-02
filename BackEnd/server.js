@@ -969,7 +969,7 @@ app.get('/recuperarPreguntesPerConceptes', (req, res) => {
     db.query(query, [conceptesIds], (err, results) => {
       if (err) {
         console.error("Error en recuperar les preguntes:", err);
-        return res.status(500).send("Error en recuperar les preguntes.");
+        return res.send("Error en recuperar les preguntes.");
       }
       res.json({ Preguntes: results });
     });
