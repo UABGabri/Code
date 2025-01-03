@@ -328,10 +328,11 @@
   font-size: 1rem;
   cursor: pointer;
   margin-top: 20px;
+  transition: background-color 0.3s ease;
 }
 
 .formRandom button:hover {
-  background-color: #45a049;
+  background-color: darkgreen;
 }
 
 .error {
@@ -339,6 +340,24 @@
   color: red;
   text-align: center;
   font-size: 0.9rem;
+}
+
+
+.buttonIA{
+
+  padding: 10px 25px;
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+  
+}
+
+.buttonIA:hover{
+  background-color: darkgreen;
 }
 
 /*FI SECCIO QUIZZ ALUMNE*/
@@ -598,7 +617,7 @@ hr {
 }
 
 .questionsContainerTeacher{
-  width: 100vw;
+    width: 100vw;
     height: 100vh;
     top: 0;
     left: 0;
@@ -610,6 +629,11 @@ hr {
     margin-bottom: 30px;
 
 }
+
+
+
+
+
 
 /*FI SECCIÓ TEST PROFESSOR*/
 
@@ -638,5 +662,6 @@ hr {
 
 .addButton:hover{
   background-color: darkgreen;
-
 }
+
+

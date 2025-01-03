@@ -14,13 +14,12 @@ function TestLayout() {
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [loading, setLoading] = useState(true);
   const [showResults, setShowResults] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    console.log("Conceptes seleccionats: ", conceptesSeleccionats);
-
     axios
       .get("http://localhost:8081/recuperarPreguntesPerConceptes", {
-        params: { conceptesSeleccionats }, // Enviar l'array dels conceptes seleccionats
+        params: { conceptesSeleccionats },
       })
       .then((response) => {
         setPreguntes(response.data.Preguntes);
@@ -33,7 +32,7 @@ function TestLayout() {
         console.error("Error al recuperar les preguntes:", error);
         setLoading(false);
       });
-  }, [conceptesSeleccionats]); // Quan canviïn els conceptes seleccionats, s'actualitza
+  }, [conceptesSeleccionats]);
 
   const barrejarRespostes = (pregunta) => {
     const respostes = [
@@ -76,12 +75,22 @@ function TestLayout() {
     return { correctes, incorrectes, percentatge };
   };
 
+  const handleDetails = () => {
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
   if (loading) {
     return <p>Carregant preguntes...</p>;
   }
 
   if (showResults) {
     const { correctes, incorrectes, percentatge } = calcularResultats();
+
+    //Modal dels resultats finals. Temps de creació, 27h.
     return (
       <div className={styles.containerQuizz}>
         <div className={styles.resultsBox}>
@@ -90,6 +99,9 @@ function TestLayout() {
           <p>Incorrectes: {incorrectes}</p>
           <p>Nota: {percentatge}%</p>
           <div>
+            <button className={styles.endButtons} onClick={handleDetails}>
+              Detalls
+            </button>
             <button
               className={styles.endButtons}
               onClick={() => window.location.reload()}
@@ -101,6 +113,48 @@ function TestLayout() {
             Tornar a la pàgina principal
           </button>
         </div>
+
+        {showModal && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.modalContent}>
+              <h2>Detalls de les Respostes</h2>
+              <ul className={styles.modalList}>
+                {preguntes.map((pregunta, index) => {
+                  const respostaSeleccionada =
+                    selectedAnswers[index]?.split("-")[0] || "No seleccionada";
+                  const correcta = pregunta.solucio_correcta;
+
+                  return (
+                    <li key={index} className={styles.modalListItem}>
+                      <p>
+                        <strong>Pregunta:</strong> {pregunta.pregunta}
+                      </p>
+                      <p>
+                        <strong>Resposta seleccionada:</strong>{" "}
+                        <span
+                          className={
+                            respostaSeleccionada === correcta
+                              ? styles.correct
+                              : styles.incorrect
+                          }
+                        >
+                          {respostaSeleccionada}
+                        </span>
+                      </p>
+                      <p>
+                        <strong>Resposta correcta:</strong>{" "}
+                        <span className={styles.correct}>{correcta}</span>
+                      </p>
+                    </li>
+                  );
+                })}
+              </ul>
+              <button className={styles.closeModalButton} onClick={closeModal}>
+                Tancar
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -111,7 +165,6 @@ function TestLayout() {
     <div className={styles.containerQuizz}>
       <div className={styles.containerElements}>
         <h1>Qüestionari de Pràctica</h1>
-
         <p className={styles.pregunta}>
           {preguntes[currentIndex].pregunta.length > 100
             ? preguntes[currentIndex].pregunta.slice(0, 70) + "..."
@@ -132,7 +185,6 @@ function TestLayout() {
             </li>
           ))}
         </ul>
-
         <div className={styles.botoAnterior}>
           <button onClick={anarAnterior}>Anterior</button>
           <button onClick={anarSeguent}>
