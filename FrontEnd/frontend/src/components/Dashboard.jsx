@@ -65,11 +65,11 @@ function Dashboard({ id_User, role_User }) {
         prev.filter((assignatura) => assignatura.id_assignatura !== deleteId)
       );
       closeDeleteModal();
-      alert("Subject deleted successfully!");
+      alert("Assignatura eliminada correctament!");
       window.location.reload();
     } catch (err) {
-      console.error("Error deleting subject:", err);
-      alert("Failed to delete the subject.");
+      console.error("Error eliminant l'assignatura:", err);
+      alert("No s'ha pogut eliminar l'assignatura.");
     }
   };
 
@@ -84,7 +84,7 @@ function Dashboard({ id_User, role_User }) {
     <div>
       <Headercap />
       <div className={styles.title}>
-        <h1>YOUR COURSES</h1>
+        <h1>LES TEVES ASSIGNATURES</h1>
       </div>
 
       <div className={styles.container}>
@@ -129,13 +129,13 @@ function Dashboard({ id_User, role_User }) {
         <div className={styles.buttonsContainer}>
           {role_User === "professor" && (
             <button onClick={openAddModal} className={styles.addButton}>
-              Add Subject
+              Afegir Assignatura
             </button>
           )}
 
           {role_User === "professor" && (
             <button onClick={openDeleteModal} className={styles.deleteButton}>
-              Delete Subject
+              Eliminar Assignatura
             </button>
           )}
         </div>
@@ -148,7 +148,7 @@ function Dashboard({ id_User, role_User }) {
       {deleteModal && (
         <div className={styles.modalOver}>
           <div className={styles.modalContent}>
-            <h2 className={styles.modalTitle}>Delete Subject</h2>
+            <h2 className={styles.modalTitle}>Eliminar Assignatura</h2>
 
             <form
               className={styles.modalForm}
@@ -157,21 +157,25 @@ function Dashboard({ id_User, role_User }) {
                 if (/^\d{4}$/.test(deleteId)) {
                   setConfirmDelete(true);
                 } else {
-                  alert("Please enter a valid 4 digit Subject ID.");
+                  alert(
+                    "Si us plau, introdueix un ID d'assignatura vàlid de 4 dígits."
+                  );
                 }
               }}
             >
               {!confirmDelete ? (
                 <>
                   <div className={styles.formGroup}>
-                    <label htmlFor="deleteId">Enter Subject ID:</label>
+                    <label htmlFor="deleteId">
+                      Introdueix l'ID de l'assignatura:
+                    </label>
                     <input
                       type="text"
                       id="deleteId"
                       value={deleteId}
                       required
                       pattern="^\d{4}$"
-                      title="ID needs 4 digits"
+                      title="L'ID necessita 4 dígits"
                       minLength={4}
                       onChange={(e) => setDeleteId(e.target.value)}
                       className={styles.inputField}
@@ -179,20 +183,20 @@ function Dashboard({ id_User, role_User }) {
                   </div>
                   <div className={styles.buttonDeleteModal}>
                     <button type="submit" className={styles.addButtonModal}>
-                      Accept
+                      Acceptar
                     </button>
                     <button
                       type="button"
                       onClick={closeDeleteModal}
                       className={styles.cancelButtonModal}
                     >
-                      Cancel
+                      Cancel·lar
                     </button>
                   </div>
                 </>
               ) : (
                 <>
-                  <p>Are you sure you want to delete this subject?</p>
+                  <p>Estàs segur que vols eliminar aquesta assignatura?</p>
                   <div className={styles.modalActions}>
                     <div className={styles.buttonDeleteModal}>
                       <button
@@ -200,7 +204,7 @@ function Dashboard({ id_User, role_User }) {
                         onClick={handleDeleteSubject}
                         className={styles.addButtonModal}
                       >
-                        Yes
+                        Sí
                       </button>
                       <button
                         type="button"

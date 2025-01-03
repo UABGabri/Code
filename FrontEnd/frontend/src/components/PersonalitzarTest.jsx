@@ -4,6 +4,7 @@ import { BiArrowBack } from "react-icons/bi";
 import Headercap from "./Headercap";
 import styles from "./StyleComponents/Elements.module.css";
 import axios from "axios";
+import { FaSave, FaTrash } from "react-icons/fa";
 
 function PersonalitzarTest() {
   const navigate = useNavigate();
@@ -205,13 +206,13 @@ function PersonalitzarTest() {
           className={styles.backArrow}
         />
         <button onClick={guardarCanvis} className={styles.saveButton}>
-          Save Changes
+          <FaSave />
         </button>
         <button
           onClick={() => setShowDeleteModal(true)}
           className={styles.deleteTestButton}
         >
-          Delete Test
+          <FaTrash />
         </button>
       </header>
 

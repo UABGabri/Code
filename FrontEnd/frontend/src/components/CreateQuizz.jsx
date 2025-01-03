@@ -89,11 +89,11 @@ function CreateQuizz() {
           onClick={() => navigate(-1)}
           className={styles.arrowBack}
         />
-        <h2>Create Quizz</h2>
+        <h2>Creació de Tests</h2>
 
         <div>
           <label>
-            Deadline:
+            Data finalització:
             <input
               type="date"
               value={dataFinalitzacio}
@@ -107,7 +107,7 @@ function CreateQuizz() {
             value={temaSeleccionat}
             onChange={(e) => setTemaSeleccionat(e.target.value)}
           >
-            <option value="">Select Topics</option>
+            <option value="">Selecciona els Temes</option>
             {temes
               .filter(
                 (tema) => !seleccions.some((sel) => sel.id === tema.id_tema)
@@ -124,16 +124,17 @@ function CreateQuizz() {
             value={numeroPreguntes}
             onChange={(e) => setNumeroPreguntes(parseInt(e.target.value))}
           />
-          <button onClick={afegirTema}>Add</button>
+          <button onClick={afegirTema}>Afegir</button>
         </div>
 
         <ul className={styles.temesSeleccionats}>
           {seleccions.map((seleccio) => (
             <li key={seleccio.id} className={styles.temaSeleccionat}>
-              <span>{seleccio.nom_tema} - Questions:</span>
+              <span>{seleccio.nom_tema} - Preguntes:</span>
               <input
                 type="number"
                 min="1"
+                max="10"
                 value={seleccio.preguntes}
                 onChange={(e) =>
                   setSeleccions((prev) =>

@@ -65,28 +65,28 @@ function AssignaturaLayout() {
           key="CURS"
           onClick={() => setMenuOption("CURS")}
         >
-          Course
+          CURS
         </span>
         <span
           className={menuOption === "PARTICIPANTS" ? styles.activeTab : ""}
           key="PARTICIPANTS"
           onClick={() => setMenuOption("PARTICIPANTS")}
         >
-          Participants
+          PARTICIPANTS
         </span>
         <span
           className={menuOption === "PREGUNTES" ? styles.activeTab : ""}
           key="PREGUNTES"
           onClick={() => setMenuOption("PREGUNTES")}
         >
-          Questions
+          PREGUNTES
         </span>
         <span
           className={menuOption === "TESTS" ? styles.activeTab : ""}
           key="TESTS"
           onClick={() => setMenuOption("TESTS")}
         >
-          Tests
+          TESTS
         </span>
       </div>
 

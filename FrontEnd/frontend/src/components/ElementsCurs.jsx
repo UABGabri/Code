@@ -97,12 +97,12 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
 
     // Verifica que test no sigui null
     if (!test || !test.id_test) {
-      console.error("Test is not valid or missing 'id_test'");
+      console.error("Test no vàlid o falta 'id_test'");
       return;
     }
 
     if (Role_User === "professor") {
-      // Si es professor, redirigim  a pàgina de personalització
+      // Si és professor, redirigim a la pàgina de personalització
       navigate("/personalitzarTest", {
         state: {
           idTest: test.id_test,
@@ -122,7 +122,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
             state: { idTest: selectedTest.id_test, Id_User },
           });
         } else {
-          console.error("Selected test is invalid or missing 'id_test'");
+          console.error("El test seleccionat és invàlid o manca 'id_test'");
         }
       }
     }
@@ -172,17 +172,20 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
   };
 
   const toggleTema = (id) => {
-    setOpenTema((prev) => ({ ...prev, [id]: !prev[id] }));
+    setOpenTema((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
   };
 
   return (
     <div className={styles.elementsCursContainer}>
       <h1 className={styles.elementsCursHeader}>
-        <strong>TOPIC MANAGEMENT</strong>
+        <strong>GESTIÓ DE TEMES</strong>
       </h1>
       <div className={styles.temesList}>
         {temes.length === 0 ? (
-          <p className={styles.noTemes}>No topics created</p>
+          <p className={styles.noTemes}>No s'han creat temes</p>
         ) : (
           temes.map((tema) => (
             <div key={tema.id_tema} className={styles.temaItem}>
@@ -203,7 +206,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                 <div className={styles.temaContent}>
                   <div className={styles.tests}>
                     <h3 className={styles.temaSubtitle}>
-                      <strong>Practice Tests</strong>
+                      <strong>Proves Pràctiques</strong>
                     </h3>
                     <hr />
                     <div className={styles.testList}>
@@ -223,7 +226,10 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                           ))}
                         </ol>
                       ) : (
-                        <p>No practice tests available for this topic.</p>
+                        <p>
+                          No hi ha proves pràctiques disponibles per aquest
+                          tema.
+                        </p>
                       )}
 
                       {Role_User === "professor" && (
@@ -249,7 +255,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
 
                   <div className={styles.tests}>
                     <h3 className={styles.temaSubtitle}>
-                      <strong>Evaluation Tests</strong>
+                      <strong>Proves Avaluatives</strong>
                     </h3>
                     <hr />
                     <div className={styles.testList}>
@@ -269,7 +275,10 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                           ))}
                         </ol>
                       ) : (
-                        <p>No evaluation tests available for this topic.</p>
+                        <p>
+                          No hi ha proves avaluatives disponibles per aquest
+                          tema.
+                        </p>
                       )}
 
                       {Role_User === "professor" && (
@@ -297,7 +306,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                       className={styles.deleteTheme}
                       onClick={() => handleDeleteTheme(tema.id_tema)}
                     >
-                      Delete
+                      Eliminar
                     </button>
                   )}
                 </div>
@@ -318,14 +327,14 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
               type="text"
               value={newTemaName}
               onChange={(e) => setNewTemaName(e.target.value)}
-              placeholder="Topic name"
+              placeholder="Nom del tema"
               className={styles.temaInput}
               required
               pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
-              title="The topic name must contain valid elements."
+              title="El nom del tema ha de contenir elements vàlids."
             />
             <button type="submit" className={styles.temaButton}>
-              Add Topic
+              Afegir Tema
             </button>
           </form>
         )}
@@ -334,26 +343,26 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
       {showModal && (
         <div className={styles.modal}>
           <div className={styles.modalContent}>
-            <h2>Enter Access Key</h2>
+            <h2>Introdueix la Clau d'Accés</h2>
             <input
               type="password"
               value={accessKey}
               onChange={(e) => setAccessKey(e.target.value)}
               className={styles.modalInput}
-              placeholder="Access key"
+              placeholder="Clau d'accés"
             />
             <div className={styles.modalActions}>
               <button
                 onClick={handleAccessKeySubmit}
                 className={styles.modalButton}
               >
-                Validate
+                Validar
               </button>
               <button
                 onClick={handleCloseModal}
                 className={styles.modalButtonCancel}
               >
-                Cancel
+                Cancel·lar
               </button>
             </div>
           </div>

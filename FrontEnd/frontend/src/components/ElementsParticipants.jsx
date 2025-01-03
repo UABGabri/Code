@@ -148,26 +148,26 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
     <div>
       <div className={styles.participantContainer}>
         <strong className={styles.elementsCursHeader}>
-          PARTICIPANTS MANAGEMENT
+          GESTIÓ DE PARTICIPANTS
         </strong>
         {users.length > 0 ? (
           users.map((user) => (
             <div key={user.niu} className={styles.participantCard}>
               <div className={styles.participantDetails}>
                 <p>
-                  <strong>Name:</strong> {user.username}
+                  <strong>Nom:</strong> {user.username}
                 </p>
                 <p>
                   <strong>NIU:</strong> {user.niu}
                 </p>
                 <p>
-                  <strong>Email:</strong> {user.email}
+                  <strong>Email:</strong> <a href="">{user.email}</a>
                 </p>
                 <p>
-                  <strong>Role: </strong> {user.role}
+                  <strong>Rol: </strong> {user.role}
                 </p>
                 <p>
-                  <strong>Grade: </strong> {user.notes}
+                  <strong>Nota Assignatura: </strong> {user.notes}
                 </p>
               </div>
 

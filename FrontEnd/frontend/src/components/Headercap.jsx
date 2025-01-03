@@ -58,7 +58,7 @@ function Headercap() {
           </Dropdown.Toggle>
           <Dropdown.Menu>
             <Dropdown.Item as={Link} to={handleGoBack()}>
-              {location.pathname === "/profile" ? "Go back" : "Profile"}
+              {location.pathname === "/profile" ? "Tornar" : "Perfil"}
             </Dropdown.Item>
             <Dropdown.Item onClick={handleDelete}>Logout</Dropdown.Item>
           </Dropdown.Menu>

@@ -22,11 +22,10 @@ function Profile() {
     axios
       .get("http://localhost:8081/user", { withCredentials: true })
       .then((res) => {
-        //console.log("Resposta del servidor:", res.data);
         setValues(res.data.user);
       })
       .catch((err) => {
-        console.error("Error a la solicitud:", err);
+        console.error("Error a la sol·licitud:", err);
       });
   }, []);
 
@@ -42,7 +41,7 @@ function Profile() {
     e.preventDefault();
 
     if (values.password !== confirmPassword) {
-      setError("Please enter matching passwords.");
+      setError("Si us plau, introdueix contrasenyes coincidents.");
       alert(error);
       return;
     } else {
@@ -81,7 +80,7 @@ function Profile() {
       })
       .catch((err) => {
         console.error(err);
-        alert("An error occurred while trying to drop out.");
+        alert("S'ha produït un error en intentar donar-se de baixa.");
       });
   };
 
@@ -89,7 +88,7 @@ function Profile() {
     <div>
       <Headercap />
       <div className={styles.maindisplay}>
-        <h1>Edit Profile</h1>
+        <h1>Editar Perfil</h1>
 
         <form onSubmit={handleSubmit} className={styles.formProfile}>
           <div>
@@ -104,7 +103,7 @@ function Profile() {
           </div>
 
           <div>
-            <label>Username:</label>
+            <label>Nom d'usuari:</label>
             <input
               type="text"
               name="username"
@@ -112,28 +111,28 @@ function Profile() {
               onChange={handleInputChange}
               required
               pattern="^[A-Za-zÀ-ÿ\s]+$"
-              title="Name with letters from the alphabet"
+              title="Nom amb lletres de l'alfabet"
               className={styles.inputProfile}
-              placeholder="Username"
+              placeholder="Nom d'usuari"
             />
           </div>
 
           <div>
-            <label>Email:</label>
+            <label>Correu electrònic:</label>
             <input
               type="email"
               name="email"
               value={values.email}
               onChange={handleInputChange}
               required
-              title="Input a valid email"
+              title="Introdueix un correu electrònic vàlid"
               className={styles.inputProfile}
-              placeholder="Email"
+              placeholder="Correu electrònic"
             />
           </div>
 
           <div>
-            <label>Password:</label>
+            <label>Contrasenya:</label>
             <input
               type="password"
               name="password"
@@ -141,27 +140,27 @@ function Profile() {
               required
               id="password"
               minLength={8}
-              title="Needs 8 characters min"
+              title="Es necessiten almenys 8 caràcters"
               className={styles.inputProfile}
-              placeholder="New Password"
+              placeholder="Nova Contrasenya"
             />
           </div>
 
           <div>
             <label htmlFor="confirmPassword" className="form-label">
-              Confirm password
+              Confirmar contrasenya:
             </label>
             <input
               type="password"
               onChange={(e) => setConfirmPassword(e.target.value)}
               className={styles.inputProfile}
               id="confirmPassword"
-              placeholder="Confirm password"
+              placeholder="Confirma la contrasenya"
             />
           </div>
 
           <div>
-            <label>Role (No editable):</label>
+            <label>Rol (No editable):</label>
             <input
               type="text"
               name="role"
@@ -172,7 +171,7 @@ function Profile() {
           </div>
 
           <button type="submit" className={styles.saveButton}>
-            Save Changes
+            Desar Canvis
           </button>
 
           <button
@@ -180,23 +179,23 @@ function Profile() {
             onClick={openModal}
             className={styles.dropButton}
           >
-            Drop out
+            Donar-se de Baixa
           </button>
         </form>
 
         {isModalOpen && (
           <div className={styles.modalOver}>
             <div className={styles.modalContent}>
-              <p>Are you sure? Your account will be eliminated.</p>
+              <p>Estàs segur? El teu compte serà eliminat.</p>
               <div className={styles.modalButtons}>
                 <button
                   onClick={handleConfirmDropOut}
                   className={styles.acceptButton}
                 >
-                  Accept
+                  Acceptar
                 </button>
                 <button onClick={closeModal} className={styles.cancelButton}>
-                  Cancel
+                  Cancel·lar
                 </button>
               </div>
             </div>

@@ -207,6 +207,7 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   overflow-y: auto;
   max-height: 80%;
+  
 }
 
 .modalList {
@@ -218,6 +219,9 @@
   margin-bottom: 20px;
   padding: 10px;
   border-bottom: 1px solid #ddd;
+  overflow: hidden; 
+    text-overflow: ellipsis; 
+
 }
 
 .modalListItem p {

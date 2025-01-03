@@ -62,11 +62,11 @@ function ElementsTests({ idAssignatura }) {
 
   return (
     <div className={styles.quizzContainerTitle}>
-      <strong className={styles.titleGenerator}>QUIZZ GENERATOR</strong>
+      <strong className={styles.titleGenerator}>GENERADOR DE TESTS</strong>
       <div className={styles.quizzContainerBody}>
         <form className={styles.formRandom} onSubmit={handleSubmit}>
           <div className={styles.parametersQuizz}>
-            <label htmlFor="conceptes">Concepts:</label>
+            <label htmlFor="conceptes">Conceptes:</label>
             <Select
               id="conceptes"
               name="conceptes"

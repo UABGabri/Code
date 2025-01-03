@@ -10,7 +10,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
   const [editingQuestionId, setEditingQuestionId] = useState(null);
   const [editedQuestion, setEditedQuestion] = useState({});
   const [showModal, setShowModal] = useState(false);
-  const [actionType, setActionType] = useState(""); // "delete" or "accept"
+  const [actionType, setActionType] = useState(""); // "delete" o "accept"
   const [questionIdToAct, setQuestionIdToAct] = useState(null);
 
   const navigate = useNavigate();
@@ -155,9 +155,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
 
   return (
     <div className={styles.questionsContainer}>
-      <strong className={styles.elementsCursHeader}>
-        QUESTIONS MANAGEMENT
-      </strong>
+      <strong className={styles.elementsCursHeader}>GESTIÓ DE PREGUNTES</strong>
       <div className={styles.questionsList}>
         {questions.map((question) => (
           <div key={question.id_pregunta} className={styles.questionCard}>
@@ -174,7 +172,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
               {editingQuestionId === question.id_pregunta ? (
                 <>
                   <p>
-                    <strong>Question:</strong>
+                    <strong>Pregunta:</strong>
                     <input
                       type="text"
                       value={editedQuestion.pregunta}
@@ -186,7 +184,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                     />
                   </p>
                   <p>
-                    <strong>Answer:</strong>
+                    <strong>Resposta:</strong>
                     <input
                       type="text"
                       value={editedQuestion.solucio_correcta}
@@ -200,10 +198,10 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
               ) : (
                 <>
                   <p className={styles.editInput}>
-                    <strong>Question: </strong> {question.pregunta}
+                    <strong>Pregunta: </strong> {question.pregunta}
                   </p>
                   <p>
-                    <strong className={styles.editInput}>Answer:</strong>{" "}
+                    <strong className={styles.editInput}>Resposta:</strong>{" "}
                     {question.solucio_correcta}
                   </p>
                 </>
@@ -261,7 +259,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
 
       <div className={styles.addQuestionButtonContainer}>
         <button className={styles.addQuestionButton} onClick={handleButton}>
-          Add Question
+          Afegir Pregunta
         </button>
       </div>
 
@@ -269,11 +267,11 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
         <div className={styles.modal}>
           <div className={styles.modalContent}>
             <h3>
-              Are you sure you want to{" "}
-              {actionType === "delete" ? "delete" : "accept"} this question?
+              Segur que vols {actionType === "delete" ? "esborrar" : "acceptar"}{" "}
+              aquesta pregunta?
             </h3>
             <div className={styles.modalActions}>
-              <button onClick={handleConfirmAction}>Yes</button>
+              <button onClick={handleConfirmAction}>Si</button>
               <button onClick={handleCloseModal}>No</button>
             </div>
           </div>
