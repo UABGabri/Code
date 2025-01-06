@@ -4,14 +4,14 @@ import { BiArrowBack } from "react-icons/bi";
 import Headercap from "./Headercap";
 import styles from "./StyleComponents/Elements.module.css";
 import axios from "axios";
-import { FaSave, FaTrash } from "react-icons/fa";
+import { FaArrowLeft, FaArrowRight, FaSave, FaTrash } from "react-icons/fa";
 
 function PersonalitzarTest() {
   const navigate = useNavigate();
   const location = useLocation();
   const [preguntesTest, setPreguntesTest] = useState([]);
   const [bancPreguntes, setBancPreguntes] = useState([]);
-  const { idTest, idTema } = location.state || {};
+  const { idTest, idTema, idAssignatura } = location.state || {};
   const preguntaArrossegar = useRef(0);
   const preguntaSobreArrossegar = useRef(0);
 
@@ -43,7 +43,7 @@ function PersonalitzarTest() {
   const fetchRemainingQuestions = (preguntesTest) => {
     axios
       .get("http://localhost:8081/recoverPreguntesTema", {
-        params: { id_tema: idTema },
+        params: { idAssignatura },
       })
       .then((response) => {
         const filteredPreguntes = response.data.filter(
@@ -55,7 +55,7 @@ function PersonalitzarTest() {
         );
         setBancPreguntes(filteredPreguntes);
       })
-      .catch(() => alert("Error fetching the remaining questions."));
+      .catch(() => alert("Error obtenint les preguntes."));
   };
 
   // Ordenar les preguntes del test
@@ -217,105 +217,120 @@ function PersonalitzarTest() {
       </header>
 
       <div className={styles.customBody}>
-        <h1>Test Questions</h1>
+        <h1>Preguntes del Test</h1>
         <div className={styles.questionsList}>
           {preguntesActualsTest.map((pregunta, index) => (
-            <div
-              key={pregunta.id_pregunta}
-              className={styles.questionCard}
-              draggable
-              onDragStart={() => (preguntaArrossegar.current = index)}
-              onDragEnter={() => (preguntaSobreArrossegar.current = index)}
-              onDragEnd={ordenarPreguntes}
-              onDragOver={(e) => e.preventDefault()}
-            >
-              <p>
-                <strong>Pregunta: </strong>
-                {pregunta.pregunta}
-              </p>
-              <p>
-                <strong>Solució: </strong>
-                {pregunta.solucio_correcta}
-              </p>
-
-              <p>
-                <strong>Tema: </strong>
-                {pregunta.id_tema}
-              </p>
-              <button
-                className={styles.deleteButton}
-                onClick={() => eliminarPregunta(pregunta)}
+            <>
+              <div
+                key={pregunta.id_pregunta}
+                className={styles.questionCard}
+                draggable
+                onDragStart={() => (preguntaArrossegar.current = index)}
+                onDragEnter={() => (preguntaSobreArrossegar.current = index)}
+                onDragEnd={ordenarPreguntes}
+                onDragOver={(e) => e.preventDefault()}
               >
-                Delete
-              </button>
-            </div>
+                <p>
+                  <strong>Pregunta: </strong>
+                  {pregunta.pregunta}
+                </p>
+                <p>
+                  <strong>Solució: </strong>
+                  {pregunta.solucio_correcta}
+                </p>
+
+                <p>
+                  <strong>Tema: </strong>
+                  {pregunta.id_tema}
+                </p>
+                <button
+                  className={styles.deleteButton}
+                  onClick={() => eliminarPregunta(pregunta)}
+                >
+                  Eliminar
+                </button>
+              </div>
+            </>
           ))}
         </div>
 
         <div className={styles.paginationControls}>
-          <button onClick={prevPage} disabled={paginaActual === 1}>
-            Previous
+          <button
+            onClick={prevPage}
+            disabled={paginaActual === 1}
+            className={styles.ArrowsPages}
+          >
+            <FaArrowLeft></FaArrowLeft>
           </button>
-          <span>Page {paginaActual}</span>
+          <span>Pàgina {paginaActual}</span>
           <button
             onClick={nextPage}
             disabled={
               paginaActual ===
               Math.ceil(preguntesTest.length / preguntesPerPagina)
             }
+            className={styles.ArrowsPages}
           >
-            Next
+            <FaArrowRight></FaArrowRight>
           </button>
         </div>
 
         <hr className={styles.lineCustom}></hr>
 
-        <h1>Question Bank</h1>
+        <h1>Banc de preguntes</h1>
         <div className={styles.questionsList}>
           {preguntesActualsBanc.map((pregunta) => (
             <div key={pregunta.id_pregunta} className={styles.questionCard}>
-              <p>
-                <strong>Pregunta: </strong>
-                {pregunta.pregunta}
-              </p>
-              <p>
-                <strong>Solució: </strong>
-                {pregunta.solucio_correcta}
-              </p>
-              <p>
-                <strong>Tema: </strong>
-                {pregunta.id_tema}
-              </p>
+              <div className={styles.questionCardCustom}>
+                <p>
+                  <strong>Pregunta: </strong>
+                  {pregunta.pregunta}
+                </p>
+                <p>
+                  <strong>Solució: </strong>
+                  {pregunta.solucio_correcta}
+                </p>
+                <p>
+                  <strong>Tema: </strong>
+                  {pregunta.id_tema}
+                </p>
+              </div>
+
               <button
                 className={styles.addButton}
                 onClick={() => afegirPregunta(pregunta)}
               >
-                Add
+                Afegir
               </button>
             </div>
           ))}
         </div>
 
         <div className={styles.paginationControls}>
-          <button onClick={prevPageBanc} disabled={paginaBanc === 1}>
-            Previous
+          <button
+            onClick={prevPageBanc}
+            disabled={paginaBanc === 1}
+            className={styles.ArrowsPages}
+          >
+            <FaArrowLeft></FaArrowLeft>
           </button>
-          <span>Page {paginaBanc}</span>
+          <span>Pàgina {paginaBanc}</span>
           <button
             onClick={nextPageBanc}
             disabled={
               paginaBanc ===
               Math.ceil(bancPreguntes.length / preguntesPerPaginaBanc)
             }
+            className={styles.ArrowsPages}
           >
-            Next
+            <FaArrowRight></FaArrowRight>
           </button>
         </div>
 
         {showDeleteModal && (
           <div className={styles.modal}>
             <div className={styles.modalContent}>
-              <h3>Are you sure you want to delete this test?</h3>
+              <h3>Segur que vols eliminar aquest test?</h3>
               <div>
                 <button
                   className={styles.deleteTestConfirmButton}
@@ -324,7 +339,7 @@ function PersonalitzarTest() {
                     setShowDeleteModal(false);
                   }}
                 >
-                  Yes
+                  Si
                 </button>
                 <button
                   className={styles.deleteTestCancelButton}

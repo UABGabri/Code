@@ -103,10 +103,13 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
 
     if (Role_User === "professor") {
       // Si és professor, redirigim a la pàgina de personalització
+
+      const id = parseInt(Id_Assignatura);
       navigate("/personalitzarTest", {
         state: {
           idTest: test.id_test,
           idTema: id_tema,
+          idAssignatura: id,
         },
       });
     } else {

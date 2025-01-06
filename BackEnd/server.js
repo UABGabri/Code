@@ -688,6 +688,8 @@ app.get('/recoverQuestions', (req, res)=>{
 })
 
 
+
+
 //Funció d'actualització d'estat de les preguntes a la taula preguntes de la base de dades
 app.put('/updateQuestionAccept', (req, res) =>{
 
@@ -1180,30 +1182,30 @@ app.get('/recoverPreguntes', (req, res) => {
 
 //Funció de recuperació de les preguntes segons el tema
 app.get('/recoverPreguntesTema', (req, res) => {
+    const idAssignatura = req.query.idAssignatura;
+    
 
-    const idTema = req.query.id_tema;
-
-    if (!idTema) {
-        console.error("ID Tema no proporcionat");
-        return res.json({ error: "ID Tema es requerit" });
+    if (!idAssignatura) {
+        console.error("ID Assignatura no proporcionat");
+        return res.status(400).json({ error: "ID Assignatura es requerit" });
     }
 
     const sql = `
         SELECT preguntes.*, temes.nom_tema 
         FROM preguntes 
         JOIN temes ON preguntes.id_tema = temes.id_tema 
-        WHERE preguntes.id_tema = ?
+        WHERE temes.id_assignatura = ?  
     `;
-
-    db.query(sql, [idTema], (error, result) => {
+    db.query(sql, [idAssignatura], (error, result) => {
         if (error) {
             console.error("Error a la consulta:", error);
-            return res.json({ Status: "Failed" });
-        } else {
-            return res.json(result);
+            return res.json({ error: "Error a la consulta." });
         }
+        console.log("Preguntes retornades:", result);
+        return res.json(result);
     });
 });
+
 
 
 
