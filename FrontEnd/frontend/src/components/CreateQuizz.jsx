@@ -26,13 +26,13 @@ function CreateQuizz() {
       .catch((error) => console.error("Error al recuperar temes:", error));
   }, [id_assignatura]);
 
-  const afegirTema = () => {
+  const addTopic = () => {
     if (!temaSeleccionat) return;
-    const existeix = seleccions.find(
+    const exists = seleccions.find(
       (seleccio) => seleccio.id === parseInt(temaSeleccionat)
     );
 
-    if (!existeix) {
+    if (!exists) {
       const tema = temes.find((t) => t.id_tema === parseInt(temaSeleccionat));
       setSeleccions((prev) => [
         ...prev,
@@ -47,7 +47,7 @@ function CreateQuizz() {
     }
   };
 
-  const handleCreateQuizz = () => {
+  const createQuiz = () => {
     if (seleccions.length === 0) {
       setErrorSelect("Selecciona almenys un concepte.");
       return;
@@ -71,9 +71,11 @@ function CreateQuizz() {
       })
       .then((response) => {
         if (response.data.Status === "Test creat correctament") {
-          alert(
-            `Test creat correctament amb clau d'accés: ${response.data.clau_acces}`
-          );
+          if (tipus === "avaluatiu") {
+            alert(
+              `Test creat correctament amb clau d'accés: ${response.data.clau_acces}`
+            );
+          }
         } else {
           alert("Error al crear el test.");
         }
@@ -84,14 +86,14 @@ function CreateQuizz() {
   return (
     <div>
       <Headercap />
-      <div className={styles.content}>
+      <div className={styles.container}>
         <BiArrowBack
           onClick={() => navigate(-1)}
           className={styles.arrowBack}
         />
         <h2>Creació de Tests</h2>
 
-        <div>
+        <div className={styles.formGroup}>
           <label>
             Data finalització:
             <input
@@ -102,7 +104,7 @@ function CreateQuizz() {
           </label>
         </div>
 
-        <div className={styles.selectContainer}>
+        <div className={styles.formGroup}>
           <select
             value={temaSeleccionat}
             onChange={(e) => setTemaSeleccionat(e.target.value)}
@@ -124,12 +126,12 @@ function CreateQuizz() {
             value={numeroPreguntes}
             onChange={(e) => setNumeroPreguntes(parseInt(e.target.value))}
           />
-          <button onClick={afegirTema}>Afegir</button>
+          <button onClick={addTopic}>Afegir</button>
         </div>
 
-        <ul className={styles.temesSeleccionats}>
+        <ul className={styles.selectedTopics}>
           {seleccions.map((seleccio) => (
-            <li key={seleccio.id} className={styles.temaSeleccionat}>
+            <li key={seleccio.id} className={styles.selectedTopic}>
               <span>{seleccio.nom_tema} - Preguntes:</span>
               <input
                 type="number"
@@ -160,7 +162,7 @@ function CreateQuizz() {
         </ul>
 
         {errorSelect && <p className={styles.error}>{errorSelect}</p>}
-        <button onClick={handleCreateQuizz}>Create Test</button>
+        <button onClick={createQuiz}>Crear Test Automàtic</button>
 
         <button
           onClick={() =>
@@ -169,7 +171,7 @@ function CreateQuizz() {
             })
           }
         >
-          Create Manual Test
+          Crear Test Manual
         </button>
       </div>
     </div>

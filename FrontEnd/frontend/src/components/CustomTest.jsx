@@ -4,9 +4,16 @@ import { BiArrowBack } from "react-icons/bi";
 import Headercap from "./Headercap";
 import styles from "./StyleComponents/Elements.module.css";
 import axios from "axios";
-import { FaArrowLeft, FaArrowRight, FaSave, FaTrash } from "react-icons/fa";
+import {
+  FaArrowLeft,
+  FaArrowRight,
+  FaCross,
+  FaCrosshairs,
+  FaSave,
+  FaTrash,
+} from "react-icons/fa";
 
-function PersonalitzarTest() {
+function CustomTest() {
   const navigate = useNavigate();
   const location = useLocation();
   const [preguntesTest, setPreguntesTest] = useState([]);
@@ -61,14 +68,20 @@ function PersonalitzarTest() {
   // Ordenar les preguntes del test
   const ordenarPreguntes = () => {
     const preguntaClone = [...preguntesTest];
+
+    // Intercanvi preguntes array global
     const temp = preguntaClone[preguntaArrossegar.current];
     preguntaClone[preguntaArrossegar.current] =
       preguntaClone[preguntaSobreArrossegar.current];
     preguntaClone[preguntaSobreArrossegar.current] = temp;
 
+    // Actualitzar posicions globals
     preguntaClone.forEach((q, index) => (q.posicio = index + 1));
+
+    // Guardar nou ordre
     setPreguntesTest(preguntaClone);
 
+    // Actualizar el backend amb nova posició
     axios
       .post("http://localhost:8081/updateTestQuestions", {
         idTest,
@@ -197,6 +210,16 @@ function PersonalitzarTest() {
     }
   };
 
+  const [showBancModal, setShowBancModal] = useState(false);
+
+  const openAddModal = () => {
+    setShowBancModal(true);
+  };
+
+  const closeAddModal = () => {
+    setShowBancModal(false);
+  };
+
   return (
     <div>
       <Headercap />
@@ -223,10 +246,18 @@ function PersonalitzarTest() {
             <>
               <div
                 key={pregunta.id_pregunta}
-                className={styles.questionCard}
+                className={styles.questionCardCustom}
                 draggable
-                onDragStart={() => (preguntaArrossegar.current = index)}
-                onDragEnter={() => (preguntaSobreArrossegar.current = index)}
+                onDragStart={() => {
+                  const globalIndex =
+                    index + (paginaActual - 1) * preguntesPerPagina;
+                  preguntaArrossegar.current = globalIndex;
+                }}
+                onDragEnter={() => {
+                  const globalIndex =
+                    index + (paginaActual - 1) * preguntesPerPagina;
+                  preguntaSobreArrossegar.current = globalIndex;
+                }}
                 onDragEnd={ordenarPreguntes}
                 onDragOver={(e) => e.preventDefault()}
               >
@@ -275,57 +306,71 @@ function PersonalitzarTest() {
           </button>
         </div>
 
+        <button className={styles.addButton} onClick={openAddModal}>
+          Afegir Preguntes
+        </button>
         <hr className={styles.lineCustom}></hr>
 
-        <h1>Banc de preguntes</h1>
-        <div className={styles.questionsList}>
-          {preguntesActualsBanc.map((pregunta) => (
-            <div key={pregunta.id_pregunta} className={styles.questionCard}>
-              <div className={styles.questionCardCustom}>
-                <p>
-                  <strong>Pregunta: </strong>
-                  {pregunta.pregunta}
-                </p>
-                <p>
-                  <strong>Solució: </strong>
-                  {pregunta.solucio_correcta}
-                </p>
-                <p>
-                  <strong>Tema: </strong>
-                  {pregunta.id_tema}
-                </p>
-              </div>
-
-              <button
-                className={styles.addButton}
-                onClick={() => afegirPregunta(pregunta)}
-              >
-                Afegir
+        {showBancModal && (
+          <>
+            <div className={styles.fonsFosc} onClick={closeAddModal}></div>
+            <div className={styles.contenidorModal}>
+              <button className={styles.botoTancar} onClick={closeAddModal}>
+                x
               </button>
+              <h1>Banc de preguntes</h1>
+              <div className={styles.llistaPreguntes}>
+                {preguntesActualsBanc.map((pregunta) => (
+                  <div
+                    key={pregunta.id_pregunta}
+                    className={styles.targetaPregunta}
+                  >
+                    <div className={styles.contingutTargeta}>
+                      <p>
+                        <strong>Pregunta: </strong>
+                        {pregunta.pregunta}
+                      </p>
+                      <p>
+                        <strong>Solució: </strong>
+                        {pregunta.solucio_correcta}
+                      </p>
+                      <p>
+                        <strong>Tema: </strong>
+                        {pregunta.id_tema}
+                      </p>
+                    </div>
+                    <button
+                      className={styles.botoAfegir}
+                      onClick={() => afegirPregunta(pregunta)}
+                    >
+                      Afegir
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <div className={styles.controlsPaginacio}>
+                <button
+                  onClick={prevPageBanc}
+                  disabled={paginaBanc === 1}
+                  className={styles.botoPaginacio}
+                >
+                  <FaArrowLeft />
+                </button>
+                <span>Pàgina {paginaBanc}</span>
+                <button
+                  onClick={nextPageBanc}
+                  disabled={
+                    paginaBanc ===
+                    Math.ceil(bancPreguntes.length / preguntesPerPaginaBanc)
+                  }
+                  className={styles.botoPaginacio}
+                >
+                  <FaArrowRight />
+                </button>
+              </div>
             </div>
-          ))}
-        </div>
-
-        <div className={styles.paginationControls}>
-          <button
-            onClick={prevPageBanc}
-            disabled={paginaBanc === 1}
-            className={styles.ArrowsPages}
-          >
-            <FaArrowLeft></FaArrowLeft>
-          </button>
-          <span>Pàgina {paginaBanc}</span>
-          <button
-            onClick={nextPageBanc}
-            disabled={
-              paginaBanc ===
-              Math.ceil(bancPreguntes.length / preguntesPerPaginaBanc)
-            }
-            className={styles.ArrowsPages}
-          >
-            <FaArrowRight></FaArrowRight>
-          </button>
-        </div>
+          </>
+        )}
 
         {showDeleteModal && (
           <div className={styles.modal}>
@@ -356,4 +401,4 @@ function PersonalitzarTest() {
   );
 }
 
-export default PersonalitzarTest;
+export default CustomTest;

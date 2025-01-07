@@ -18,8 +18,8 @@ function CrearTestProfessor() {
   const [filters, setFilters] = useState({ dificultat: "", nom_tema: "" });
   const [dataFinalitzacio, setDataFinalitzacio] = useState("");
   const [testName, setTestName] = useState("");
-  const [currentPage, setCurrentPage] = useState(1); // Página actual
-  const questionsPerPage = 5; // Preguntas por página
+  const [currentPage, setCurrentPage] = useState(1);
+  const questionsPerPage = 5;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -243,7 +243,7 @@ function CrearTestProfessor() {
             Anterior
           </button>
           <span>
-            Página {currentPage} de{" "}
+            Pàgina {currentPage} de{" "}
             {Math.ceil(filteredPreguntes.length / questionsPerPage)}
           </span>
           <button

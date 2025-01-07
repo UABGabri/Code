@@ -10,7 +10,7 @@ import AssignaturaLayout from "./components/AssignaturaLayout";
 import TestLayout from "./components/TestLayout";
 import CrearTestProfessor from "./components/CrearTestProfessor";
 import TestWithKey from "./components/TestWithKey";
-import PersonalitzarTest from "./components/PersonalitzarTest";
+import CustomTest from "./components/CustomTest";
 import TestIALayout from "./components/TestIALayout";
 import Dashboard from "./components/Dashboard";
 import CreateQuizz from "./components/CreateQuizz";
@@ -44,7 +44,7 @@ function App() {
         <Route path="/manualTest" element={<CrearTestProfessor />}></Route>
 
         <Route path="/realitzartest" element={<TestWithKey />}></Route>
-        <Route path="/personalitzarTest" element={<PersonalitzarTest />} />
+        <Route path="/personalitzarTest" element={<CustomTest />} />
 
         <Route path="/testIA" element={<TestIALayout />} />
       </Routes>
