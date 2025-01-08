@@ -5,24 +5,39 @@ import styles from "./StyleComponents/Elements.module.css";
 
 function ElementsParticipants({ Id_Assignatura, Role_User }) {
   const [users, setUsers] = useState([]);
-  const [usersGrades, setUsersGrades] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [newNiu, setNewNiu] = useState("");
   const [csvFile, setCsvFile] = useState(null);
 
+  //Funció de recuperació dels participants
   useEffect(() => {
     axios
       .get("http://localhost:8081/recoverAtendees", {
         params: { Id_Assignatura },
       })
       .then((res) => {
-        console.log(res);
         setUsers(res.data);
       })
       .catch((err) => {
         console.error("Error a la sol·licitud:", err);
       });
   }, [Id_Assignatura]);
+
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+
+  //Funció per obrir modal d'eliminació
+  const handleOpenModal = (niu) => {
+    setDeleteModal(true);
+    setUserToDelete(niu);
+  };
+
+  // Funció per tancar el modal d'eliminació
+  const handleCloseModal = () => {
+    setDeleteModal(false);
+  };
+
+  //Funció d'eliminació dels participants
 
   const handleEliminateParticipant = (niu, role) => {
     const endpoint =
@@ -44,8 +59,11 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
       .catch((err) => {
         console.error("Error a la sol·licitud:", err);
       });
+
+    handleCloseModal();
   };
 
+  //Funció d'afegir els participants a l'assignatura
   const handleCsvUpload = async () => {
     if (!csvFile) return alert("Selecciona un fitxer CSV primer!");
 
@@ -78,6 +96,7 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
     }
   };
 
+  //Funció afegir participant individual
   const handleAddParticipant = () => {
     if (!newNiu) return alert("Has d'introduir un NIU!");
 
@@ -167,18 +186,34 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
                   <strong>Rol: </strong> {user.role}
                 </p>
                 <p>
-                  <strong>Nota Assignatura: </strong> {user.notes}
+                  <strong>Nota Assignatura: </strong> {user.notes || 0.0}
                 </p>
               </div>
 
               {Role_User !== "alumne" && (
                 <div
                   className={styles.deleteButtonParticipant}
-                  onClick={() =>
-                    handleEliminateParticipant(user.niu, user.role)
-                  }
+                  onClick={() => handleOpenModal(user.niu)}
                 >
                   Eliminar
+                </div>
+              )}
+
+              {deleteModal && (
+                <div className={styles.modal}>
+                  <div className={styles.modalContent}>
+                    <h3>Segur que vols eliminar a aquest alumne?</h3>
+                    <div className={styles.modalActions}>
+                      <button
+                        onClick={() =>
+                          handleEliminateParticipant(userToDelete, user.role)
+                        }
+                      >
+                        Si
+                      </button>
+                      <button onClick={handleCloseModal}>No</button>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

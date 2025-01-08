@@ -39,6 +39,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
       });
   }, [Id_Assignatura]);
 
+  //Funció de recuperació de tots els tests de cada tema
   useEffect(() => {
     temes.forEach((tema) => {
       axios
@@ -72,6 +73,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
     });
   }, [temes]);
 
+  //Funció de creació d'un tema
   const handleCreateTema = () => {
     if (!newTemaName.trim()) {
       alert("Si us plau, introdueix un nom per al tema");
@@ -101,6 +103,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
       });
   };
 
+  //Funció d'accés a un test
   const handleTestClick = (test, tema) => {
     const id_tema = parseInt(tema);
 
@@ -140,6 +143,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
     }
   };
 
+  //Funció d'eliminació d'un tema
   const handleDeleteTheme = (id_tema) => {
     //const idTema = id_tema;
 
