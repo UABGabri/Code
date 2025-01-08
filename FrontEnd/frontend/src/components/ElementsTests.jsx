@@ -35,7 +35,7 @@ function ElementsTests({ idAssignatura }) {
     e.preventDefault();
 
     if (conceptesSeleccionats.length === 0) {
-      setErrorFormulari("Select at least one concept.");
+      setErrorFormulari("Selecciona almenys un concepte.");
       return;
     }
 

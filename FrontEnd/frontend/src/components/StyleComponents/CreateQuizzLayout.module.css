@@ -10,7 +10,7 @@
     justify-content: center;
     align-items: center;
   }
-  
+
   .arrowBack {
     position: absolute;
     top: 70px;
@@ -24,4 +24,163 @@
 .arrowBack:hover {
     transform: scale(1.2); 
     color: black;
+}
+
+.containerTitle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+}
+
+.parametersQuizz {
+  .select {
+    width: 500px;
+  }
+}
+
+.titleGenerator {
+  text-align: center;
+  color: #333;
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.quizzContainerBody {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.formRandom {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 20px;
+  align-items: center;
+  justify-items: center;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+}
+
+.formGroup{
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  grid-template-columns: repeat(3, 1fr);
+
+}
+
+.formRandom label {
+  text-align: center;
+  font-weight: bold;
+}
+
+.formRandom select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.formRandom button {
+  grid-column: span 3;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.3s ease;
+}
+
+.buttonResumee {
+  grid-column: span 3;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.3s ease;
+}
+
+.formRandom button:hover {
+  background-color: darkgreen;
+}
+
+.error {
+  grid-column: span 3;
+  color: red;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.buttonIA {
+  padding: 10px 25px;
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.buttonIA:hover {
+  background-color: darkgreen;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  text-align: center;
+}
+
+.modalLabels{
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 20px;
+}
+
+
+.modalContent input {
+  width: 50px;
+}
+
+.modalContent button {
+  margin: 5px;
 }

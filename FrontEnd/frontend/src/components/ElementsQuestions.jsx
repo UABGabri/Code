@@ -161,13 +161,13 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
           <div key={question.id_pregunta} className={styles.questionCard}>
             <div className={styles.questionDetails}>
               <p>
-                <strong>Author:</strong> {question.id_creador}
+                <strong>Autor:</strong> {question.id_creador}
               </p>
               <p>
-                <strong>Topic:</strong> {question.nom_tema}
+                <strong>Tema:</strong> {question.nom_tema}
               </p>
               <p>
-                <strong>Difficulty:</strong> {question.dificultat}
+                <strong>Dificultat:</strong> {question.dificultat}
               </p>
               {editingQuestionId === question.id_pregunta ? (
                 <>
@@ -233,14 +233,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                     >
                       <FaEdit />
                     </button>
-                    <button
-                      className={styles.deleteButton}
-                      onClick={() =>
-                        handleOpenModal("delete", question.id_pregunta)
-                      }
-                    >
-                      <FaTimes />
-                    </button>
+
                     <button
                       className={styles.acceptButton}
                       onClick={() =>
@@ -248,6 +241,14 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                       }
                     >
                       <FaCheck />
+                    </button>
+                    <button
+                      className={styles.deleteButton}
+                      onClick={() =>
+                        handleOpenModal("delete", question.id_pregunta)
+                      }
+                    >
+                      <FaTimes />
                     </button>
                   </>
                 )}

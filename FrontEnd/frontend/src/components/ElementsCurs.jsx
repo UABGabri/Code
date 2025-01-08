@@ -16,6 +16,15 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
   const [openTema, setOpenTema] = useState({});
   const navigate = useNavigate();
 
+  //Funció que permet deixar oberts els temes
+  useEffect(() => {
+    const storedOpenTema = JSON.parse(localStorage.getItem("openTema"));
+    if (storedOpenTema) {
+      setOpenTema(storedOpenTema);
+    }
+  }, []);
+
+  //Funció de recuperació dels temes de la assignatura
   useEffect(() => {
     axios
       .get("http://localhost:8081/recoverTemesAssignatura", {

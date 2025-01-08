@@ -80,11 +80,11 @@ function AddQuestion() {
       <div className={styles.content}>
         <BiArrowBack onClick={() => history(-1)} className={styles.arrowBack} />
 
-        <h1 className={styles.titleQuestion}>ADD QUESTION</h1>
+        <h1 className={styles.titleQuestion}>AFEGIR PREGUNTA</h1>
 
         <form onSubmit={handleSubmit} className={styles.addQuestionForm}>
           <div className={styles.formGroup}>
-            <label htmlFor="tema">Topic:</label>
+            <label htmlFor="tema">Tema:</label>
             <select
               id="tema"
               name="id_tema"
@@ -98,7 +98,7 @@ function AddQuestion() {
               required
             >
               <option value="" required>
-                Select a topic:
+                Selecciona un Tema:
               </option>
               {temes.map((tema) => (
                 <option key={tema.id_tema} value={tema.id_tema}>
@@ -109,14 +109,14 @@ function AddQuestion() {
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="conceptes">Concepts:</label>
+            <label htmlFor="conceptes">Conceptes:</label>
             <input
               type="text"
               id="conceptes_materia"
               name="conceptes_materia"
               value={values.conceptes_materia}
               onChange={(e) => updateField("conceptes_materia", e.target.value)}
-              placeholder="Concepts spaced by ,"
+              placeholder="Conceptes separats per comes"
               required
               pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
               className={styles.selectInput}
@@ -124,7 +124,7 @@ function AddQuestion() {
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="dificultat">Dificulty:</label>
+            <label htmlFor="dificultat">Dificultat:</label>
             <select
               id="dificultat"
               name="dificultat"
@@ -134,22 +134,22 @@ function AddQuestion() {
               required
             >
               <option value="">Selecciona</option>
-              <option value="Fàcil">Easy</option>
-              <option value="Mitjà">Medium</option>
-              <option value="Difícil">Hard</option>
+              <option value="Fàcil">Fàcil</option>
+              <option value="Mitjà">Mitjà</option>
+              <option value="Difícil">Difícil</option>
             </select>
           </div>
 
           <div className={styles.questionArea}>
             <div className={styles.formGroup}>
-              <label htmlFor="pregunta">Question:</label>
+              <label htmlFor="pregunta">Pregunta:</label>
               <textarea
                 id="pregunta"
                 name="pregunta"
                 value={values.pregunta}
                 onChange={(e) => updateField("pregunta", e.target.value)}
                 className={styles.textarea}
-                placeholder="Insert your question"
+                placeholder="Insereix la teva pregunta"
                 required
                 pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
                 maxLength={200}
@@ -158,14 +158,14 @@ function AddQuestion() {
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="solucio">Correct Answer:</label>
+            <label htmlFor="solucio">Solució:</label>
             <input
               type="text"
               id="solucio"
               name="solucio"
               value={values.solucio}
               onChange={(e) => updateField("solucio_correcta", e.target.value)}
-              placeholder="Insert correct answer"
+              placeholder="Solució correcta"
               required
               pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
               className={styles.selectInput}
@@ -174,7 +174,7 @@ function AddQuestion() {
 
           <div className={styles.wrongArea}>
             <div className={styles.formGroup}>
-              <label htmlFor="erronea_1">Wrong Answer 1:</label>
+              <label htmlFor="erronea_1">Opció erronea:</label>
               <input
                 type="text"
                 id="erronea_1"
@@ -184,11 +184,12 @@ function AddQuestion() {
                 required
                 pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
                 className={styles.selectInput}
+                placeholder="Solució erronea"
               />
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="erronea_2">Wrong Answer 2:</label>
+              <label htmlFor="erronea_2">Opció erronea: 2:</label>
               <input
                 type="text"
                 id="erronea_2"
@@ -198,11 +199,12 @@ function AddQuestion() {
                 required
                 pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
                 className={styles.selectInput}
+                placeholder="Solució erronea"
               />
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="erronea_3">Wrong Answer 3:</label>
+              <label htmlFor="erronea_3">Opció erronea: 3:</label>
               <input
                 type="text"
                 id="erronea_3"
@@ -217,6 +219,7 @@ function AddQuestion() {
                 required
                 pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
                 className={styles.selectInput}
+                placeholder="Solució erronea"
               />
             </div>
           </div>
