@@ -5,7 +5,7 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-image: linear-gradient(white, green);
+  background-image: linear-gradient(grey, white);
 }
 
 .containerElements {
