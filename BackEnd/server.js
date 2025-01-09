@@ -982,11 +982,9 @@ app.get('/recuperarPreguntesPerConceptes', (req, res) => {
 //Funció de recuperació dels temes de la assignatura i conceptes per poder crear tests
 app.get('/recoverElementsTest', (req, res) => {
     const id_assignatura = req.query.idAssignatura;
-
     
     const idAssignatura = parseInt(id_assignatura, 10);
 
-   
     const sql = `
         SELECT 
             conceptes.id_concepte, 

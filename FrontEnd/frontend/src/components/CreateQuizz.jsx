@@ -15,7 +15,7 @@ function CreateQuizz() {
   const [temaSeleccionat, setTemaSeleccionat] = useState("");
   const [numeroPreguntes, setNumeroPreguntes] = useState(1);
   const [dataFinalitzacio, setDataFinalitzacio] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [isFinalModal, setIsFinalModalOpen] = useState(false);
   const { id_assignatura, id_professor, id_tema, tipus } = location.state || {};
   const [errorSelect, setErrorSelect] = useState("");
@@ -99,6 +99,7 @@ function CreateQuizz() {
           <div className={styles.quizzContainerBody}>
             <div className={styles.formRandom}>
               <div className={styles.formGroup}>
+                <label>Selecciona els temes:</label>
                 <select
                   value={temaSeleccionat}
                   onChange={(e) => setTemaSeleccionat(e.target.value)}
@@ -115,72 +116,79 @@ function CreateQuizz() {
                       </option>
                     ))}
                 </select>
+                <label>Número de preguntes:</label>
                 <input
                   type="number"
                   min="1"
+                  max="15"
                   value={numeroPreguntes}
                   onChange={(e) => setNumeroPreguntes(parseInt(e.target.value))}
+                  inputMode="numeric"
                 />
+
                 <button onClick={addTopic}>
                   <FaPlus />
                 </button>
               </div>
 
-              <button onClick={() => setIsModalOpen(true)}>Mostra Resum</button>
+              <div className={styles.scrollTopics}>
+                <h3>Resum de Temes Seleccionats</h3>
+                <ul className={styles.selectedTopics}>
+                  {seleccions.length > 0 ? (
+                    seleccions.map((seleccio) => (
+                      <li key={seleccio.id}>
+                        {seleccio.nom_tema} - Preguntes:
+                        <input
+                          type="number"
+                          min="1"
+                          max="15"
+                          value={seleccio.preguntes}
+                          onChange={(e) =>
+                            setSeleccions((prev) =>
+                              prev.map((sel) =>
+                                sel.id === seleccio.id
+                                  ? {
+                                      ...sel,
+                                      preguntes: parseInt(e.target.value),
+                                    }
+                                  : sel
+                              )
+                            )
+                          }
+                          className={styles.selectedTopic}
+                        />
+                        <button
+                          onClick={() =>
+                            setSeleccions((prev) =>
+                              prev.filter((sel) => sel.id !== seleccio.id)
+                            )
+                          }
+                        >
+                          <FaTrash />
+                        </button>
+                      </li>
+                    ))
+                  ) : (
+                    <p>No hi ha temes seleccionats</p>
+                  )}
+                </ul>
+              </div>
               <button onClick={createQuiz} disabled={seleccions.length === 0}>
                 Crear Test Automàtic
               </button>
-
-              <button
-                onClick={() => {
-                  navigate("/manualTest");
-                }}
-              >
-                Crear Test Manual
-              </button>
             </div>
+
+            <button
+              onClick={() => {
+                navigate("/manualTest");
+              }}
+              className={styles.colorButt}
+            >
+              Crear Test Manual
+            </button>
           </div>
         </div>
       </div>
-
-      {isModalOpen && (
-        <div className={styles.modal}>
-          <div className={styles.modalContent}>
-            <h3>Resum de Temes Seleccionats</h3>
-            <ul>
-              {seleccions.map((seleccio) => (
-                <li key={seleccio.id}>
-                  {seleccio.nom_tema} - Preguntes:{" "}
-                  <input
-                    type="number"
-                    min="1"
-                    value={seleccio.preguntes}
-                    onChange={(e) =>
-                      setSeleccions((prev) =>
-                        prev.map((sel) =>
-                          sel.id === seleccio.id
-                            ? { ...sel, preguntes: parseInt(e.target.value) }
-                            : sel
-                        )
-                      )
-                    }
-                  />
-                  <button
-                    onClick={() =>
-                      setSeleccions((prev) =>
-                        prev.filter((sel) => sel.id !== seleccio.id)
-                      )
-                    }
-                  >
-                    <FaTrash />
-                  </button>
-                </li>
-              ))}
-            </ul>
-            <button onClick={() => setIsModalOpen(false)}>Tancar</button>
-          </div>
-        </div>
-      )}
 
       {isFinalModal && (
         <div className={styles.modal}>
@@ -210,8 +218,13 @@ function CreateQuizz() {
             </div>
 
             <div className={styles.modalButtons}>
-              <button onClick={confirmCreateQuiz}>Crear</button>
-              <button onClick={() => setIsFinalModalOpen(false)}>
+              <button onClick={confirmCreateQuiz} className={styles.colorButt}>
+                Crear
+              </button>
+              <button
+                onClick={() => setIsFinalModalOpen(false)}
+                className={styles.colorButtDel}
+              >
                 Cancelar
               </button>
             </div>

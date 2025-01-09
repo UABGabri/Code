@@ -244,42 +244,45 @@ function CustomTest() {
         <div className={styles.questionsList}>
           {preguntesActualsTest.map((pregunta, index) => (
             <>
-              <div
-                key={pregunta.id_pregunta}
-                className={styles.questionCardCustom}
-                draggable
-                onDragStart={() => {
-                  const globalIndex =
-                    index + (paginaActual - 1) * preguntesPerPagina;
-                  preguntaArrossegar.current = globalIndex;
-                }}
-                onDragEnter={() => {
-                  const globalIndex =
-                    index + (paginaActual - 1) * preguntesPerPagina;
-                  preguntaSobreArrossegar.current = globalIndex;
-                }}
-                onDragEnd={ordenarPreguntes}
-                onDragOver={(e) => e.preventDefault()}
-              >
-                <p>
-                  <strong>Pregunta: </strong>
-                  {pregunta.pregunta}
-                </p>
-                <p>
-                  <strong>Solució: </strong>
-                  {pregunta.solucio_correcta}
-                </p>
-
-                <p>
-                  <strong>Tema: </strong>
-                  {pregunta.id_tema}
-                </p>
-                <button
-                  className={styles.deleteButton}
-                  onClick={() => eliminarPregunta(pregunta)}
+              <div className={styles.questionOrder}>
+                <p> {index}. </p>
+                <div
+                  key={pregunta.id_pregunta}
+                  className={styles.questionCardCustom}
+                  draggable
+                  onDragStart={() => {
+                    const globalIndex =
+                      index + (paginaActual - 1) * preguntesPerPagina;
+                    preguntaArrossegar.current = globalIndex;
+                  }}
+                  onDragEnter={() => {
+                    const globalIndex =
+                      index + (paginaActual - 1) * preguntesPerPagina;
+                    preguntaSobreArrossegar.current = globalIndex;
+                  }}
+                  onDragEnd={ordenarPreguntes}
+                  onDragOver={(e) => e.preventDefault()}
                 >
-                  Eliminar
-                </button>
+                  <p>
+                    <strong>Pregunta: </strong>
+                    {pregunta.pregunta}
+                  </p>
+                  <p>
+                    <strong>Solució: </strong>
+                    {pregunta.solucio_correcta}
+                  </p>
+
+                  <p>
+                    <strong>Tema: </strong>
+                    {pregunta.id_tema}
+                  </p>
+                  <button
+                    className={styles.deleteButton}
+                    onClick={() => eliminarPregunta(pregunta)}
+                  >
+                    Eliminar
+                  </button>
+                </div>
               </div>
             </>
           ))}

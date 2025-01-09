@@ -22,6 +22,7 @@ function ElementsTests({ idAssignatura }) {
           const filteredConceptes = res.data.filter(
             (concept) => concept.value !== null && concept.label !== null
           );
+          console.log(filteredConceptes);
           setConceptes(filteredConceptes);
         })
         .catch((err) =>

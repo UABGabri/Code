@@ -153,6 +153,7 @@ function CrearTestProfessor() {
       </header>
 
       <div className={styles.questionsContainerTeacher}>
+        <h1>Creació Test Manual</h1>
         <div className={styles.filters}>
           <select
             value={filters.dificultat}
@@ -169,7 +170,7 @@ function CrearTestProfessor() {
             value={filters.nom_tema}
             onChange={(e) => handleFilterChange("nom_tema", e.target.value)}
           />
-          <button onClick={handleResetFilters}>Resetear filtres</button>
+          <button onClick={handleResetFilters}>Reseteig filtres</button>
         </div>
 
         <div className={styles.testDetails}>
