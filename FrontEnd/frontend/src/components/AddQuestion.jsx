@@ -5,16 +5,15 @@ import { BiArrowBack } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
+import { FaPlus, FaMinus } from "react-icons/fa";
 
 function AddQuestion() {
   const location = useLocation();
   const { Id_User, Id_Assignatura } = location.state;
-  const { errors, setFormErrors } = useState("");
+  const [errors, setFormErrors] = useState("");
   const navigate = useNavigate();
-
   const [temes, setTemes] = useState([]);
   const [selectedTema, setSelectedTema] = useState();
-
   const [values, setValues] = useState({
     conceptes_materia: "",
     dificultat: "",
@@ -27,6 +26,10 @@ function AddQuestion() {
     id_creador: Id_User,
     id_tema: selectedTema,
   });
+
+  const [extraOptionsVisible, setExtraOptionsVisible] = useState(false);
+  const [extraOptionsVisible2, setExtraOptionsVisible2] = useState(false);
+  const [addButtonOption, setAddButtonOption] = useState(true);
 
   const history = useNavigate();
 
@@ -72,6 +75,29 @@ function AddQuestion() {
       recoverTemasAssignatura();
     }
   }, [Id_Assignatura]);
+
+  // Función para manejar la adición de opciones
+  const handleAddOptions = () => {
+    if (!extraOptionsVisible) {
+      setExtraOptionsVisible(true);
+    } else if (!extraOptionsVisible2) {
+      setExtraOptionsVisible2(true);
+      setAddButtonOption(false);
+    }
+  };
+
+  // Funciones para eliminar opciones
+  const handleRemoveOption2 = () => {
+    setExtraOptionsVisible(false);
+    setAddButtonOption(true);
+    updateField("erronea_2", "");
+  };
+
+  const handleRemoveOption3 = () => {
+    setExtraOptionsVisible2(false);
+    setAddButtonOption(true);
+    updateField("erronea_3", "");
+  };
 
   return (
     <div>
@@ -157,70 +183,96 @@ function AddQuestion() {
             </div>
           </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="solucio">Solució:</label>
-            <input
-              type="text"
-              id="solucio"
-              name="solucio"
-              value={values.solucio}
-              onChange={(e) => updateField("solucio_correcta", e.target.value)}
-              placeholder="Solució correcta"
-              required
-              pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
-              className={styles.selectInput}
-            />
-          </div>
-
-          <div className={styles.wrongArea}>
-            <div className={styles.formGroup}>
-              <label htmlFor="erronea_1">Opció erronea:</label>
-              <input
-                type="text"
-                id="erronea_1"
-                name="erronea_1"
-                value={values.erronea_1}
-                onChange={(e) => updateField("erronea_1", e.target.value)}
-                required
-                pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
-                className={styles.selectInput}
-                placeholder="Solució erronea"
-              />
+          <div>
+            <div>
+              <div className={styles.formGroup}>
+                <label htmlFor="solucio">Solució:</label>
+                <input
+                  type="text"
+                  id="solucio"
+                  name="solucio"
+                  value={values.solucio}
+                  onChange={(e) =>
+                    updateField("solucio_correcta", e.target.value)
+                  }
+                  placeholder="Solució correcta"
+                  required
+                  pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
+                  className={styles.selectInput}
+                />
+              </div>
             </div>
 
-            <div className={styles.formGroup}>
-              <label htmlFor="erronea_2">Opció erronea: 2:</label>
-              <input
-                type="text"
-                id="erronea_2"
-                name="erronea_2"
-                value={values.erronea_2}
-                onChange={(e) => updateField("erronea_2", e.target.value)}
-                required
-                pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
-                className={styles.selectInput}
-                placeholder="Solució erronea"
-              />
-            </div>
+            <div className={styles.wrongArea}>
+              <div className={styles.formGroup}>
+                <label htmlFor="erronea_1">Opció erronea:</label>
+                <input
+                  type="text"
+                  id="erronea_1"
+                  name="erronea_1"
+                  value={values.erronea_1}
+                  onChange={(e) => updateField("erronea_1", e.target.value)}
+                  required
+                  pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
+                  className={styles.optionInput}
+                  placeholder="Solució erronea"
+                />
+              </div>
 
-            <div className={styles.formGroup}>
-              <label htmlFor="erronea_3">Opció erronea: 3:</label>
-              <input
-                type="text"
-                id="erronea_3"
-                name="erronea_3"
-                value={values.erronea_3}
-                onChange={(e) =>
-                  setValues((prevValues) => ({
-                    ...prevValues,
-                    erronea_3: e.target.value,
-                  }))
-                }
-                required
-                pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
-                className={styles.selectInput}
-                placeholder="Solució erronea"
-              />
+              {addButtonOption && (
+                <button
+                  onClick={handleAddOptions}
+                  className={styles.addOptionButton}
+                >
+                  <FaPlus />
+                </button>
+              )}
+
+              {extraOptionsVisible && (
+                <div className={styles.formGroup}>
+                  <label htmlFor="erronea_2">Opció erronea: 2</label>
+                  <input
+                    type="text"
+                    id="erronea_2"
+                    name="erronea_2"
+                    value={values.erronea_2}
+                    onChange={(e) => updateField("erronea_2", e.target.value)}
+                    pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
+                    className={styles.optionInput}
+                    placeholder="Solució erronea"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleRemoveOption2}
+                    className={styles.removeOptionButton}
+                  >
+                    <FaMinus />
+                  </button>
+                </div>
+              )}
+
+              {extraOptionsVisible2 && (
+                <div className={styles.formGroup}>
+                  <label htmlFor="erronea_3">Opció erronea: 3</label>
+                  <input
+                    type="text"
+                    id="erronea_3"
+                    name="erronea_3"
+                    value={values.erronea_3}
+                    onChange={(e) => updateField("erronea_3", e.target.value)}
+                    pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
+                    className={styles.optionInput}
+                    placeholder="Solució erronea"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleRemoveOption3}
+                    className={styles.removeOptionButton}
+                  >
+                    <FaMinus />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 

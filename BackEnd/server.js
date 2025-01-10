@@ -499,8 +499,6 @@ app.post('/addQuestion', async (req, res) => {
         !pregunta ||
         !solucio_correcta ||
         !erronea_1 ||
-        !erronea_2 ||
-        !erronea_3 ||
         !dificultat ||
         !conceptes_materia ||
         !id_creador ||
