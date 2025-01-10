@@ -3,20 +3,19 @@ import styles from "./StyleComponents/Headercap.module.css";
 import { FaCircleUser } from "react-icons/fa6";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
-
 import axios from "axios";
 
-function Headercap() {
+function Headercap({}) {
   const [dropdown, setDropdown] = useState(false);
-  const location = useLocation();
+  const location = useLocation(); // Per obtenir la ruta actual
   const navigate = useNavigate();
 
-  //Funció per definir la visualització del dropdown
+  // Funció per obrir/tancar el dropdown
   const openCloseDropdown = () => {
     setDropdown(!dropdown);
   };
 
-  //Funció que serveix per fer un logout
+  // Funció per fer logout
   const handleDelete = () => {
     axios
       .get("http://localhost:8081/logout")
@@ -26,12 +25,9 @@ function Headercap() {
       .catch((err) => console.log(err));
   };
 
-  //Funció per tornar a la pestanya anterior
+  // Funció per tornar a la pàgina anterior
   const handleGoBack = () => {
-    if (location.pathname === "/profile") {
-      return "/modules";
-    }
-    return "/profile";
+    navigate(-1); // Torna a la pàgina anterior
   };
 
   return (
@@ -57,7 +53,13 @@ function Headercap() {
             <FaCircleUser />
           </Dropdown.Toggle>
           <Dropdown.Menu>
-            <Dropdown.Item as={Link} to={handleGoBack()}>
+            <Dropdown.Item
+              as={Link}
+              to={{
+                pathname: "/profile",
+              }}
+              onClick={location.pathname === "/profile" ? handleGoBack : null} // Si estem a perfil, tornem a la pàgina anterior
+            >
               {location.pathname === "/profile" ? "Tornar" : "Perfil"}
             </Dropdown.Item>
             <Dropdown.Item onClick={handleDelete}>Logout</Dropdown.Item>

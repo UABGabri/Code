@@ -118,7 +118,7 @@ function Dashboard({ id_User, role_User }) {
     <div>
       <Headercap />
       <div className={styles.title}>
-        <h1>LES TEVES ASSIGNATURES</h1>
+        <strong>LES TEVES ASSIGNATURES</strong>
       </div>
 
       <div className={styles.container}>

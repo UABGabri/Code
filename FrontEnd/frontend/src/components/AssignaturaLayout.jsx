@@ -6,8 +6,9 @@ import { useState } from "react";
 import ElementsCurs from "./ElementsCurs";
 import ElementsQuestions from "./ElementsQuestions";
 import ElementsParticipants from "./ElementsParticipants";
-//import ElementsTestsProfessor from "./ElementsTestsProfessor";
 import ElementsTests from "./ElementsTests";
+import { FaSignOutAlt } from "react-icons/fa";
+import axios from "axios";
 
 function AssignaturaLayout() {
   const { id } = useParams(); //id de la ASSIGNATURA
@@ -15,8 +16,24 @@ function AssignaturaLayout() {
   const { name, id_User, role_User } = location.state;
   const history = useNavigate();
   const [menuOption, setMenuOption] = useState("CURS");
+  const [leaveSubject, setLeaveSubject] = useState(false);
 
-  //Estructura per modificar contingut visualitzat sota la capçalera segons la selecció del menu
+  //Funció per abandonar una assignatura
+  const handleConfirmDropOut = () => {
+    console.log(id);
+
+    axios
+      .delete("http://localhost:8081/leaveSubject", {
+        params: { Id_Assignatura: id, id: id_User, role_User },
+      })
+      .then(() => {
+        alert("Has abandonat l'assignatura");
+        history("/modules");
+      })
+      .catch((error) => console.error("Error al recuperar temes:", error));
+  };
+
+  //Estructura per modificar contingut visualitzat sota la capçalera segons la selecció del menu.
   const render = () => {
     switch (menuOption) {
       case "CURS":
@@ -50,13 +67,28 @@ function AssignaturaLayout() {
     }
   };
 
+  const handleOpenModal = () => {
+    setLeaveSubject(true);
+  };
+
   return (
     <div>
       <Headercap />
       <header className={styles.headerSubject}>
-        <BiArrowBack onClick={() => history(-1)} className={styles.backArrow} />
-        <span>{name}</span>
-        <span>{id}</span>
+        <div className={styles.elementHeader}>
+          <BiArrowBack
+            onClick={() => history(-1)}
+            className={styles.backArrow}
+          />
+          <div className={styles.informationHeader}>
+            <span>{name}</span>
+            <span>{id}</span>
+          </div>
+        </div>
+
+        <button className={styles.buttonSecondHeader} onClick={handleOpenModal}>
+          <FaSignOutAlt />
+        </button>
       </header>
 
       <div className={styles.mainMenu}>
@@ -91,6 +123,18 @@ function AssignaturaLayout() {
       </div>
 
       <div className={styles.contentElements}>{render()}</div>
+
+      {leaveSubject && (
+        <div className={styles.modalOver}>
+          <div className={styles.modalContent}>
+            <p>Estàs segur de deixar aquesta assignatura?</p>
+            <div className={styles.modalButtons}>
+              <button onClick={handleConfirmDropOut}>Acceptar</button>
+              <button onClick={() => setLeaveSubject(false)}>Cancel·lar</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

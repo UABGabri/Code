@@ -16,7 +16,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
   const [openTema, setOpenTema] = useState({});
   const navigate = useNavigate();
 
-  //Funció que permet deixar oberts els temes
+  //Funció que permet deixar oberts els temes.
   useEffect(() => {
     const storedOpenTema = JSON.parse(localStorage.getItem("openTema"));
     if (storedOpenTema) {
@@ -24,7 +24,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
     }
   }, []);
 
-  //Funció de recuperació dels temes de la assignatura
+  //Funció de recuperació dels temes de la assignatura.
   useEffect(() => {
     axios
       .get("http://localhost:8081/recoverTemesAssignatura", {
@@ -39,7 +39,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
       });
   }, [Id_Assignatura]);
 
-  //Funció de recuperació de tots els tests de cada tema
+  //Funció de recuperació de tots els tests de cada tema.
   useEffect(() => {
     temes.forEach((tema) => {
       axios
@@ -73,7 +73,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
     });
   }, [temes]);
 
-  //Funció de creació d'un tema
+  //Funció de creació d'un tema.
   const handleCreateTema = () => {
     if (!newTemaName.trim()) {
       alert("Si us plau, introdueix un nom per al tema");
@@ -103,7 +103,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
       });
   };
 
-  //Funció d'accés a un test
+  //Funció d'accés a un test en concret.
   const handleTestClick = (test, tema) => {
     const id_tema = parseInt(tema);
 
@@ -125,7 +125,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
         },
       });
     } else {
-      // Mostrar modal en cas de no ser professor
+      // Mostrar modal en cas de no ser professor.
       if (test.tipus === "avaluatiu") {
         setSelectedTest(test);
         setShowModal(true);
@@ -143,7 +143,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
     }
   };
 
-  //Funció d'eliminació d'un tema
+  //Funció d'eliminació d'un tema.
   const handleDeleteTheme = (id_tema) => {
     //const idTema = id_tema;
 

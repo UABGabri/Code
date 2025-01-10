@@ -179,7 +179,7 @@ function Profile() {
             onClick={openModal}
             className={styles.dropButton}
           >
-            Donar-se de Baixa
+            Eliminar Compte
           </button>
         </form>
 

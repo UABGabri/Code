@@ -332,6 +332,7 @@ app.post('/registerSubject', async (req, res) => {
         // Afegir el professor a la taula professors_assignatures
         await Promise.all(checkAndInsertProfessor (id_User));
 
+      
         if (errors.length > 0) {
             return res.json({ Status: "Failed", Messages: errors });
         } else {
@@ -908,6 +909,39 @@ app.delete('/deleteUser', (req, res) =>{
  
 
 })
+
+
+
+app.delete('/leaveSubject', (req,res) =>{
+
+    const id_participant = req.query.id;
+    const id_assignatura = parseInt(req.query.Id_Assignatura);
+    const role = req.query.role_User;
+    let deleteSql;
+
+    console.log(id_assignatura, id_participant, role)
+
+    if(role === 'alumne'){
+         deleteSql = `DELETE FROM alumnes_assignatures WHERE id_alumne = ? AND id_assignatura = ?`;
+
+        
+    }else if(role === 'professor'){
+         deleteSql = `DELETE FROM professors_assignatures WHERE id_professor = ? AND id_assignatura = ?`;
+    }
+
+    db.query(deleteSql, [id_participant, id_assignatura], (deleteError) => {
+        if (deleteError) {
+            console.error("Error a la consulta:", deleteError);
+            return res.json({ Status: "Failed" });
+        }else{
+            return res.json({ Status: "Success" });
+        }
+
+    });
+
+})
+
+
 
 app.delete('/eliminateStudent', (req, res) => {
     const id_participant = req.query.id;

@@ -23,7 +23,7 @@ function AddSubjectModal({ id_User, onClose }) {
       .post("http://localhost:8081/registerSubject", values)
       .then((res) => {
         if (res.data.Status === "Failed") {
-          setErrorMessage(res.data.Messages.join(", ")); // Mostrar missatges d'error
+          alert(res.data.Messages);
         } else {
           window.location.reload(); // Si tot va bé, recarregar
         }
