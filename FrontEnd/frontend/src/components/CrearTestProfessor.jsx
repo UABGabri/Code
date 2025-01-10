@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Headercap from "./Headercap";
 import { BiArrowBack } from "react-icons/bi";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 
 function CrearTestProfessor() {
   const location = useLocation();
@@ -14,20 +15,34 @@ function CrearTestProfessor() {
   const tipus = location.state?.tipus;
   const [preguntes, setPreguntes] = useState([]);
   const [filteredPreguntes, setFilteredPreguntes] = useState([]);
+  const [temesFilters, setTemesFilters] = useState([]);
   const [selectedQuestions, setSelectedQuestions] = useState([]);
   const [filters, setFilters] = useState({ dificultat: "", nom_tema: "" });
   const [dataFinalitzacio, setDataFinalitzacio] = useState("");
-  const [testName, setTestName] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const questionsPerPage = 5;
   const navigate = useNavigate();
+  const [isFinalModal, setIsFinalModalOpen] = useState(false);
+  const [nomTest, setNomTest] = useState("");
 
   useEffect(() => {
     axios
-      .get("http://localhost:8081/recoverPreguntes")
+      .get("http://localhost:8081/recoverPreguntes", {
+        params: { idAssignatura },
+      })
       .then((response) => {
         setPreguntes(response.data);
         setFilteredPreguntes(response.data);
+
+        const id_assignatura = idAssignatura;
+        axios
+          .get("http://localhost:8081/recoverTemasAssignatura", {
+            params: { Id_Assignatura: id_assignatura },
+          })
+          .then((response) => setTemesFilters(response.data))
+          .catch((error) => console.error("Error al recuperar temes:", error));
+
+        console.log(temesFilters);
       })
       .catch((error) => {
         console.error("Error al recuperar les preguntes:", error);
@@ -49,7 +64,7 @@ function CrearTestProfessor() {
       return;
     }
 
-    if (!testName) {
+    if (!nomTest) {
       alert("Has de proporcionar un nom per al test.");
       return;
     }
@@ -64,7 +79,7 @@ function CrearTestProfessor() {
 
     axios
       .post("http://localhost:8081/createTest", {
-        nom_test: testName,
+        nom_test: nomTest,
         id_creador,
         id_assignatura,
         idTema,
@@ -99,15 +114,12 @@ function CrearTestProfessor() {
         console.error("Error al crear el test:", error);
         alert("Hi ha hagut un error al crear el test. Torna-ho a intentar.");
       });
+
+    setIsFinalModalOpen(false);
   };
 
   const handleFilterChange = (key, value) => {
     setFilters({ ...filters, [key]: value });
-  };
-
-  const handleResetFilters = () => {
-    setFilters({ dificultat: "", nom_tema: "" });
-    setFilteredPreguntes(preguntes);
   };
 
   useEffect(() => {
@@ -130,7 +142,7 @@ function CrearTestProfessor() {
     indexOfLastQuestion
   );
 
-  // Caniv pàgina
+  // Canvi de pàgina
   const handlePageChange = (direction) => {
     if (
       direction === "next" &&
@@ -140,6 +152,10 @@ function CrearTestProfessor() {
     } else if (direction === "prev" && currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
+  };
+
+  const createQuizz = () => {
+    setIsFinalModalOpen(true);
   };
 
   return (
@@ -155,50 +171,80 @@ function CrearTestProfessor() {
       <div className={styles.questionsContainerTeacher}>
         <h1>Creació Test Manual</h1>
         <div className={styles.filters}>
+          <label>Filtrar per Dificultat:</label>
           <select
             value={filters.dificultat}
             onChange={(e) => handleFilterChange("dificultat", e.target.value)}
           >
-            <option value="">Filtrar per dificultat</option>
+            <option value=""></option>
             <option value="Fàcil">Fàcil</option>
             <option value="Mitjà">Mitjà</option>
             <option value="Difícil">Difícil</option>
           </select>
-          <input
-            type="text"
-            placeholder="Filtrar per tema"
+
+          <label>Filtrar per tema:</label>
+          <select
             value={filters.nom_tema}
             onChange={(e) => handleFilterChange("nom_tema", e.target.value)}
-          />
-          <button onClick={handleResetFilters}>Reseteig filtres</button>
-        </div>
-
-        <div className={styles.testDetails}>
-          <label>
-            Nom del Test:
-            <input
-              type="text"
-              value={testName}
-              onChange={(e) => setTestName(e.target.value)}
-            />
-          </label>
-          <label>
-            Data de Finalització:
-            <input
-              type="date"
-              value={dataFinalitzacio}
-              onChange={(e) => setDataFinalitzacio(e.target.value)}
-            />
-          </label>
+          >
+            <option value="">Selecciona un tema</option>
+            {temesFilters.map((tema) => (
+              <option key={tema.id_tema} value={tema.nom_tema}>
+                {tema.nom_tema}
+              </option>
+            ))}
+          </select>
         </div>
 
         <button
           className={styles.createTestButton}
-          onClick={handleCreateTest}
+          onClick={createQuizz}
           disabled={selectedQuestions.length < 1}
         >
           Crear Test
         </button>
+
+        {isFinalModal && (
+          <div className={styles.modal}>
+            <div className={styles.modalContent}>
+              <strong className={styles.titleGenerator}>Crear Test</strong>
+
+              <div className={styles.modalLabels}>
+                <label className={styles.inputLabel}>
+                  Nom del Test:
+                  <input
+                    type="text"
+                    className={styles.inputField}
+                    value={nomTest}
+                    onChange={(e) => setNomTest(e.target.value)}
+                  />
+                </label>
+
+                <label className={styles.inputLabel}>
+                  Data de Finalització:
+                  <input
+                    type="date"
+                    value={dataFinalitzacio}
+                    onChange={(e) => setDataFinalitzacio(e.target.value)}
+                    className={styles.inputField}
+                  />
+                </label>
+              </div>
+
+              <div className={styles.modalButtons}>
+                <button onClick={handleCreateTest} className={styles.colorButt}>
+                  Crear
+                </button>
+                <button
+                  onClick={() => setIsFinalModalOpen(false)}
+                  className={styles.colorButtDel}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className={styles.questionsList}>
           {currentQuestions.length === 0 ? (
@@ -241,7 +287,7 @@ function CrearTestProfessor() {
             onClick={() => handlePageChange("prev")}
             disabled={currentPage === 1}
           >
-            Anterior
+            <FaArrowLeft />
           </button>
           <span>
             Pàgina {currentPage} de{" "}
@@ -254,7 +300,7 @@ function CrearTestProfessor() {
               Math.ceil(filteredPreguntes.length / questionsPerPage)
             }
           >
-            Següent
+            <FaArrowRight />
           </button>
         </div>
       </div>

@@ -393,8 +393,9 @@ app.post('/createTema', (req,res) => {
 })
 
 
-
+//Funció d'eliminació d'una assignatura. 
 app.delete('/deleteSubject', (req, res)=>{
+
 
 
     const id_subject = parseInt(req.query.id_subject);
@@ -464,8 +465,7 @@ app.post('/recoverSubjects', (req, res) => {
 
     }
     else if (role_User === "alumne"){
-        console.log("hahdhas")
-
+        
         const sql = `SELECT a.id_assignatura, a.nom_assignatura 
         FROM assignatures a 
         JOIN alumnes_assignatures pa ON a.id_assignatura = pa.id_assignatura 
@@ -1143,7 +1143,7 @@ app.post('/saveResults', (req, res) =>{
     const id_User = req.body.Id_User;
     const id_Subject = parseInt(req.body.Id_Subject);
 
-    console.log(id_User, id_Test, grade)
+    //console.log(id_User, id_Test, grade)
 
     const sql = `INSERT INTO resultats (id_alumne, id_test, nota, id_assignatura) VALUES (?,?,?, ?)`;
 
@@ -1165,9 +1165,13 @@ app.post('/saveResults', (req, res) =>{
 //Funció de recuperació de totes les preguntes
 app.get('/recoverPreguntes', (req, res) => {
 
-    const sql = "SELECT p.*, t.nom_tema FROM preguntes p JOIN temes t ON p.id_tema = t.id_tema";
+    const id_assignatura = req.query.idAssignatura;
 
-    db.query(sql, (error, result) => {
+   
+
+    const sql = "SELECT p.*, t.nom_tema FROM preguntes p JOIN temes t ON p.id_tema = t.id_tema AND id_assignatura = ?";
+
+    db.query(sql, [id_assignatura], (error, result) => {
         if (error) {
             console.error("Error a la consulta:", error);
             return res.json({ Status: "Failed" });
@@ -1199,7 +1203,7 @@ app.get('/recoverPreguntesTema', (req, res) => {
             console.error("Error a la consulta:", error);
             return res.json({ error: "Error a la consulta." });
         }
-        console.log("Preguntes retornades:", result);
+        //console.log("Preguntes retornades:", result);
         return res.json(result);
     });
 });

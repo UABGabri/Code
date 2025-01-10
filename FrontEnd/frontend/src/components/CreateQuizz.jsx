@@ -51,7 +51,7 @@ function CreateQuizz() {
     }
   };
 
-  const createQuiz = () => {
+  const createQuizz = () => {
     setIsFinalModalOpen(true);
   };
 
@@ -173,14 +173,14 @@ function CreateQuizz() {
                   )}
                 </ul>
               </div>
-              <button onClick={createQuiz} disabled={seleccions.length === 0}>
+              <button onClick={createQuizz} disabled={seleccions.length === 0}>
                 Crear Test Automàtic
               </button>
             </div>
 
             <button
               onClick={() => {
-                navigate("/manualTest");
+                navigate("/manualTest", { state: { id_assignatura } });
               }}
               className={styles.colorButt}
             >

@@ -20,6 +20,7 @@ function Dashboard({ id_User, role_User }) {
         idUser: id_User,
         roleUser: role_User,
       });
+
       return res.data;
     } catch (err) {
       console.error("Error in request:", err);
@@ -56,6 +57,7 @@ function Dashboard({ id_User, role_User }) {
   };
 
   const handleDeleteSubject = async () => {
+    console.log(deleteId);
     try {
       await axios.delete("http://localhost:8081/deleteSubject", {
         params: { id_subject: deleteId },
