@@ -5,6 +5,7 @@ import AddSubjectModal from "./AddSubjectModal";
 import styles from "./StyleComponents/DashboardStyle.module.css";
 import Headercap from "./Headercap";
 import axios from "axios";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 
 function Dashboard({ id_User, role_User }) {
   const [assignatures, setAssignatures] = useState([]);
@@ -14,6 +15,7 @@ function Dashboard({ id_User, role_User }) {
   const [deleteId, setDeleteId] = useState("");
   const navigate = useNavigate();
 
+  //Funció auxiliar per la obtenció de tota la informació de les assignatures relacionades amb un usuari.
   const fetchAssignatures = async () => {
     try {
       const res = await axios.post("http://localhost:8081/recoverSubjects", {
@@ -23,21 +25,25 @@ function Dashboard({ id_User, role_User }) {
 
       return res.data;
     } catch (err) {
-      console.error("Error in request:", err);
+      console.error("Error en la sol·licitud:", err);
       return [];
     }
   };
 
+  //Funció d'obtenció de les assignatures i informació inicial.
   useEffect(() => {
     if (id_User && role_User) {
       fetchAssignatures().then((data) => {
         setAssignatures(data);
       });
+
+      console.log(assignatures);
     } else {
-      console.error("id_User or role_User is not defined");
+      console.error("id_User or role_User no està definit");
     }
   }, [id_User, role_User]);
 
+  //Funcions auxiliar obrir i tancar els modals.
   const openAddModal = () => {
     setAddModal(true);
   };
@@ -56,18 +62,24 @@ function Dashboard({ id_User, role_User }) {
     setDeleteId("");
   };
 
+  //Funció asíncrona per esborrar assignatures. Es fa de forma asíncrona per qüestió del CASCADE.
   const handleDeleteSubject = async () => {
-    console.log(deleteId);
     try {
-      await axios.delete("http://localhost:8081/deleteSubject", {
+      const res = await axios.delete("http://localhost:8081/deleteSubject", {
         params: { id_subject: deleteId },
       });
+
+      if (res.data.success) {
+        alert(res.data.message);
+      } else {
+        alert(res.data.message);
+      }
 
       setAssignatures((prev) =>
         prev.filter((assignatura) => assignatura.id_assignatura !== deleteId)
       );
       closeDeleteModal();
-      alert("Assignatura eliminada correctament!");
+
       window.location.reload();
     } catch (err) {
       console.error("Error eliminant l'assignatura:", err);
@@ -75,12 +87,32 @@ function Dashboard({ id_User, role_User }) {
     }
   };
 
+  //Funció de navegació de l'assignatura que l'usuari seleccioni.
   const handleSelectAssignatura = (id, name) => {
     navigate(`/assignatura/${id}`, { state: { name, id, id_User, role_User } });
   };
 
-  const leftColumn = assignatures.filter((_, index) => index % 2 === 0);
-  const rightColumn = assignatures.filter((_, index) => index % 2 !== 0);
+  //Apartat de paginació.
+  const [currentPage, setCurrentPage] = useState(1);
+  const assignaturesPerPage = 6;
+
+  const indexOfLastAssignatura = currentPage * assignaturesPerPage;
+  const indexOfFirstAssignatura = indexOfLastAssignatura - assignaturesPerPage;
+  const currentAssignatures = assignatures.slice(
+    indexOfFirstAssignatura,
+    indexOfLastAssignatura
+  );
+
+  const pageNumbers = [];
+  for (
+    let i = 1;
+    i <= Math.ceil(assignatures.length / assignaturesPerPage);
+    i++
+  ) {
+    pageNumbers.push(i);
+  }
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div>
@@ -91,41 +123,41 @@ function Dashboard({ id_User, role_User }) {
 
       <div className={styles.container}>
         <div className={styles.columnsContainer}>
-          <div className={styles.left}>
-            {leftColumn.map((assignatura) => (
-              <div
-                key={assignatura.id_assignatura}
-                className={styles.assignaturaCard}
-                onClick={() =>
-                  handleSelectAssignatura(
-                    assignatura.id_assignatura,
-                    assignatura.nom_assignatura
-                  )
-                }
-              >
-                <h3>{assignatura.nom_assignatura}</h3>
-                <p>ID: {assignatura.id_assignatura}</p>
-              </div>
-            ))}
-          </div>
+          {currentAssignatures.map((assignatura) => (
+            <div
+              key={assignatura.id_assignatura}
+              className={styles.assignaturaCard}
+              onClick={() =>
+                handleSelectAssignatura(
+                  assignatura.id_assignatura,
+                  assignatura.nom_assignatura
+                )
+              }
+            >
+              <h3>{assignatura.nom_assignatura}</h3>
+              <p>ID: {assignatura.id_assignatura}</p>
+            </div>
+          ))}
+        </div>
 
-          <div className={styles.right}>
-            {rightColumn.map((assignatura) => (
-              <div
-                key={assignatura.id_assignatura}
-                className={styles.assignaturaCard}
-                onClick={() =>
-                  handleSelectAssignatura(
-                    assignatura.id_assignatura,
-                    assignatura.nom_assignatura
-                  )
-                }
-              >
-                <h3>{assignatura.nom_assignatura}</h3>
-                <p>ID: {assignatura.id_assignatura}</p>
-              </div>
-            ))}
-          </div>
+        <div className={styles.pagination}>
+          <button
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+            className={styles.pagination}
+          >
+            <FaArrowLeft />
+          </button>
+
+          <span className={styles.pageNumber}>Pàgina {currentPage}</span>
+
+          <button
+            onClick={() => paginate(currentPage + 1)}
+            disabled={currentPage === pageNumbers.length}
+            className={styles.pagination}
+          >
+            <FaArrowRight />
+          </button>
         </div>
 
         <div className={styles.buttonsContainer}>

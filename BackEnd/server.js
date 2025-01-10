@@ -394,28 +394,25 @@ app.post('/createTema', (req,res) => {
 
 
 //Funció d'eliminació d'una assignatura. 
-app.delete('/deleteSubject', (req, res)=>{
-
-
-
+app.delete('/deleteSubject', (req, res) => {
     const id_subject = parseInt(req.query.id_subject);
-
-
-    const sql= "DELETE FROM assignatures WHERE id_assignatura = ?";
-
-    
+  
+    const sql = "DELETE FROM assignatures WHERE id_assignatura = ?";
+  
     db.query(sql, [id_subject], (error, result) => {
-        if (error) {
-          console.error("Error al eliminar l'assignatura:", error);
-          return res.json({ success: false, message: "Error al eliminar l'assignatura" });
-        }
-    
-        return res.json({ success: true, message: "Tema creat amb èxit" });
-      });
-
-
-
-})
+      if (error) {
+        console.error("Error al eliminar l'assignatura:", error);
+        return res.json({ success: false, message: "Error al eliminar l'assignatura" });
+      }
+  
+      if (result.affectedRows > 0) {
+        return res.json({ success: true, message: "Assignatura eliminada correctament!" });
+      } else if (result.affectedRows === 0) {
+        return res.json({ success: false, message: "No existeix la assignatura" });
+      }
+    });
+  });
+  
 
 
 
