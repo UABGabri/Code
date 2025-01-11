@@ -15,7 +15,7 @@ function CreateQuizz() {
   const [temaSeleccionat, setTemaSeleccionat] = useState("");
   const [numeroPreguntes, setNumeroPreguntes] = useState(1);
   const [dataFinalitzacio, setDataFinalitzacio] = useState("");
-
+  const [duracio, setDuracio] = useState("");
   const [isFinalModal, setIsFinalModalOpen] = useState(false);
   const { id_assignatura, id_professor, id_tema, tipus } = location.state || {};
   const [errorSelect, setErrorSelect] = useState("");
@@ -56,6 +56,9 @@ function CreateQuizz() {
   };
 
   const confirmCreateQuiz = () => {
+    const durationNormal = parseInt(duracio) * 60; //canvi a segons per facilitar temporitzador
+
+    console.log(durationNormal);
     axios
       .post("http://localhost:8081/createQuizz", {
         seleccions,
@@ -65,6 +68,7 @@ function CreateQuizz() {
         id_tema,
         tipus,
         data_finalitzacio: dataFinalitzacio,
+        durationNormal,
       })
       .then((response) => {
         console.log(response.data.Status);
@@ -213,6 +217,23 @@ function CreateQuizz() {
                   value={dataFinalitzacio}
                   onChange={(e) => setDataFinalitzacio(e.target.value)}
                   className={styles.inputField}
+                />
+              </label>
+
+              <label className={styles.inputLabel}>
+                Duració del test:
+                <input
+                  type="text"
+                  value={duracio}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+
+                    if (/^\d{0,3}$/.test(inputValue)) {
+                      setDuracio(inputValue);
+                    }
+                  }}
+                  className={styles.inputField}
+                  placeholder="En minuts"
                 />
               </label>
             </div>

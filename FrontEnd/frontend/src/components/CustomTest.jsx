@@ -4,23 +4,29 @@ import { BiArrowBack } from "react-icons/bi";
 import Headercap from "./Headercap";
 import styles from "./StyleComponents/Elements.module.css";
 import axios from "axios";
-import { FaArrowLeft, FaArrowRight, FaSave, FaTrash } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
+import { FaInfo } from "react-icons/fa6";
 
 function CustomTest() {
   const navigate = useNavigate();
   const location = useLocation();
   const [preguntesTest, setPreguntesTest] = useState([]);
   const [bancPreguntes, setBancPreguntes] = useState([]);
-  const { idTest, idTema, idAssignatura } = location.state || {};
+
+  const { idTest, idAssignatura } = location.state || {};
   const preguntaArrossegar = useRef(0);
   const preguntaSobreArrossegar = useRef(0);
 
-  // Estat per a la paginació de les preguntes del test
-  const [paginaActual, setPaginaActual] = useState(1);
-  const preguntesPerPagina = 5;
-
-  // Estat per a gestionar el modal de confirmació de delete
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showBancModal, setShowBancModal] = useState(false);
+  const [showInfoTest, setShowInfoTest] = useState(false);
+
+  //Camps actualització
+  const [testName, setTestName] = useState("");
+  const [duration, setDuration] = useState("");
+  const [data, setData] = useState("");
+  const [tipus, setTipus] = useState("");
+  const [clau, setClau] = useState("");
 
   // Obtenir les preguntes del test seleccionat
   useEffect(() => {
@@ -32,12 +38,25 @@ function CustomTest() {
         const sortedPreguntes = response.data.Preguntes.sort(
           (a, b) => a.posicio - b.posicio
         );
+        console.log(response);
+
         setPreguntesTest(sortedPreguntes);
         fetchRemainingQuestions(sortedPreguntes);
-        console.log(sortedPreguntes);
+
+        //Elements per modificar tipus de test
+        setTestName(sortedPreguntes[0].nom_test);
+        setDuration(sortedPreguntes[0].temps / 60);
+        const aux = sortedPreguntes[0].data_final;
+        const formattedDate = new Date(aux).toISOString().split("T")[0];
+        setData(formattedDate);
+        setTipus(sortedPreguntes[0].tipus);
+
+        if (tipus === "avaluatiu") {
+          setClau(sortedPreguntes[0].clau_acces);
+        }
       })
-      .catch(() => alert("Error fetching the test questions."));
-  }, [idTest, idTema]);
+      .catch(() => console.log("Error fetching the test questions."));
+  }, [idTest]);
 
   // Obtenir les preguntes restants del banc
   const fetchRemainingQuestions = (preguntesTest) => {
@@ -61,20 +80,12 @@ function CustomTest() {
   // Ordenar les preguntes del test
   const ordenarPreguntes = () => {
     const preguntaClone = [...preguntesTest];
-
-    // Intercanvi preguntes array global
     const temp = preguntaClone[preguntaArrossegar.current];
     preguntaClone[preguntaArrossegar.current] =
       preguntaClone[preguntaSobreArrossegar.current];
     preguntaClone[preguntaSobreArrossegar.current] = temp;
-
-    // Actualitzar posicions globals
     preguntaClone.forEach((q, index) => (q.posicio = index + 1));
-
-    // Guardar nou ordre
     setPreguntesTest(preguntaClone);
-
-    // Actualizar el backend amb nova posició
     axios
       .post("http://localhost:8081/updateTestQuestions", {
         idTest,
@@ -94,7 +105,6 @@ function CustomTest() {
       { ...pregunta, posicio: lastPosition },
     ];
     setPreguntesTest(updatedTestPreguntes);
-
     axios
       .post("http://localhost:8081/updateTestQuestions", {
         idTest,
@@ -116,9 +126,7 @@ function CustomTest() {
     const updatedTestPreguntes = preguntesTest
       .filter((q) => q.id_pregunta !== pregunta.id_pregunta)
       .map((q, index) => ({ ...q, posicio: index + 1 }));
-
     setPreguntesTest(updatedTestPreguntes);
-
     axios
       .post("http://localhost:8081/updateTestQuestions", {
         idTest,
@@ -144,59 +152,53 @@ function CustomTest() {
       .catch(() => alert("Error deleting the test."));
   };
 
-  // Lògica de la paginació per a les preguntes del test
-  const indexOfLastPregunta = paginaActual * preguntesPerPagina;
-  const indexOfFirstPregunta = indexOfLastPregunta - preguntesPerPagina;
-  const preguntesActualsTest = preguntesTest.slice(
-    indexOfFirstPregunta,
-    indexOfLastPregunta
-  );
+  //Funció d'aplicar canvis
+  const aplicarCanvis = () => {
+    let clauAux;
+    if (tipus === "avaluatiu") {
+      let userInput = prompt("Introdueix la clau pel nou test:");
 
-  // Funcions de paginació
-  const nextPage = () => {
-    if (paginaActual < Math.ceil(preguntesTest.length / preguntesPerPagina)) {
-      setPaginaActual(paginaActual + 1);
+      // Validar la entrada
+      const validInput = /^[a-zA-Z0-9]{1,5}$/;
+      clauAux = userInput;
+
+      if (userInput !== null && validInput.test(userInput)) {
+        alert(`La clau introduïda és: ${userInput}`);
+
+        //console.log(testName, data, duration, tipus, userInput);
+      } else if (userInput !== null) {
+        alert(
+          "La clau només pot contenir lletres i números, i fins a 5 caràcters."
+        );
+      } else {
+        alert("No es va introduir cap clau.");
+      }
+    } else {
+      setClau(null);
     }
-  };
 
-  const prevPage = () => {
-    if (paginaActual > 1) {
-      setPaginaActual(paginaActual - 1);
-    }
-  };
+    console.log(testName, data, duration, tipus, clauAux);
+    setClau(clauAux);
 
-  // Paginació del banc de preguntes
-  const [paginaBanc, setPaginaBanc] = useState(1);
-  const preguntesPerPaginaBanc = 5;
+    const minutes = duration * 60;
 
-  const indexOfLastPreguntaBanc = paginaBanc * preguntesPerPaginaBanc;
-  const indexOfFirstPreguntaBanc =
-    indexOfLastPreguntaBanc - preguntesPerPaginaBanc;
-  const preguntesActualsBanc = bancPreguntes.slice(
-    indexOfFirstPreguntaBanc,
-    indexOfLastPreguntaBanc
-  );
-
-  const nextPageBanc = () => {
-    if (paginaBanc < Math.ceil(bancPreguntes.length / preguntesPerPaginaBanc)) {
-      setPaginaBanc(paginaBanc + 1);
-    }
-  };
-
-  const prevPageBanc = () => {
-    if (paginaBanc > 1) {
-      setPaginaBanc(paginaBanc - 1);
-    }
-  };
-
-  const [showBancModal, setShowBancModal] = useState(false);
-
-  const openAddModal = () => {
-    setShowBancModal(true);
-  };
-
-  const closeAddModal = () => {
-    setShowBancModal(false);
+    axios
+      .put("http://localhost:8081/updateTestCustom", {
+        testName,
+        data,
+        minutes,
+        tipus,
+        clauAux,
+        idTest,
+      })
+      .then((res) => {
+        if (res.status === "Sucess") {
+          alert("Canvis efectuats");
+        } else {
+          alert("Error en el servidor");
+        }
+      })
+      .catch(() => alert("Error amb la sol·licitud"));
   };
 
   return (
@@ -207,100 +209,87 @@ function CustomTest() {
           onClick={() => navigate(-1)}
           className={styles.backArrow}
         />
-
         <button
           onClick={() => setShowDeleteModal(true)}
           className={styles.deleteTestButton}
         >
           <FaTrash />
         </button>
+
+        <button
+          onClick={() => setShowInfoTest(true)}
+          className={styles.deleteTestButton}
+        >
+          <FaInfo />
+        </button>
       </header>
 
       <div className={styles.customBody}>
-        <h1>Preguntes del Test</h1>
+        <h1>Preguntes del Test {testName}</h1>
         <div className={styles.questionsList}>
-          {preguntesActualsTest.map((pregunta, index) => (
-            <>
-              <div className={styles.questionOrder}>
-                <p> {index}. </p>
-                <div
-                  key={pregunta.id_pregunta}
-                  className={styles.questionCardCustom}
-                  draggable
-                  onDragStart={() => {
-                    const globalIndex =
-                      index + (paginaActual - 1) * preguntesPerPagina;
-                    preguntaArrossegar.current = globalIndex;
-                  }}
-                  onDragEnter={() => {
-                    const globalIndex =
-                      index + (paginaActual - 1) * preguntesPerPagina;
-                    preguntaSobreArrossegar.current = globalIndex;
-                  }}
-                  onDragEnd={ordenarPreguntes}
-                  onDragOver={(e) => e.preventDefault()}
+          {preguntesTest.map((pregunta, index) => (
+            <div key={pregunta.id_pregunta} className={styles.questionOrder}>
+              <p> {index + 1}. </p>
+              <div
+                className={styles.questionCardCustom}
+                draggable
+                onDragStart={() => {
+                  preguntaArrossegar.current = index;
+                }}
+                onDragEnter={() => {
+                  preguntaSobreArrossegar.current = index;
+                }}
+                onDragEnd={ordenarPreguntes}
+                onDragOver={(e) => e.preventDefault()}
+              >
+                <p>
+                  <strong>Pregunta: </strong>
+                  {pregunta.pregunta}
+                </p>
+                <p>
+                  <strong>Solució: </strong>
+                  {pregunta.solucio_correcta}
+                </p>
+                <p>
+                  <strong>Tema: </strong>
+                  {pregunta.id_tema}
+                </p>
+                <button
+                  className={styles.deleteButton}
+                  onClick={() => eliminarPregunta(pregunta)}
                 >
-                  <p>
-                    <strong>Pregunta: </strong>
-                    {pregunta.pregunta}
-                  </p>
-                  <p>
-                    <strong>Solució: </strong>
-                    {pregunta.solucio_correcta}
-                  </p>
-
-                  <p>
-                    <strong>Tema: </strong>
-                    {pregunta.id_tema}
-                  </p>
-                  <button
-                    className={styles.deleteButton}
-                    onClick={() => eliminarPregunta(pregunta)}
-                  >
-                    Eliminar
-                  </button>
-                </div>
+                  Eliminar
+                </button>
               </div>
-            </>
+            </div>
           ))}
         </div>
 
-        <div className={styles.paginationControls}>
-          <button
-            onClick={prevPage}
-            disabled={paginaActual === 1}
-            className={styles.ArrowsPages}
-          >
-            <FaArrowLeft></FaArrowLeft>
-          </button>
-          <span>Pàgina {paginaActual}</span>
-          <button
-            onClick={nextPage}
-            disabled={
-              paginaActual ===
-              Math.ceil(preguntesTest.length / preguntesPerPagina)
-            }
-            className={styles.ArrowsPages}
-          >
-            <FaArrowRight></FaArrowRight>
-          </button>
-        </div>
-
-        <button className={styles.addButton} onClick={openAddModal}>
+        <button
+          className={styles.addButton}
+          onClick={() => setShowBancModal(true)}
+        >
           Afegir Preguntes
         </button>
         <hr className={styles.lineCustom}></hr>
 
         {showBancModal && (
           <>
-            <div className={styles.fonsFosc} onClick={closeAddModal}></div>
+            <div
+              className={styles.fonsFosc}
+              onClick={() => setShowBancModal(false)}
+            ></div>
             <div className={styles.contenidorModal}>
-              <button className={styles.botoTancar} onClick={closeAddModal}>
+              <button
+                className={styles.botoTancar}
+                onClick={() => setShowBancModal(false)}
+              >
                 x
               </button>
               <h1>Banc de preguntes</h1>
+
               <div className={styles.llistaPreguntes}>
-                {preguntesActualsBanc.map((pregunta) => (
+                {bancPreguntes.map((pregunta) => (
                   <div
                     key={pregunta.id_pregunta}
                     className={styles.targetaPregunta}
@@ -328,53 +317,121 @@ function CustomTest() {
                   </div>
                 ))}
               </div>
-              <div className={styles.controlsPaginacio}>
-                <button
-                  onClick={prevPageBanc}
-                  disabled={paginaBanc === 1}
-                  className={styles.botoPaginacio}
-                >
-                  <FaArrowLeft />
-                </button>
-                <span>Pàgina {paginaBanc}</span>
-                <button
-                  onClick={nextPageBanc}
-                  disabled={
-                    paginaBanc ===
-                    Math.ceil(bancPreguntes.length / preguntesPerPaginaBanc)
-                  }
-                  className={styles.botoPaginacio}
-                >
-                  <FaArrowRight />
-                </button>
-              </div>
             </div>
           </>
         )}
 
         {showDeleteModal && (
-          <div className={styles.modal}>
-            <div className={styles.modalContent}>
-              <h3>Segur que vols eliminar aquest test?</h3>
-              <div>
-                <button
-                  className={styles.deleteTestConfirmButton}
-                  onClick={() => {
-                    eliminarTest();
-                    setShowDeleteModal(false);
+          <>
+            <div
+              className={styles.fonsFosc}
+              onClick={() => setShowDeleteModal(false)}
+            ></div>
+            <div className={styles.contenidorModal}>
+              <button
+                className={styles.botoTancar}
+                onClick={() => setShowDeleteModal(false)}
+              >
+                x
+              </button>
+              <h1>Estàs segur que vols eliminar el test?</h1>
+              <button
+                className={styles.deleteTestButtonConfirm}
+                onClick={eliminarTest}
+              >
+                Eliminar
+              </button>
+              <button
+                className={styles.cancelButton}
+                onClick={() => setShowDeleteModal(false)}
+              >
+                Cancel·lar
+              </button>
+            </div>
+          </>
+        )}
+
+        {showInfoTest && (
+          <>
+            <div
+              className={styles.fonsFosc}
+              onClick={() => setShowInfoTest(false)}
+            ></div>
+            <div className={styles.contenidorModalCustom}>
+              <button
+                className={styles.botoTancar}
+                onClick={() => setShowInfoTest(false)}
+              >
+                x
+              </button>
+
+              <h1>Paràmetres de la Prova</h1>
+
+              <label className={styles.inputLabel}>
+                Nom del Test:
+                <input
+                  type="text"
+                  className={styles.inputField}
+                  value={testName}
+                  onChange={(e) => setTestName(e.target.value)}
+                />
+              </label>
+
+              <label className={styles.inputLabel}>
+                Data de Finalització:
+                <input
+                  type="date"
+                  value={data}
+                  onChange={(e) => setData(e.target.value)}
+                  className={styles.inputField}
+                />
+              </label>
+
+              <label className={styles.inputLabel}>
+                Duració del test:
+                <input
+                  type="text"
+                  value={duration}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+
+                    if (/^\d{0,3}$/.test(inputValue)) {
+                      setDuration(inputValue);
+                    }
                   }}
+                  className={styles.inputField}
+                  placeholder="En minuts"
+                />
+              </label>
+
+              <label className={styles.inputLabel}>
+                Tipus:
+                <select
+                  value={tipus}
+                  onChange={(e) => setTipus(e.target.value)}
+                  className={styles.inputField}
                 >
-                  Si
+                  <option value="practica">Pràctica</option>
+                  <option value="avaluatiu">Avaluatiu</option>
+                </select>
+              </label>
+
+              <div style={{ gap: "20px" }}>
+                <button
+                  className={styles.deleteTestButtonConfirm}
+                  onClick={aplicarCanvis}
+                >
+                  Aplicar Canvis
                 </button>
                 <button
-                  className={styles.deleteTestCancelButton}
-                  onClick={() => setShowDeleteModal(false)}
+                  className={styles.cancelButton}
+                  onClick={() => setShowInfoTest(false)}
                 >
-                  No
+                  Cancel·lar
                 </button>
               </div>
             </div>
-          </div>
+          </>
         )}
       </div>
     </div>

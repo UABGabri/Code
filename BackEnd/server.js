@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import multer from "multer";
 import fs from 'fs';
 import csvParser from 'csv-parser';
+import { type } from "os";
 
 
 
@@ -1227,7 +1228,11 @@ app.get('/recoverSelectedTestWithKeyQuestions', (req, res) => {
         pt.posicio_test, 
         p.id_tema, 
         t.tipus,
-        t.id_assignatura  
+        t.id_assignatura,  
+        t.nom_test,
+        t.data_final,
+        t.temps,
+        t.clau_acces
     FROM test_preguntes pt 
     JOIN preguntes p ON pt.id_pregunta = p.id_pregunta 
     JOIN tests t ON pt.id_test = t.id_test  
@@ -1263,6 +1268,35 @@ app.post('/saveResults', (req, res) =>{
         }
         res.json({  Status: "Sucess" });
     });
+
+})
+
+//Funció actualització del test
+
+app.put('/updateTestCustom', (req, res) =>{
+
+
+    const {testName, data, minutes, tipus, clauAux, idTest} = req.body;
+
+    const sql = 'UPDATE tests SET nom_test = ?, data_final = ?, temps = ?, tipus = ?, clau_acces = ? WHERE id_test = ? ';
+
+
+    console.log(testName, data, minutes, tipus, clauAux, idTest)
+
+    console.log(typeof(data))
+
+    db.query(sql, [testName, data, minutes, tipus, clauAux, idTest], (error, result) => {
+        if (error) {
+            console.error("Error a la consulta:", error);
+            return res.json({ status: "Failed", error });
+        }
+        res.json({  Status: "Sucess" });
+    });
+
+
+    
+
+
 
 })
 
@@ -1363,7 +1397,7 @@ app.post('/createTest', async (req, res) => {
 
 //Funció creació test automàtic
 app.post('/createQuizz', (req, res) => {
-    const { seleccions, nom_test, id_creador, id_assignatura, id_tema, tipus, data_finalitzacio } = req.body;
+    const { seleccions, nom_test, id_creador, id_assignatura, id_tema, tipus, data_finalitzacio, durationNormal } = req.body;
 
     // Validar la data de finalització
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/; // Format YYYY-MM-DD
@@ -1374,13 +1408,13 @@ app.post('/createQuizz', (req, res) => {
     
     const idCreador = parseInt(id_creador, 10);
     const idAssignatura = parseInt(id_assignatura, 10);
-
+    const duration = parseInt(durationNormal);
     let clau_acces = null;
 
     const sqlInsertTestBase = `
         INSERT INTO tests 
-        (nom_test, data_final, clau_acces, id_creador, id_assignatura, id_tema, tipus) 
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        (nom_test, data_final, clau_acces, id_creador, id_assignatura, id_tema, tipus, temps) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
    
@@ -1388,7 +1422,7 @@ app.post('/createQuizz', (req, res) => {
         clau_acces = Math.random().toString(36).substr(2, 8);
     }
 
-    db.query(sqlInsertTestBase, [nom_test, data_finalitzacio, clau_acces, idCreador, idAssignatura, id_tema, tipus], (error, result) => {
+    db.query(sqlInsertTestBase, [nom_test, data_finalitzacio, clau_acces, idCreador, idAssignatura, id_tema, tipus, duration], (error, result) => {
         if (error) {
             console.error("Error al crear el test:", error);
             return res.json({ Status: "Error al crear el test" });
