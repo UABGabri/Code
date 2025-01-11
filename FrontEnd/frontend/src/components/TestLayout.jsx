@@ -34,6 +34,7 @@ function TestLayout() {
       });
   }, [conceptesSeleccionats]);
 
+  // Filtra les respostes buides abans de barrejarlas
   const barrejarRespostes = (pregunta) => {
     const respostes = [
       pregunta.solucio_correcta,
@@ -41,7 +42,14 @@ function TestLayout() {
       pregunta.solucio_erronia2,
       pregunta.solucio_erronia3,
     ];
-    return respostes.sort(() => Math.random() - 0.5);
+
+    // Filtra les respostes buides
+    const respostesNoBuides = respostes.filter(
+      (resposta) => resposta.trim() !== ""
+    );
+
+    // Baralla les respostes no buides
+    return respostesNoBuides.sort(() => Math.random() - 0.5);
   };
 
   const seleccionarResposta = (respostaUnica) => {
@@ -90,7 +98,7 @@ function TestLayout() {
   if (showResults) {
     const { correctes, incorrectes, percentatge } = calcularResultats();
 
-    //Modal dels resultats finals. Temps de creació, 27h.
+    // Modal dels resultats finals
     return (
       <div className={styles.containerQuizz}>
         <div className={styles.resultsBox}>

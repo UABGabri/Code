@@ -17,23 +17,27 @@ function TestWithKey() {
   const { idTest, Id_User } = location.state || {};
   const [avaluatiu, setAvaluatiu] = useState(false);
   const [Id_Subject, setIdSubject] = useState("");
+  const [time, setTime] = useState(0);
 
-  //La funció useEffect es llança dos cops pel mode dev -> resultats enviats dos cops -> cal aplicar funció de normalització
+  // La funció useEffect es llança dos cops pel mode dev -> resultats enviats dos cops -> cal aplicar funció de normalització
   useEffect(() => {
     axios
       .get("http://localhost:8081/recoverSelectedTestWithKeyQuestions", {
         params: { idTest },
       })
       .then((response) => {
-        const sortedPreguntes = response.data.Preguntes.sort(
-          (a, b) => a.posicio - b.posicio
-        );
-        setPreguntes(sortedPreguntes);
+        const preguntasConContenido = response.data.Preguntes.filter(
+          (pregunta) => pregunta.pregunta && pregunta.pregunta.trim() !== ""
+        ).sort((a, b) => a.posicio - b.posicio);
+
+        setTime(parseInt(response.data.Preguntes[0].temps * 60));
+        //setTime(5);
+        setPreguntes(preguntasConContenido);
         setRespostesBarrejades(
-          response.data.Preguntes.map((pregunta) => barrejarRespostes(pregunta))
+          preguntasConContenido.map((pregunta) => barrejarRespostes(pregunta))
         );
 
-        setIdSubject(response.data.Preguntes[0].id_assignatura);
+        setIdSubject(response.data.Preguntes[0]?.id_assignatura);
         setLoading(false);
       })
       .catch(() => {
@@ -42,14 +46,17 @@ function TestWithKey() {
       });
   }, [idTest]);
 
+  //Funció de temporitzador
   useEffect(() => {
-    if (showResults && preguntes.length > 0) {
-      if (preguntes[0].tipus === "avaluatiu") {
-        setAvaluatiu(true);
-      }
+    if (time > 0) {
+      const interval = setInterval(() => {
+        setTime((prevTime) => prevTime - 1);
+      }, 1000);
+      return () => clearInterval(interval);
     }
-  }, [showResults, preguntes]); // Només quan apareguin els resultats
+  }, [time]);
 
+  // Filtra las respostes buides en barrejarRespostes
   const barrejarRespostes = (pregunta) => {
     const respostes = [
       pregunta.solucio_correcta,
@@ -58,7 +65,11 @@ function TestWithKey() {
       pregunta.solucio_erronia3,
     ];
 
-    return respostes.sort(() => Math.random() - 0.5);
+    // Filtra respostes buides
+    const respostesFiltradas = respostes.filter(
+      (resposta) => resposta && resposta.trim() !== ""
+    );
+    return respostesFiltradas.sort(() => Math.random() - 0.5);
   };
 
   const seleccionarResposta = (respostaUnica) => {
@@ -167,25 +178,30 @@ function TestWithKey() {
       <div className={styles.containerElements}>
         <h1>Formulari</h1>
         <hr />
-        <p className={styles.pregunta}>{preguntes[currentIndex].pregunta}</p>
+        <p className={styles.pregunta}>{preguntes[currentIndex]?.pregunta}</p>
         <ul className={styles.llistaRespostes}>
-          {respostesActuals.map((resposta, index) => (
-            <li
-              key={index}
-              className={
-                selectedAnswers[currentIndex] === `${resposta}-${index}`
-                  ? styles.selected
-                  : ""
-              }
-              onClick={() => seleccionarResposta(`${resposta}-${index}`)}
-            >
-              {resposta}
-            </li>
-          ))}
+          {respostesActuals.map(
+            (resposta, index) =>
+              resposta && (
+                <li
+                  key={index}
+                  className={
+                    selectedAnswers[currentIndex] === `${resposta}-${index}`
+                      ? styles.selected
+                      : ""
+                  }
+                  onClick={() => seleccionarResposta(`${resposta}-${index}`)}
+                >
+                  {resposta}
+                </li>
+              )
+          )}
         </ul>
+        <p>Temps Restant: {time}</p>
         <p className={styles.contadorPreguntes}>
           Pregunta {currentIndex + 1} de {preguntes.length}
         </p>
+
         <div className={styles.botonsAccio}>
           <button onClick={anarAnterior} disabled={currentIndex === 0}>
             Anterior

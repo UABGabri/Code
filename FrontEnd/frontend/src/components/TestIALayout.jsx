@@ -13,6 +13,7 @@ function TestIALayout() {
   const [probabilities, setProbabilities] = useState({});
   const [loading, setLoading] = useState(true);
   const history = useNavigate();
+
   // Carrega temes i probabilitats
   useEffect(() => {
     const Id_Assignatura = parseInt(idAssignatura);
@@ -66,7 +67,6 @@ function TestIALayout() {
       .then((response) => {
         if (response.data.length > 0) {
           const pregunta = response.data[0];
-          //console.log("Pregunta trobada:", pregunta);
           setPreguntaActual(pregunta);
           setRespostesBarrejades(barrejarRespostes(pregunta));
           setLoading(false);
@@ -106,7 +106,7 @@ function TestIALayout() {
     setProbabilities(novesProbabilitats);
   };
 
-  // Barreja les respostes
+  // Barreja les respostes, filtrant les respostes buides
   const barrejarRespostes = (pregunta) => {
     const respostes = [
       pregunta.solucio_correcta,
@@ -114,7 +114,14 @@ function TestIALayout() {
       pregunta.solucio_erronia2,
       pregunta.solucio_erronia3,
     ];
-    return respostes.sort(() => Math.random() - 0.5);
+
+    // Filtra les respostes buides
+    const respostesNoBuides = respostes.filter(
+      (resposta) => resposta.trim() !== ""
+    );
+
+    // Baralla les respostes no buides
+    return respostesNoBuides.sort(() => Math.random() - 0.5);
   };
 
   if (loading) {
@@ -130,7 +137,7 @@ function TestIALayout() {
       setFeedback({ correct: true });
     } else {
       setFeedback({ correct: false });
-      ajustarProbabilitats(preguntaActual.id_tema); // Només ajustar probabilidades
+      ajustarProbabilitats(preguntaActual.id_tema); // Només ajustar probabilitats
     }
   };
 

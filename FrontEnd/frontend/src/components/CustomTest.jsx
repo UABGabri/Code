@@ -208,7 +208,8 @@ function CustomTest() {
       .catch(() => alert("Error amb la sol·licitud"));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
     aplicarCanvis();
   };
 
