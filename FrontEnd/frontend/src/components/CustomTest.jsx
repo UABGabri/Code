@@ -155,30 +155,36 @@ function CustomTest() {
   //Funció d'aplicar canvis
   const aplicarCanvis = () => {
     let clauAux;
+
     if (tipus === "avaluatiu") {
-      let userInput = prompt("Introdueix la clau pel nou test:");
+      let userInput;
 
-      // Validar la entrada
-      const validInput = /^[a-zA-Z0-9]{1,5}$/;
-      clauAux = userInput;
+      while (true) {
+        userInput = prompt("Introdueix la clau pel nou test:");
 
-      if (userInput !== null && validInput.test(userInput)) {
-        alert(`La clau introduïda és: ${userInput}`);
+        if (userInput === null) {
+          alert("No es va introduir cap clau.");
+          break;
+        }
 
-        //console.log(testName, data, duration, tipus, userInput);
-      } else if (userInput !== null) {
-        alert(
-          "La clau només pot contenir lletres i números, i fins a 5 caràcters."
-        );
-      } else {
-        alert("No es va introduir cap clau.");
+        const validInput = /^[a-zA-Z0-9]{1,5}$/;
+        if (validInput.test(userInput)) {
+          alert(`La clau introduïda és: ${userInput}`);
+          clauAux = userInput;
+          break;
+        } else {
+          alert(
+            "La clau només pot contenir lletres i números, i fins a 5 caràcters."
+          );
+        }
       }
     } else {
       setClau(null);
     }
 
-    console.log(testName, data, duration, tipus, clauAux);
-    setClau(clauAux);
+    if (clauAux) {
+      setClau(clauAux);
+    }
 
     const minutes = duration * 60;
 
@@ -192,6 +198,7 @@ function CustomTest() {
         idTest,
       })
       .then((res) => {
+        console.log(res);
         if (res.status === "Sucess") {
           alert("Canvis efectuats");
         } else {
@@ -199,6 +206,10 @@ function CustomTest() {
         }
       })
       .catch(() => alert("Error amb la sol·licitud"));
+  };
+
+  const handleSubmit = () => {
+    aplicarCanvis();
   };
 
   return (
@@ -367,69 +378,70 @@ function CustomTest() {
 
               <h1>Paràmetres de la Prova</h1>
 
-              <label className={styles.inputLabel}>
-                Nom del Test:
-                <input
-                  type="text"
-                  className={styles.inputField}
-                  value={testName}
-                  onChange={(e) => setTestName(e.target.value)}
-                />
-              </label>
+              <form onSubmit={handleSubmit}>
+                <label className={styles.inputLabel}>
+                  Nom del Test:
+                  <input
+                    type="text"
+                    className={styles.inputField}
+                    value={testName}
+                    onChange={(e) => setTestName(e.target.value)}
+                    maxLength="10"
+                    required
+                  />
+                </label>
 
-              <label className={styles.inputLabel}>
-                Data de Finalització:
-                <input
-                  type="date"
-                  value={data}
-                  onChange={(e) => setData(e.target.value)}
-                  className={styles.inputField}
-                />
-              </label>
+                <label className={styles.inputLabel}>
+                  Data de Finalització:
+                  <input
+                    type="date"
+                    value={data}
+                    onChange={(e) => setData(e.target.value)}
+                    className={styles.inputField}
+                    required
+                  />
+                </label>
 
-              <label className={styles.inputLabel}>
-                Duració del test:
-                <input
-                  type="text"
-                  value={duration}
-                  onChange={(e) => {
-                    const inputValue = e.target.value;
+                <label className={styles.inputLabel}>
+                  Duració del test:
+                  <input
+                    type="text"
+                    value={duration}
+                    onChange={(e) => setDuration(e.target.value)}
+                    className={styles.inputField}
+                    placeholder="En minuts"
+                    required
+                  />
+                </label>
 
-                    if (/^\d{0,3}$/.test(inputValue)) {
-                      setDuration(inputValue);
-                    }
-                  }}
-                  className={styles.inputField}
-                  placeholder="En minuts"
-                />
-              </label>
+                <label className={styles.inputLabel}>
+                  Tipus:
+                  <select
+                    value={tipus}
+                    onChange={(e) => setTipus(e.target.value)}
+                    className={styles.inputField}
+                  >
+                    <option value="practica">Pràctica</option>
+                    <option value="avaluatiu">Avaluatiu</option>
+                  </select>
+                </label>
 
-              <label className={styles.inputLabel}>
-                Tipus:
-                <select
-                  value={tipus}
-                  onChange={(e) => setTipus(e.target.value)}
-                  className={styles.inputField}
-                >
-                  <option value="practica">Pràctica</option>
-                  <option value="avaluatiu">Avaluatiu</option>
-                </select>
-              </label>
-
-              <div style={{ gap: "20px" }}>
-                <button
-                  className={styles.deleteTestButtonConfirm}
-                  onClick={aplicarCanvis}
-                >
-                  Aplicar Canvis
-                </button>
-                <button
-                  className={styles.cancelButton}
-                  onClick={() => setShowInfoTest(false)}
-                >
-                  Cancel·lar
-                </button>
-              </div>
+                <div style={{ gap: "20px", display: "flex" }}>
+                  <button
+                    type="submit"
+                    className={styles.deleteTestButtonConfirm}
+                  >
+                    Aplicar Canvis
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.cancelButton}
+                    onClick={() => setShowInfoTest(false)}
+                  >
+                    Cancel·lar
+                  </button>
+                </div>
+              </form>
             </div>
           </>
         )}

@@ -16,6 +16,7 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
         params: { Id_Assignatura },
       })
       .then((res) => {
+        console.log(res);
         setUsers(res.data);
       })
       .catch((err) => {
@@ -193,9 +194,12 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
                 <p>
                   <strong>Rol: </strong> {user.role}
                 </p>
-                <p>
-                  <strong>Nota Assignatura: </strong> {user.notes || 0.0}
-                </p>
+
+                {Role_User === "professor" && (
+                  <p>
+                    <strong>Nota Assignatura: {user.notes || 0.0} %</strong>
+                  </p>
+                )}
               </div>
 
               {Role_User !== "alumne" && (

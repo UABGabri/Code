@@ -796,7 +796,7 @@ app.get('/recoverAtendees', (req, res) => {
                AVG(resultats.nota) AS notes
         FROM usuaris 
         JOIN alumnes_assignatures ON usuaris.niu = alumnes_assignatures.id_alumne 
-        LEFT JOIN resultats ON usuaris.niu = resultats.id_alumne AND resultats.id_assignatura = 1598407
+        LEFT JOIN resultats ON usuaris.niu = resultats.id_alumne AND resultats.id_assignatura = ?
         WHERE alumnes_assignatures.id_assignatura = ?
         GROUP BY usuaris.niu
     `;
@@ -804,7 +804,7 @@ app.get('/recoverAtendees', (req, res) => {
     db.query(sql, [id_assignatura, id_assignatura], (error, result) => {
         if (error) {
             console.error("Error en la consulta:", error);
-            return res.status(500).json({ Status: "Failed" });
+            return res.json({ Status: "Failed" });
         }
         res.json(result);
     });
@@ -1281,22 +1281,14 @@ app.put('/updateTestCustom', (req, res) =>{
     const sql = 'UPDATE tests SET nom_test = ?, data_final = ?, temps = ?, tipus = ?, clau_acces = ? WHERE id_test = ? ';
 
 
-    console.log(testName, data, minutes, tipus, clauAux, idTest)
-
-    console.log(typeof(data))
 
     db.query(sql, [testName, data, minutes, tipus, clauAux, idTest], (error, result) => {
         if (error) {
             console.error("Error a la consulta:", error);
             return res.json({ status: "Failed", error });
         }
-        res.json({  Status: "Sucess" });
+        return res.json({  Status: "Sucess" });
     });
-
-
-    
-
-
 
 })
 
