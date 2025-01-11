@@ -12,14 +12,35 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
   const [showModal, setShowModal] = useState(false);
   const [actionType, setActionType] = useState(""); // "delete" o "accept"
   const [questionIdToAct, setQuestionIdToAct] = useState(null);
-
   const navigate = useNavigate();
 
-  // Funció que navega a la secció d'afegir pregunta amb els elements necessaris
+  const [numberQuestionsPendent, setNumberQuestionsPendent] = useState(0); // Inicializar como número
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:8081/pendentQuestions", {
+        params: { Id_User },
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          const count = parseInt(res.data.count);
+
+          setNumberQuestionsPendent(count);
+        }
+      })
+      .catch((err) => {
+        console.error("Error a la sol·licitud:", err);
+      });
+  }, [Id_Assignatura]);
+
   const handleButton = () => {
-    navigate("/addQuestion", {
-      state: { Id_User, Id_Assignatura },
-    });
+    if (numberQuestionsPendent >= 3) {
+      alert("No pots navegar perquè tens 3 o més preguntes pendents.");
+    } else {
+      navigate("/addQuestion", {
+        state: { Id_User, Id_Assignatura },
+      });
+    }
   };
 
   // Funció que recupera totes les preguntes pendents d'avaluació

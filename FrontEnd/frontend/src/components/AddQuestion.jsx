@@ -221,6 +221,7 @@ function AddQuestion() {
 
               {addButtonOption && (
                 <button
+                  type="button"
                   onClick={handleAddOptions}
                   className={styles.addOptionButton}
                 >

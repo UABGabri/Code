@@ -67,6 +67,14 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
   const handleCsvUpload = async () => {
     if (!csvFile) return alert("Selecciona un fitxer CSV primer!");
 
+    const fileName = csvFile.name;
+    const fileExtension = fileName.split(".").pop().toLowerCase();
+    if (fileExtension !== "csv") {
+      return alert(
+        "El fitxer seleccionat no és un fitxer CSV. Si us plau, tria un fitxer amb extensió .csv"
+      );
+    }
+
     const formData = new FormData();
     formData.append("file", csvFile);
 

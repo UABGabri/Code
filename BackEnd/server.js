@@ -481,6 +481,32 @@ app.post('/recoverSubjects', (req, res) => {
     
 }) 
 
+
+//Funció recuperació preguntes pendents
+app.get('/pendentQuestions', (req, res)=>{
+
+
+    const user = parseInt(req.query.Id_User);
+    const estat = 'pendent'
+
+
+    const sql = `SELECT count(*) AS count FROM preguntes WHERE estat = ? AND id_creador = ?`
+
+    db.query(sql, [estat, user], (error, result) => {
+        if (error) {
+          console.error("Error en la consulta:", error);
+          return res.json({ Status: "Failed", message:"Error a la consulta" });
+        } else {
+            const count = parseInt(result[0]?.count || 0);
+            return res.json({ Status: "Sucess", count });
+        }
+      });
+
+
+
+})
+
+
 //Funció inserció de les preguntes a la taula preguntes de la base de dades
 app.post('/addQuestion', async (req, res) => {
     const {
@@ -516,7 +542,37 @@ app.post('/addQuestion', async (req, res) => {
         });
 
     try {
-        // Insertar la pregunta
+        // Verificar si hi ha pregunta igual
+        const existingQuestionSql = `
+            SELECT id_pregunta 
+            FROM preguntes 
+            WHERE 
+                pregunta = ? AND 
+                solucio_correcta = ? AND 
+                solucio_erronia1 = ? AND 
+                solucio_erronia2 = ? AND 
+                solucio_erronia3 = ? AND 
+                dificultat = ? AND 
+                id_tema = ?
+        `;
+        const existingQuestion = await dbQuery(existingQuestionSql, [
+            pregunta,
+            solucio_correcta,
+            erronea_1,
+            erronea_2,
+            erronea_3,
+            dificultat,
+            id_tema,
+        ]);
+
+        if (existingQuestion.length > 0) {
+            return res.json({
+                Status: "Failed",
+                Message: "Ja existeix una pregunta amb els mateixos paràmetres.",
+            });
+        }
+
+        // Insertar nova pregunta
         const questionSql = `
             INSERT INTO preguntes 
             (pregunta, solucio_correcta, solucio_erronia1, solucio_erronia2, solucio_erronia3, dificultat, estat, id_creador, id_tema) 
@@ -536,13 +592,14 @@ app.post('/addQuestion', async (req, res) => {
 
         const questionId = questionResult.insertId;
 
-        // Insertar conceptes
-        const conceptos = conceptes_materia.split(",").map((concept) => concept.trim());
+        // Obtener els conceptes de la matèria
+        const conceptes = [...new Set(conceptes_materia.split(",").map((concept) => concept.trim()))];
+
         const conceptIds = [];
-        for (const concept of conceptos) {
+        for (const concept of conceptes) {
             let conceptId;
 
-            // Verificar si el concepte ja existeix
+            // Verificar si el concepto ja existeix
             const existingConcept = await dbQuery(
                 "SELECT id_concepte FROM conceptes WHERE nom_concepte = ?",
                 [concept]
@@ -550,28 +607,41 @@ app.post('/addQuestion', async (req, res) => {
 
             if (existingConcept.length > 0) {
                 conceptId = existingConcept[0].id_concepte;
+
+                // Verificar si existeix relació concepte amb tema
+                const existingConceptTema = await dbQuery(
+                    "SELECT * FROM conceptes_temes WHERE id_concepte = ? AND id_tema = ?",
+                    [conceptId, id_tema]
+                );
+
+                if (existingConceptTema.length === 0) {
+                    // Relacionar concepto amb tema si no existeix
+                    await dbQuery(
+                        "INSERT INTO conceptes_temes (id_concepte, id_tema) VALUES (?, ?)",
+                        [conceptId, id_tema]
+                    );
+                }
             } else {
-                // Insertar nou concepte
+                // Insertar nou  concepte i associar al tema
                 const conceptInsert = await dbQuery(
                     "INSERT INTO conceptes (nom_concepte) VALUES (?)",
                     [concept]
                 );
                 conceptId = conceptInsert.insertId;
+
+                await dbQuery(
+                    "INSERT INTO conceptes_temes (id_concepte, id_tema) VALUES (?, ?)",
+                    [conceptId, id_tema]
+                );
             }
 
             conceptIds.push(conceptId);
         }
 
-        // Associar conceptes amb la pregunta
+        // Associar conceptes amb preguntes
         const conceptQuestionSql = `INSERT INTO preguntes_conceptes (id_pregunta, id_concepte) VALUES (?, ?)`;
         for (const conceptId of conceptIds) {
             await dbQuery(conceptQuestionSql, [questionId, conceptId]);
-        }
-
-    
-        const conceptTemaSql = `INSERT INTO conceptes_temes (id_concepte, id_tema) VALUES (?, ?)`;
-        for (const conceptId of conceptIds) {
-            await dbQuery(conceptTemaSql, [conceptId, id_tema]);
         }
 
         return res.json({ Status: "Success", Message: "Pregunta afegida correctament!" });
@@ -580,6 +650,7 @@ app.post('/addQuestion', async (req, res) => {
         return res.json({ Status: "Failed", Message: "Error en el servidor." });
     }
 });
+
 
 
 app.put("/updateQuestion", (req, res)=>{
@@ -1015,19 +1086,28 @@ app.get('/recoverElementsTest', (req, res) => {
     const idAssignatura = parseInt(id_assignatura, 10);
 
     const sql = `
-        SELECT 
-            conceptes.id_concepte, 
-            conceptes.nom_concepte
-        FROM 
-            temes
-        LEFT JOIN 
-            conceptes_temes ON temes.id_tema = conceptes_temes.id_tema
-        LEFT JOIN 
-            conceptes ON conceptes_temes.id_concepte = conceptes.id_concepte
-        WHERE 
-            temes.id_assignatura = ?
-        ORDER BY 
-            conceptes.nom_concepte;
+       SELECT 
+    conceptes.id_concepte, 
+    conceptes.nom_concepte
+FROM 
+    temes
+INNER JOIN 
+    conceptes_temes ON temes.id_tema = conceptes_temes.id_tema
+INNER JOIN 
+    conceptes ON conceptes_temes.id_concepte = conceptes.id_concepte
+INNER JOIN 
+    preguntes_conceptes ON conceptes.id_concepte = preguntes_conceptes.id_concepte
+INNER JOIN 
+    preguntes ON preguntes_conceptes.id_pregunta = preguntes.id_pregunta
+WHERE 
+    temes.id_assignatura = ? AND
+    preguntes.estat = 'acceptada'
+GROUP BY 
+    conceptes.id_concepte, 
+    conceptes.nom_concepte
+ORDER BY 
+    conceptes.nom_concepte;
+
     `;
 
     // Ejecutar la consulta en la base de datos

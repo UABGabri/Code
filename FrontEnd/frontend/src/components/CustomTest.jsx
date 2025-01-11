@@ -4,14 +4,7 @@ import { BiArrowBack } from "react-icons/bi";
 import Headercap from "./Headercap";
 import styles from "./StyleComponents/Elements.module.css";
 import axios from "axios";
-import {
-  FaArrowLeft,
-  FaArrowRight,
-  FaCross,
-  FaCrosshairs,
-  FaSave,
-  FaTrash,
-} from "react-icons/fa";
+import { FaArrowLeft, FaArrowRight, FaSave, FaTrash } from "react-icons/fa";
 
 function CustomTest() {
   const navigate = useNavigate();
@@ -138,20 +131,6 @@ function CustomTest() {
       .catch(() => alert("Error removing the question from the test."));
   };
 
-  // Guardar els canvis realitzats en el test
-  const guardarCanvis = () => {
-    axios
-      .post("http://localhost:8081/updateTestQuestions", {
-        idTest,
-        questions: preguntesTest.map((q) => ({
-          id_pregunta: q.id_pregunta,
-          posicio: q.posicio,
-        })),
-      })
-      .then(() => alert("Changes saved successfully."))
-      .catch(() => alert("Error saving the changes."));
-  };
-
   // Eliminar el test
   const eliminarTest = () => {
     axios
@@ -228,9 +207,7 @@ function CustomTest() {
           onClick={() => navigate(-1)}
           className={styles.backArrow}
         />
-        <button onClick={guardarCanvis} className={styles.saveButton}>
-          <FaSave />
-        </button>
+
         <button
           onClick={() => setShowDeleteModal(true)}
           className={styles.deleteTestButton}
