@@ -3,61 +3,108 @@ import styles from "./StyleComponents/Elements.module.css";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { FaCheck, FaTimes, FaEdit, FaSave } from "react-icons/fa";
+import {
+  FaCheck,
+  FaTimes,
+  FaEdit,
+  FaSave,
+  FaArrowLeft,
+  FaArrowRight,
+} from "react-icons/fa";
 
 function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
   const [questions, setQuestions] = useState([]);
   const [editingQuestionId, setEditingQuestionId] = useState(null);
   const [editedQuestion, setEditedQuestion] = useState({});
   const [showModal, setShowModal] = useState(false);
-  const [actionType, setActionType] = useState(""); // "delete" o "accept"
+  const [actionType, setActionType] = useState("");
   const [questionIdToAct, setQuestionIdToAct] = useState(null);
   const navigate = useNavigate();
 
-  const [numberQuestionsPendent, setNumberQuestionsPendent] = useState(0); // Inicializar como número
+  const [numberQuestionsPendent, setNumberQuestionsPendent] = useState(0);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 2;
+
+  const [filterText, setFilterText] = useState("");
+  const [selectedTopic, setSelectedTopic] = useState("");
 
   useEffect(() => {
     axios
-      .get("http://localhost:8081/pendentQuestions", {
-        params: { Id_User },
-      })
+      .get("http://localhost:8081/pendentQuestions", { params: { Id_User } })
       .then((res) => {
         if (res.status === 200) {
-          const count = parseInt(res.data.count);
-
-          setNumberQuestionsPendent(count);
+          setNumberQuestionsPendent(parseInt(res.data.count));
         }
       })
-      .catch((err) => {
-        console.error("Error a la sol·licitud:", err);
-      });
-  }, [Id_Assignatura]);
+      .catch((err) => console.error("Error a la sol·licitud:", err));
+  }, [Id_User]);
 
   const handleButton = () => {
     if (numberQuestionsPendent >= 3) {
       alert("No pots navegar perquè tens 3 o més preguntes pendents.");
     } else {
-      navigate("/addQuestion", {
-        state: { Id_User, Id_Assignatura },
-      });
+      navigate("/addQuestion", { state: { Id_User, Id_Assignatura } });
     }
   };
 
-  // Funció que recupera totes les preguntes pendents d'avaluació
   useEffect(() => {
     axios
       .get("http://localhost:8081/recoverQuestions", {
         params: { Id_Assignatura },
       })
-      .then((res) => {
-        setQuestions(res.data);
-      })
-      .catch((err) => {
-        console.error("Error a la sol·licitud:", err);
-      });
+      .then((res) => setQuestions(res.data))
+      .catch((err) => console.error("Error a la sol·licitud:", err));
   }, [Id_Assignatura]);
 
-  // Funció que inicia el mode d'edició
+  const handleFilterChange = (e) => {
+    setFilterText(e.target.value.toLowerCase());
+    setCurrentPage(1);
+  };
+
+  const handleTopicChange = (e) => {
+    setSelectedTopic(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const filteredQuestions = questions.filter(
+    (q) =>
+      q.pregunta.toLowerCase().includes(filterText) &&
+      (selectedTopic ? q.nom_tema === selectedTopic : true)
+  );
+
+  const totalPages = Math.ceil(filteredQuestions.length / itemsPerPage);
+  const displayedQuestions = filteredQuestions.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (direction) => {
+    if (direction === -1 && currentPage > 1) setCurrentPage(currentPage - 1);
+    if (direction === 1 && currentPage < totalPages)
+      setCurrentPage(currentPage + 1);
+  };
+
+  const handleOpenModal = (action, idPregunta) => {
+    setActionType(action);
+    setQuestionIdToAct(idPregunta);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setActionType("");
+    setQuestionIdToAct(null);
+  };
+
+  const handleConfirmAction = () => {
+    if (actionType === "delete" && questionIdToAct)
+      handleDelete(questionIdToAct);
+    if (actionType === "accept" && questionIdToAct)
+      handleStatusChange(questionIdToAct, "acceptada");
+    handleCloseModal();
+  };
+
   const handleEdit = (question) => {
     setEditingQuestionId(question.id_pregunta);
     setEditedQuestion({
@@ -66,19 +113,12 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
     });
   };
 
-  // Funció que gestiona els canvis a l'entrada
-  const handleInputChange = (field, value) => {
-    setEditedQuestion((prev) => ({ ...prev, [field]: value }));
-  };
-
-  // Funció per guardar els canvis
   const handleSave = (idPregunta) => {
-    // Validació dels camps
     if (
       !editedQuestion.pregunta.trim() ||
       !editedQuestion.solucio_correcta.trim()
     ) {
-      alert("Both question and answer are required.");
+      alert("Tant la pregunta com la resposta són obligatoris.");
       return;
     }
 
@@ -97,42 +137,14 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
         );
         setEditingQuestionId(null);
       })
-      .catch((err) => {
-        console.error("Error actualitzant la pregunta:", err);
-      });
+      .catch((err) => console.error("Error actualitzant la pregunta:", err));
   };
 
-  // Funció per cancel·lar l'edició
   const handleCancel = () => {
     setEditingQuestionId(null);
     setEditedQuestion({});
   };
 
-  // Funció que actualitza l'estat de les preguntes a 'Acceptada'
-  const handleStatusChange = (idPregunta, nouEstat) => {
-    axios
-      .put("http://localhost:8081/updateQuestionAccept", {
-        id_pregunta: idPregunta,
-        estat: nouEstat,
-      })
-      .then(() => {
-        axios
-          .get("http://localhost:8081/recoverQuestions", {
-            params: { Id_Assignatura },
-          })
-          .then((res) => {
-            setQuestions(res.data);
-          })
-          .catch((err) => {
-            console.error("Error a la sol·licitud:", err);
-          });
-      })
-      .catch((err) => {
-        console.error("Error actualitzant l'estat:", err);
-      });
-  };
-
-  // Funció que elimina les preguntes no necessàries
   const handleDelete = (idPregunta) => {
     axios
       .delete("http://localhost:8081/deleteQuestion", {
@@ -145,45 +157,62 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
           )
         );
       })
-      .catch((err) => {
-        console.error("Error en eliminar la pregunta:", err);
-      });
+      .catch((err) => console.error("Error en eliminar la pregunta:", err));
   };
 
-  // Funció per obrir el modal de confirmació
-  const handleOpenModal = (action, idPregunta) => {
-    setActionType(action);
-    setQuestionIdToAct(idPregunta);
-    setShowModal(true);
-  };
-
-  // Funció per tancar el modal de confirmació
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setActionType("");
-    setQuestionIdToAct(null);
-  };
-
-  // Funció que confirma l'acció
-  const handleConfirmAction = () => {
-    if (actionType === "delete" && questionIdToAct) {
-      handleDelete(questionIdToAct);
-    } else if (actionType === "accept" && questionIdToAct) {
-      handleStatusChange(questionIdToAct, "acceptada");
-    }
-    handleCloseModal();
+  const handleStatusChange = (idPregunta, nouEstat) => {
+    axios
+      .put("http://localhost:8081/updateQuestionAccept", {
+        id_pregunta: idPregunta,
+        estat: nouEstat,
+      })
+      .then(() => {
+        axios
+          .get("http://localhost:8081/recoverQuestions", {
+            params: { Id_Assignatura },
+          })
+          .then((res) => setQuestions(res.data))
+          .catch((err) => console.error("Error a la sol·licitud:", err));
+      })
+      .catch((err) => console.error("Error actualitzant l'estat:", err));
   };
 
   return (
     <div className={styles.questionsContainer}>
       <strong className={styles.elementsCursHeader}>GESTIÓ DE PREGUNTES</strong>
+
+      <div className={styles.filterContainer}>
+        <label style={{ marginLeft: "10px", marginRight: "10px" }}>
+          Filtrar preguntes:{" "}
+        </label>
+        <input
+          type="text"
+          placeholder="Filtrar preguntes..."
+          value={filterText}
+          onChange={handleFilterChange}
+          className={styles.filterInput}
+        />
+        <label style={{ marginLeft: "10px", marginRight: "10px" }}>
+          Filtrar per Tema:{" "}
+        </label>
+        <select
+          value={selectedTopic}
+          onChange={handleTopicChange}
+          className={styles.filterInput}
+        >
+          <option value="">Tots els temes</option>
+          {Array.from(new Set(questions.map((q) => q.nom_tema))).map((tema) => (
+            <option key={tema} value={tema}>
+              {tema}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div className={styles.questionsList}>
-        {questions.map((question) => (
+        {displayedQuestions.map((question) => (
           <div key={question.id_pregunta} className={styles.questionCard}>
             <div className={styles.questionDetails}>
-              <p>
-                <strong>Autor:</strong> {question.id_creador}
-              </p>
               <p>
                 <strong>Tema:</strong> {question.nom_tema}
               </p>
@@ -198,10 +227,12 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                       type="text"
                       value={editedQuestion.pregunta}
                       onChange={(e) =>
-                        handleInputChange("pregunta", e.target.value)
+                        setEditedQuestion({
+                          ...editedQuestion,
+                          pregunta: e.target.value,
+                        })
                       }
                       className={styles.editInput}
-                      required
                     />
                   </p>
                   <p>
@@ -210,7 +241,10 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                       type="text"
                       value={editedQuestion.solucio_correcta}
                       onChange={(e) =>
-                        handleInputChange("solucio_correcta", e.target.value)
+                        setEditedQuestion({
+                          ...editedQuestion,
+                          solucio_correcta: e.target.value,
+                        })
                       }
                       className={styles.editInput}
                     />
@@ -218,17 +252,15 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                 </>
               ) : (
                 <>
-                  <p className={styles.editInput}>
-                    <strong>Pregunta: </strong> {question.pregunta}
+                  <p>
+                    <strong>Pregunta:</strong> {question.pregunta}
                   </p>
                   <p>
-                    <strong className={styles.editInput}>Resposta:</strong>{" "}
-                    {question.solucio_correcta}
+                    <strong>Resposta:</strong> {question.solucio_correcta}
                   </p>
                 </>
               )}
             </div>
-
             {Role_User !== "alumne" && (
               <div className={styles.actionButtonsContainer}>
                 {editingQuestionId === question.id_pregunta ? (
@@ -254,7 +286,6 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                     >
                       <FaEdit />
                     </button>
-
                     <button
                       className={styles.acceptButton}
                       onClick={() =>
@@ -279,22 +310,53 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
         ))}
       </div>
 
-      <div className={styles.addQuestionButtonContainer}>
-        <button className={styles.addQuestionButton} onClick={handleButton}>
-          Afegir Pregunta
+      <div className={styles.paginationContainer}>
+        <button
+          onClick={() => handlePageChange(-1)}
+          disabled={currentPage === 1}
+          className={styles.paginationButton}
+          style={{ background: "none" }}
+        >
+          <FaArrowLeft />
+        </button>
+        <span style={{ marginBottom: "10px" }}>
+          Pàgina {currentPage} de {totalPages}
+        </span>
+        <button
+          onClick={() => handlePageChange(1)}
+          disabled={currentPage === totalPages}
+          className={styles.paginationButton}
+          style={{ background: "none" }}
+        >
+          <FaArrowRight />
         </button>
       </div>
+
+      <button className={styles.addQuestionButton} onClick={handleButton}>
+        Afegeix Pregunta
+      </button>
 
       {showModal && (
         <div className={styles.modal}>
           <div className={styles.modalContent}>
-            <h3>
-              Segur que vols {actionType === "delete" ? "esborrar" : "acceptar"}{" "}
+            <p>
+              Estàs segur que vols{" "}
+              {actionType === "delete" ? "eliminar" : "acceptar"}
               aquesta pregunta?
-            </h3>
-            <div className={styles.modalActions}>
-              <button onClick={handleConfirmAction}>Si</button>
-              <button onClick={handleCloseModal}>No</button>
+            </p>
+            <div className={styles.modalButtons}>
+              <button
+                onClick={handleConfirmAction}
+                className={styles.confirmButton}
+              >
+                Confirmar
+              </button>
+              <button
+                onClick={() => setShowModal(false)}
+                className={styles.cancelButton}
+              >
+                Cancel·lar
+              </button>
             </div>
           </div>
         </div>

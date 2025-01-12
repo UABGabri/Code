@@ -120,15 +120,6 @@ function CreateQuizz() {
                       </option>
                     ))}
                 </select>
-                <label>Número de preguntes:</label>
-                <input
-                  type="number"
-                  min="1"
-                  max="15"
-                  value={numeroPreguntes}
-                  onChange={(e) => setNumeroPreguntes(parseInt(e.target.value))}
-                  inputMode="numeric"
-                />
 
                 <button onClick={addTopic}>
                   <FaPlus />

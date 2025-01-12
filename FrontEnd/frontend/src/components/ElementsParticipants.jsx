@@ -11,6 +11,7 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
   const [userInfo, setUserInfo] = useState(null);
   const [newNiu, setNewNiu] = useState("");
   const [csvFile, setCsvFile] = useState(null);
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const [filter, setFilter] = useState("");

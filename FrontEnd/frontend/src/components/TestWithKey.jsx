@@ -153,17 +153,24 @@ function TestWithKey() {
                   enviarResultats({ percentatge });
                   history(-1);
                 }}
+                className={styles.endButtons}
               >
                 Tornar a la pàgina principal
               </button>
             ) : (
               <>
-                <button onClick={() => window.location.reload()}>
+                <button
+                  onClick={() => window.location.reload()}
+                  className={styles.endButtons}
+                >
                   Reiniciar
                 </button>
 
-                <button onClick={() => history(-1)}>
-                  Tornar a la pàgina principal
+                <button
+                  onClick={() => history(-1)}
+                  className={styles.endButtons}
+                >
+                  Inici
                 </button>
               </>
             )}
