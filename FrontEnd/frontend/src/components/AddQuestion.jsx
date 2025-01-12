@@ -9,14 +9,14 @@ import { FaPlus, FaMinus } from "react-icons/fa";
 
 function AddQuestion() {
   const location = useLocation();
-  const { Id_User, Id_Assignatura } = location.state;
+  const { Id_User, Id_Assignatura, Role_User } = location.state;
   const [errors, setFormErrors] = useState("");
   const navigate = useNavigate();
   const [temes, setTemes] = useState([]);
   const [selectedTema, setSelectedTema] = useState();
   const [values, setValues] = useState({
     conceptes_materia: "",
-    dificultat: "",
+    dificultat: "Avaluació",
     pregunta: "",
     solucio_correcta: "",
     estat: "pendent",
@@ -144,27 +144,29 @@ function AddQuestion() {
               onChange={(e) => updateField("conceptes_materia", e.target.value)}
               placeholder="Conceptes separats per comes"
               required
-              pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
+              pattern="^[A-Za-zÀ-ÿ0-9\s,]+$"
               className={styles.selectInput}
             />
           </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="dificultat">Dificultat:</label>
-            <select
-              id="dificultat"
-              name="dificultat"
-              value={values.dificultat}
-              onChange={(e) => updateField("dificultat", e.target.value)}
-              className={styles.selectInput}
-              required
-            >
-              <option value="">Selecciona</option>
-              <option value="Fàcil">Fàcil</option>
-              <option value="Mitjà">Mitjà</option>
-              <option value="Difícil">Difícil</option>
-            </select>
-          </div>
+          {Role_User === "professor" && (
+            <div className={styles.formGroup}>
+              <label htmlFor="dificultat">Dificultat:</label>
+              <select
+                id="dificultat"
+                name="dificultat"
+                value={values.dificultat}
+                onChange={(e) => updateField("dificultat", e.target.value)}
+                className={styles.selectInput}
+                required
+              >
+                <option value="">Selecciona</option>
+                <option value="Fàcil">Fàcil</option>
+                <option value="Mitjà">Mitjà</option>
+                <option value="Difícil">Difícil</option>
+              </select>
+            </div>
+          )}
 
           <div className={styles.questionArea}>
             <div className={styles.formGroup}>

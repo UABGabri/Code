@@ -25,9 +25,10 @@ function CreateManualQuizz() {
   const navigate = useNavigate();
   const [isFinalModal, setIsFinalModalOpen] = useState(false);
   const [nomTest, setNomTest] = useState("");
+  const [duracio, setDuracio] = useState("");
+  const [clau, setClau] = useState("");
 
   useEffect(() => {
-    console.log(tipus, idAssignatura, idProfessor, idTema);
     axios
       .get("http://localhost:8081/recoverPreguntes", {
         params: { idAssignatura },
@@ -36,6 +37,8 @@ function CreateManualQuizz() {
         setPreguntes(response.data);
         setFilteredPreguntes(response.data);
 
+        console.log(response);
+
         const id_assignatura = idAssignatura;
         axios
           .get("http://localhost:8081/recoverTemasAssignatura", {
@@ -43,8 +46,6 @@ function CreateManualQuizz() {
           })
           .then((response) => setTemesFilters(response.data))
           .catch((error) => console.error("Error al recuperar temes:", error));
-
-        console.log(temesFilters);
       })
       .catch((error) => {
         console.error("Error al recuperar les preguntes:", error);
@@ -76,8 +77,15 @@ function CreateManualQuizz() {
       return;
     }
 
+    if (!duracio) {
+      alert("Has de proporcionar una data de finalització.");
+      return;
+    }
+
     const id_creador = idProfessor;
     const id_assignatura = idAssignatura;
+
+    console.log(nomTest, id_assignatura, id_creador, duracio, dataFinalitzacio);
 
     axios
       .post("http://localhost:8081/createTest", {
@@ -87,9 +95,20 @@ function CreateManualQuizz() {
         idTema,
         tipus,
         data_finalitzacio: dataFinalitzacio,
+        duracio,
       })
       .then((response) => {
-        alert("Test creat correctament!");
+        if (response.data.Status === "Failed") {
+          alert("Error al crear");
+          return;
+        }
+
+        if (tipus === "avaluatiu") {
+          alert("Test creat correctament amb clau: " + clau);
+        } else {
+          alert("Test creat correctament!");
+        }
+
         const idTest = parseInt(response.data.id_test);
 
         const orderedQuestions = selectedQuestions.map(
@@ -133,6 +152,7 @@ function CreateManualQuizz() {
         (filters.nom_tema ? question.nom_tema === filters.nom_tema : true)
       );
     });
+
     setFilteredPreguntes(filtered);
     setCurrentPage(1);
   }, [filters, preguntes]);
@@ -173,10 +193,13 @@ function CreateManualQuizz() {
       <div className={styles.questionsContainerTeacher}>
         <h1>Creació Test Manual</h1>
         <div className={styles.filters}>
-          <label>Filtrar per Dificultat:</label>
+          <label style={{ marginRight: "10px" }}>
+            Filtrar per Dificultat:{" "}
+          </label>
           <select
             value={filters.dificultat}
             onChange={(e) => handleFilterChange("dificultat", e.target.value)}
+            style={{ marginRight: "10px" }}
           >
             <option value=""></option>
             <option value="Fàcil">Fàcil</option>
@@ -184,7 +207,7 @@ function CreateManualQuizz() {
             <option value="Difícil">Difícil</option>
           </select>
 
-          <label>Filtrar per tema:</label>
+          <label style={{ marginRight: "10px" }}>Filtrar per tema:</label>
           <select
             value={filters.nom_tema}
             onChange={(e) => handleFilterChange("nom_tema", e.target.value)}
@@ -201,7 +224,7 @@ function CreateManualQuizz() {
         {isFinalModal && (
           <div className={styles.modal}>
             <div className={styles.modalContent}>
-              <strong className={styles.titleGenerator}>Crear Test</strong>
+              <h3 className={styles.titleGenerator}>Crear Test</h3>
 
               <div className={styles.modalLabels}>
                 <label className={styles.inputLabel}>
@@ -223,9 +246,26 @@ function CreateManualQuizz() {
                     className={styles.inputField}
                   />
                 </label>
+
+                <label className={styles.inputLabel}>
+                  Duració del test:
+                  <input
+                    type="text"
+                    value={duracio}
+                    onChange={(e) => {
+                      const inputValue = e.target.value;
+
+                      if (/^\d{0,3}$/.test(inputValue)) {
+                        setDuracio(inputValue);
+                      }
+                    }}
+                    className={styles.inputField}
+                    placeholder="En minuts"
+                  />
+                </label>
               </div>
 
-              <div className={styles.modalButtons}>
+              <div>
                 <button onClick={handleCreateTest} className={styles.colorButt}>
                   Crear
                 </button>
@@ -249,6 +289,9 @@ function CreateManualQuizz() {
                 <div className={styles.questionDetails}>
                   <p>
                     <strong>Tema:</strong> {question.nom_tema}
+                  </p>
+                  <p>
+                    <strong>Conceptes:</strong> {question.conceptes}
                   </p>
                   <p>
                     <strong>Dificultat:</strong> {question.dificultat}
@@ -277,7 +320,7 @@ function CreateManualQuizz() {
           <button
             onClick={() => handlePageChange("prev")}
             disabled={currentPage === 1}
-            style={{ background: "none" }}
+            style={{ background: "none", border: "none" }}
           >
             <FaArrowLeft />
           </button>
@@ -291,7 +334,7 @@ function CreateManualQuizz() {
               currentPage ===
               Math.ceil(filteredPreguntes.length / questionsPerPage)
             }
-            style={{ background: "none" }}
+            style={{ background: "none", border: "none" }}
           >
             <FaArrowRight />
           </button>

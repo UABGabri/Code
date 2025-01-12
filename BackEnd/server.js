@@ -1261,27 +1261,53 @@ app.get('/recoverSelectedTestWithKeyQuestions', (req, res) => {
     const idTest = parseInt(req.query.idTest);
     
     const sql = `
-    SELECT 
-        p.id_pregunta, 
-        p.pregunta, 
-        p.solucio_correcta, 
-        p.solucio_erronia1, 
-        p.solucio_erronia2, 
-        p.solucio_erronia3, 
-        pt.posicio_test, 
-        p.id_tema, 
-        t.tipus,
-        t.id_assignatura,  
-        t.nom_test,
-        t.data_final,
-        t.temps,
-        t.clau_acces
-    FROM test_preguntes pt 
-    JOIN preguntes p ON pt.id_pregunta = p.id_pregunta 
-    JOIN tests t ON pt.id_test = t.id_test  
-    WHERE pt.id_test = ?
-    ORDER BY pt.posicio_test
-`;
+            SELECT 
+                p.id_pregunta, 
+                p.pregunta, 
+                p.solucio_correcta, 
+                p.solucio_erronia1, 
+                p.solucio_erronia2, 
+                p.solucio_erronia3, 
+                pt.posicio_test, 
+                p.id_tema, 
+                t.tipus,
+                t.id_assignatura,  
+                t.nom_test,
+                t.data_final,
+                t.temps,
+                t.clau_acces,
+                GROUP_CONCAT(c.nom_concepte ORDER BY c.nom_concepte SEPARATOR ', ') AS conceptes
+            FROM 
+                test_preguntes pt
+            JOIN 
+                preguntes p ON pt.id_pregunta = p.id_pregunta
+            JOIN 
+                tests t ON pt.id_test = t.id_test
+            LEFT JOIN 
+                preguntes_conceptes pc ON p.id_pregunta = pc.id_pregunta
+            LEFT JOIN 
+                conceptes c ON pc.id_concepte = c.id_concepte
+            WHERE 
+                pt.id_test = ?
+            GROUP BY
+                p.id_pregunta, 
+                p.pregunta, 
+                p.solucio_correcta, 
+                p.solucio_erronia1, 
+                p.solucio_erronia2, 
+                p.solucio_erronia3, 
+                pt.posicio_test, 
+                p.id_tema, 
+                t.tipus,
+                t.id_assignatura,  
+                t.nom_test,
+                t.data_final,
+                t.temps,
+                t.clau_acces
+            ORDER BY 
+                pt.posicio_test;
+
+            `;
     db.query(sql, [idTest], (error, result) => {
         if (error) {
             console.error("Error a la consulta:", error);
@@ -1345,9 +1371,26 @@ app.get('/recoverPreguntes', (req, res) => {
 
     const id_assignatura = req.query.idAssignatura;
 
-   
 
-    const sql = "SELECT p.*, t.nom_tema FROM preguntes p JOIN temes t ON p.id_tema = t.id_tema AND id_assignatura = ?";
+    const sql = `SELECT 
+    p.id_pregunta, 
+    p.pregunta,
+    p.solucio_correcta,
+    p.dificultat,
+    t.nom_tema, 
+    GROUP_CONCAT(c.nom_concepte SEPARATOR ', ') AS conceptes
+    FROM 
+        preguntes p
+    JOIN 
+        temes t ON p.id_tema = t.id_tema
+    LEFT JOIN 
+        preguntes_conceptes pc ON p.id_pregunta = pc.id_pregunta
+    LEFT JOIN 
+        conceptes c ON pc.id_concepte = c.id_concepte
+    WHERE 
+        t.id_assignatura = ?
+    GROUP BY     
+        p.id_pregunta, p.pregunta, t.nom_tema`;
 
     db.query(sql, [id_assignatura], (error, result) => {
         if (error) {
@@ -1389,10 +1432,10 @@ app.get('/recoverPreguntesTema', (req, res) => {
 
 
 
-//Funció creació de test pel professor
+//Funció creació de test manual pel professor
 
 app.post('/createTest', async (req, res) => {
-    const { nom_test, id_creador, id_assignatura, idTema, tipus, data_finalitzacio } = req.body;
+    const { nom_test, id_creador, id_assignatura, idTema, tipus, data_finalitzacio, duracio } = req.body;
 
     // Validar data finalització
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/; // Formato YYYY-MM-DD
@@ -1400,7 +1443,12 @@ app.post('/createTest', async (req, res) => {
         return res.json({ Status: "Failed", Message: "Data finalització no vàlida. Utilitza el format YYYY-MM-DD." });
     }
 
-    const clau_acces = Math.random().toString(36).substr(2, 8);
+
+    const clau_acces = null;
+    if (tipus === 'avaluatiu') {
+        clau_acces = Math.random().toString(36).substr(2, 8);
+    }
+ 
     
 
     const idCreador = parseInt(id_creador, 10);
@@ -1409,17 +1457,17 @@ app.post('/createTest', async (req, res) => {
 
     const sql = `
         INSERT INTO tests 
-        (nom_test,  data_final, clau_acces, id_creador, id_assignatura, id_tema, tipus) 
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        (nom_test,  data_final, clau_acces, id_creador, id_assignatura, id_tema, tipus, temps) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     db.query(
         sql,
-        [nom_test, data_finalitzacio, clau_acces, idCreador, idAssignatura, idTemaParsed, tipus],
+        [nom_test, data_finalitzacio, clau_acces, idCreador, idAssignatura, idTemaParsed, tipus, duracio],
         (error, result) => {
             if (error) {
                 console.error("Error en la consulta:", error);
-                return res.json({ Status: "Failed" });
+                return res.json({ Status: "Failed", message:"Error al insertar" });
             } else {
                 return res.json({ success: true, id_test: result.insertId });
             }

@@ -35,6 +35,7 @@ function CustomTest() {
         params: { idTest },
       })
       .then((response) => {
+        console.log(response);
         const sortedPreguntes = response.data.Preguntes.sort(
           (a, b) => a.posicio - b.posicio
         );
@@ -255,6 +256,14 @@ function CustomTest() {
                 onDragOver={(e) => e.preventDefault()}
               >
                 <p>
+                  <strong>Tema: </strong>
+                  {pregunta.id_tema}
+                </p>
+                <p>
+                  <strong>Conceptes: </strong>
+                  {pregunta.conceptes}
+                </p>
+                <p>
                   <strong>Pregunta: </strong>
                   {pregunta.pregunta}
                 </p>
@@ -262,10 +271,7 @@ function CustomTest() {
                   <strong>Solució: </strong>
                   {pregunta.solucio_correcta}
                 </p>
-                <p>
-                  <strong>Tema: </strong>
-                  {pregunta.id_tema}
-                </p>
+
                 <button
                   className={styles.deleteButton}
                   onClick={() => eliminarPregunta(pregunta)}
@@ -307,6 +313,14 @@ function CustomTest() {
                     className={styles.targetaPregunta}
                   >
                     <div className={styles.contingutTargeta}>
+                      <p>
+                        <strong>Tema: </strong>
+                        {pregunta.id_tema}
+                      </p>
+                      <p>
+                        <strong>Conceptes: </strong>
+                        {pregunta.conceptes}
+                      </p>
                       <p>
                         <strong>Pregunta: </strong>
                         {pregunta.pregunta}

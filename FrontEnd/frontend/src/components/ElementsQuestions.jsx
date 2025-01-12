@@ -44,7 +44,9 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
     if (numberQuestionsPendent >= 3) {
       alert("No pots navegar perquè tens 3 o més preguntes pendents.");
     } else {
-      navigate("/addQuestion", { state: { Id_User, Id_Assignatura } });
+      navigate("/addQuestion", {
+        state: { Id_User, Id_Assignatura, Role_User },
+      });
     }
   };
 
