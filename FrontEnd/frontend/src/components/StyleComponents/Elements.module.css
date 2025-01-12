@@ -879,3 +879,33 @@ hr {
 .botoTancar:hover {
   color: red;
 }
+
+
+.updateForm{
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sectionOne{
+
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.sectionTwo{
+
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+}
+
+.formUpdate{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}

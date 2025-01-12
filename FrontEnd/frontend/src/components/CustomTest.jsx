@@ -199,7 +199,7 @@ function CustomTest() {
       })
       .then((res) => {
         console.log(res);
-        if (res.status === "Sucess") {
+        if (res.data.Status === "Sucess") {
           alert("Canvis efectuats");
         } else {
           alert("Error en el servidor");
@@ -379,68 +379,73 @@ function CustomTest() {
 
               <h1>Paràmetres de la Prova</h1>
 
-              <form onSubmit={handleSubmit}>
-                <label className={styles.inputLabel}>
-                  Nom del Test:
-                  <input
-                    type="text"
-                    className={styles.inputField}
-                    value={testName}
-                    onChange={(e) => setTestName(e.target.value)}
-                    maxLength="10"
-                    required
-                  />
-                </label>
+              <form onSubmit={handleSubmit} className={styles.formUpdate}>
+                <div className={styles.updateForm}>
+                  <div className={styles.sectionOne}>
+                    <label className={styles.inputLabel}>
+                      Nom del Test:
+                      <input
+                        type="text"
+                        className={styles.inputField}
+                        value={testName}
+                        onChange={(e) => setTestName(e.target.value)}
+                        maxLength="10"
+                        required
+                      />
+                    </label>
 
-                <label className={styles.inputLabel}>
-                  Data de Finalització:
-                  <input
-                    type="date"
-                    value={data}
-                    onChange={(e) => setData(e.target.value)}
-                    className={styles.inputField}
-                    required
-                  />
-                </label>
+                    <label className={styles.inputLabel}>
+                      Data de Finalització:
+                      <input
+                        type="date"
+                        value={data}
+                        onChange={(e) => setData(e.target.value)}
+                        className={styles.inputField}
+                        required
+                      />
+                    </label>
 
-                <label className={styles.inputLabel}>
-                  Duració del test:
-                  <input
-                    type="text"
-                    value={duration}
-                    onChange={(e) => setDuration(e.target.value)}
-                    className={styles.inputField}
-                    placeholder="En minuts"
-                    required
-                  />
-                </label>
+                    <label className={styles.inputLabel}>
+                      Duració del test:
+                      <input
+                        type="text"
+                        value={duration}
+                        onChange={(e) => setDuration(e.target.value)}
+                        className={styles.inputField}
+                        placeholder="En minuts"
+                        required
+                      />
+                    </label>
+                  </div>
 
-                <label className={styles.inputLabel}>
-                  Tipus:
-                  <select
-                    value={tipus}
-                    onChange={(e) => setTipus(e.target.value)}
-                    className={styles.inputField}
-                  >
-                    <option value="practica">Pràctica</option>
-                    <option value="avaluatiu">Avaluatiu</option>
-                  </select>
-                </label>
+                  <label className={styles.inputLabel}>
+                    Tipus:
+                    <select
+                      value={tipus}
+                      onChange={(e) => setTipus(e.target.value)}
+                      className={styles.inputField}
+                      style={{ marginBottom: "50px" }}
+                    >
+                      <option value="practica">Pràctica</option>
+                      <option value="avaluatiu">Avaluatiu</option>
+                    </select>
+                  </label>
 
-                <div style={{ gap: "20px", display: "flex" }}>
-                  <button
-                    type="submit"
-                    className={styles.deleteTestButtonConfirm}
-                  >
-                    Aplicar Canvis
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.cancelButton}
-                    onClick={() => setShowInfoTest(false)}
-                  >
-                    Cancel·lar
-                  </button>
+                  <div style={{ gap: "20px", display: "flex" }}>
+                    <button
+                      type="submit"
+                      className={styles.deleteTestButtonConfirm}
+                    >
+                      Aplicar Canvis
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.cancelButton}
+                      onClick={() => setShowInfoTest(false)}
+                    >
+                      Cancel·lar
+                    </button>
+                  </div>
                 </div>
               </form>
             </div>
