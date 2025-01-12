@@ -116,6 +116,7 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
       .then((res) => {
         if (res.data.exists) {
           const role = res.data.role;
+
           const checkEndpoint =
             role === "professor"
               ? "http://localhost:8081/checkProfessorInSubject"
@@ -197,7 +198,10 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
 
                 {Role_User === "professor" && (
                   <p>
-                    <strong>Nota Assignatura: {user.notes || 0.0} %</strong>
+                    <strong>
+                      Nota Global Assignatura:{" "}
+                      {(user.notes / 10 || 0.0).toFixed(2)}{" "}
+                    </strong>
                   </p>
                 )}
               </div>

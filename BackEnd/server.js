@@ -924,9 +924,26 @@ app.get("/checkStudentInSubject", (req, res) => {
             console.error("Error al afegir el professor:", error);
             return res.json({ success: false });
         }
-        return res.json({ success: true });
+        else{
+            const sqlSelect = `SELECT usuaris.*, 'alumne' AS role 
+            FROM usuaris 
+            JOIN alumnes_assignatures ON usuaris.niu = alumnes_assignatures.id_alumne 
+            WHERE alumnes_assignatures.id_assignatura = ? `;
+
+            db.query(sqlSelect, [Id_Assignatura], (error, resultSelect) => {
+
+            if(error){
+                return res.json({ success: false})
+            }
+
+        return res.json({ success: true, resultSelect});
+        })
+        }
+       
     });
 });
+
+
 
 app.post("/addStudentToSubject", async (req, res) => {
     const { niu, Id_Assignatura } = req.body;

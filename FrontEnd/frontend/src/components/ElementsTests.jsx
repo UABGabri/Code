@@ -84,7 +84,11 @@ function ElementsTests({ idAssignatura }) {
 
           {errorFormulari && <p className={styles.error}>{errorFormulari}</p>}
 
-          <button type="submit" className={styles.buttonSubmit}>
+          <button
+            type="submit"
+            className={styles.buttonSubmit}
+            style={{ backgroundColor: "green" }}
+          >
             Generar Test
           </button>
         </form>
@@ -93,6 +97,7 @@ function ElementsTests({ idAssignatura }) {
           type="button"
           className={styles.buttonIA}
           onClick={handleTestIA}
+          style={{ backgroundColor: "green" }}
         >
           Generar Test IA
         </button>

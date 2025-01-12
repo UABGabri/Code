@@ -322,6 +322,7 @@ function CustomTest() {
                     </div>
                     <button
                       className={styles.botoAfegir}
+                      style={{ backgroundColor: "green" }}
                       onClick={() => afegirPregunta(pregunta)}
                     >
                       Afegir

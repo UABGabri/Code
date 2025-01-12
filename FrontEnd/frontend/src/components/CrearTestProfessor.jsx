@@ -254,9 +254,6 @@ function CrearTestProfessor() {
               <div key={question.id_pregunta} className={styles.questionCard}>
                 <div className={styles.questionDetails}>
                   <p>
-                    <strong>Autor:</strong> {question.id_creador}
-                  </p>
-                  <p>
                     <strong>Tema:</strong> {question.nom_tema}
                   </p>
                   <p>

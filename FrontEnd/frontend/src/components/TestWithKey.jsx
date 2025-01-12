@@ -30,6 +30,12 @@ function TestWithKey() {
           (pregunta) => pregunta.pregunta && pregunta.pregunta.trim() !== ""
         ).sort((a, b) => a.posicio - b.posicio);
 
+        if (response.data.Preguntes[0].tipus === "avaluatiu") {
+          setAvaluatiu(true);
+        }
+
+        console.log(response.data.Preguntes[0].tipus);
+
         setTime(parseInt(response.data.Preguntes[0].temps * 60));
         //setTime(5);
         setPreguntes(preguntasConContenido);
@@ -133,11 +139,6 @@ function TestWithKey() {
   if (showResults) {
     const { correctes, incorrectes, percentatge } = calcularResultats();
 
-    if (avaluatiu) {
-      console.log("Enviament de resultats");
-      enviarResultats({ percentatge });
-    }
-
     return (
       <div className={styles.containerQuizz}>
         <div className={styles.resultsBox}>
@@ -149,6 +150,7 @@ function TestWithKey() {
             {avaluatiu ? (
               <button
                 onClick={() => {
+                  enviarResultats({ percentatge });
                   history(-1);
                 }}
               >
@@ -176,8 +178,6 @@ function TestWithKey() {
   return (
     <div className={styles.containerQuizz}>
       <div className={styles.containerElements}>
-        <h1>Formulari</h1>
-        <hr />
         <p className={styles.pregunta}>{preguntes[currentIndex]?.pregunta}</p>
         <ul className={styles.llistaRespostes}>
           {respostesActuals.map(
