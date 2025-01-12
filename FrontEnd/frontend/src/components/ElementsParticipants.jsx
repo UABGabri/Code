@@ -2,15 +2,18 @@ import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 import styles from "./StyleComponents/Elements.module.css";
-import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
+import { FaArrowLeft, FaArrowRight, FaInfo } from "react-icons/fa6";
 
 function ElementsParticipants({ Id_Assignatura, Role_User }) {
   const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [infoModal, setInfoModal] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
   const [newNiu, setNewNiu] = useState("");
   const [csvFile, setCsvFile] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+  const [filter, setFilter] = useState("");
 
   //Funció de recuperació dels participants
   useEffect(() => {
@@ -41,8 +44,13 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
     setDeleteModal(false);
   };
 
-  //Funció d'eliminació dels participants
+  const handleOpenInformation = (user) => {
+    setInfoModal(true);
 
+    setUserInfo(user);
+  };
+
+  //Funció d'eliminació dels participants
   const handleEliminateParticipant = (niu, role) => {
     const endpoint =
       role === "professor"
@@ -94,7 +102,7 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
         }
       );
       if (response.data.status === "success") {
-        console.log(response.data);
+        //console.log(response.data);
         alert("Importació completada correctament!");
         setUsers(response.data.participants); // Actualitzar la llista d'usuaris amb les noves dades
       } else {
@@ -144,7 +152,7 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
                     Id_Assignatura,
                   })
                   .then((addRes) => {
-                    console.log(addRes);
+                    //console.log(addRes);
                     setUsers(addRes.data.resultSelect);
                     setShowModal(false);
                     setNewNiu("");
@@ -174,8 +182,13 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
     setShowModal(false);
   };
 
-  const totalPages = Math.ceil(users.length / itemsPerPage);
-  const displayedUsers = users.slice(
+  // Filtratge de participants pel nom
+  const filteredUsers = users.filter((user) => {
+    return user.username.toLowerCase().includes(filter.toLowerCase()); // Filtra per nom
+  });
+
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const displayedUsers = filteredUsers.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -194,6 +207,17 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
         <strong className={styles.elementsCursHeader}>
           GESTIÓ DE PARTICIPANTS
         </strong>
+        <div style={{ marginBottom: "10px", gap: "30px" }}>
+          <label style={{ marginRight: "10px" }}>Filtrar per Nom: </label>
+          <input
+            type="text"
+            placeholder="Filtrar per nom"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className={styles.filterInput}
+          />
+        </div>
+
         {displayedUsers.length > 0 ? (
           displayedUsers.map((user) => (
             <div key={user.niu} className={styles.participantCard}>
@@ -201,24 +225,20 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
                 <p>
                   <strong>Nom:</strong> {user.username}
                 </p>
-                <p>
-                  <strong>NIU:</strong> {user.niu}
-                </p>
+
                 <p>
                   <strong>Email:</strong> <a href="">{user.email}</a>
                 </p>
                 <p>
                   <strong>Rol: </strong> {user.role}
                 </p>
+              </div>
 
-                {Role_User === "professor" && (
-                  <p>
-                    <strong>
-                      Nota Global Assignatura:{" "}
-                      {(user.notes / 10 || 0.0).toFixed(2)}{" "}
-                    </strong>
-                  </p>
-                )}
+              <div
+                onClick={() => handleOpenInformation(user)}
+                style={{ marginTop: "80px" }}
+              >
+                <FaInfo />
               </div>
 
               {Role_User !== "alumne" && (
@@ -227,6 +247,43 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
                   onClick={() => handleOpenModal(user.niu)}
                 >
                   Eliminar
+                </div>
+              )}
+
+              {infoModal && userInfo && (
+                <div
+                  key={userInfo.niu}
+                  className={styles.modalInformation}
+                  onClick={(e) => {
+                    if (e.target === e.currentTarget) {
+                      setInfoModal(false);
+                    }
+                  }}
+                >
+                  <div className={styles.modalInformationUser}>
+                    <p>
+                      <strong>Nom:</strong> {userInfo.username}
+                    </p>
+                    <p>
+                      <strong>NIU:</strong> {userInfo.niu}
+                    </p>
+                    <p>
+                      <strong>Email:</strong>{" "}
+                      <a href={`mailto:${userInfo.email}`}>{userInfo.email}</a>
+                    </p>
+                    <p>
+                      <strong>Rol: </strong> {userInfo.role}
+                    </p>
+
+                    {Role_User === "professor" && (
+                      <p>
+                        <strong>
+                          Nota Global Assignatura:{" "}
+                          {(userInfo.notes / 10 || 0.0).toFixed(2)}{" "}
+                        </strong>
+                      </p>
+                    )}
+                  </div>
                 </div>
               )}
 
