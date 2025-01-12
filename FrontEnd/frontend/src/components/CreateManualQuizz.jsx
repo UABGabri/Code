@@ -1,4 +1,4 @@
-import styles from "./StyleComponents/Elements.module.css";
+import styles from "./StyleComponents/CreateQuizzManual.module.css";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { useState, useEffect } from "react";
@@ -7,12 +7,13 @@ import Headercap from "./Headercap";
 import { BiArrowBack } from "react-icons/bi";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 
-function CrearTestProfessor() {
+function CreateManualQuizz() {
   const location = useLocation();
   const idTema = location.state?.id_tema;
   const idProfessor = location.state?.id_professor;
   const idAssignatura = location.state?.id_assignatura;
   const tipus = location.state?.tipus;
+
   const [preguntes, setPreguntes] = useState([]);
   const [filteredPreguntes, setFilteredPreguntes] = useState([]);
   const [temesFilters, setTemesFilters] = useState([]);
@@ -26,6 +27,7 @@ function CrearTestProfessor() {
   const [nomTest, setNomTest] = useState("");
 
   useEffect(() => {
+    console.log(tipus, idAssignatura, idProfessor, idTema);
     axios
       .get("http://localhost:8081/recoverPreguntes", {
         params: { idAssignatura },
@@ -196,14 +198,6 @@ function CrearTestProfessor() {
           </select>
         </div>
 
-        <button
-          className={styles.createTestButton}
-          onClick={createQuizz}
-          disabled={selectedQuestions.length < 1}
-        >
-          Crear Test
-        </button>
-
         {isFinalModal && (
           <div className={styles.modal}>
             <div className={styles.modalContent}>
@@ -283,6 +277,7 @@ function CrearTestProfessor() {
           <button
             onClick={() => handlePageChange("prev")}
             disabled={currentPage === 1}
+            style={{ background: "none" }}
           >
             <FaArrowLeft />
           </button>
@@ -296,13 +291,22 @@ function CrearTestProfessor() {
               currentPage ===
               Math.ceil(filteredPreguntes.length / questionsPerPage)
             }
+            style={{ background: "none" }}
           >
             <FaArrowRight />
           </button>
         </div>
+
+        <button
+          className={styles.createTestButtonn}
+          onClick={createQuizz}
+          disabled={selectedQuestions.length < 1}
+        >
+          Crear Test
+        </button>
       </div>
     </div>
   );
 }
 
-export default CrearTestProfessor;
+export default CreateManualQuizz;

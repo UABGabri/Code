@@ -734,6 +734,32 @@ app.get('/recoverTemasAssignatura', (req, res)=>{
 
 })
 
+
+//Funció de recuperació dels temes amb preguntes acceptades
+app.get('/recoverTemasAssignaturaPreguntes', (req, res) => {
+    const id_assignatura = req.query.Id_Assignatura;
+  
+    
+    const sql = `
+      SELECT t.*
+    FROM temes t
+    JOIN preguntes p ON t.id_tema = p.id_tema
+    WHERE t.id_assignatura = ?
+    AND p.estat = 'acceptada'
+    GROUP BY t.id_tema
+    `;
+  
+    db.query(sql, [id_assignatura], (error, result) => {
+      if (error) {
+        console.error("Error en la consulta:", error);
+        return res.json({ Status: "Failed" });
+      } else {
+        return res.json(result);
+      }
+    });
+  });
+  
+
 //Funció de recuperació preguntes per ser avaluades pel professor
 app.get('/recoverQuestions', (req, res)=>{ 
 

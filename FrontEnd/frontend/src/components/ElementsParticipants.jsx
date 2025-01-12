@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 import styles from "./StyleComponents/Elements.module.css";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 
 function ElementsParticipants({ Id_Assignatura, Role_User }) {
   const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [newNiu, setNewNiu] = useState("");
   const [csvFile, setCsvFile] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   //Funció de recuperació dels participants
   useEffect(() => {
@@ -94,8 +97,6 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
         console.log(response.data);
         alert("Importació completada correctament!");
         setUsers(response.data.participants); // Actualitzar la llista d'usuaris amb les noves dades
-
-        //window.location.reload();
       } else {
         alert("Error a la importació: " + response.data.message);
       }
@@ -173,14 +174,28 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
     setShowModal(false);
   };
 
+  const totalPages = Math.ceil(users.length / itemsPerPage);
+  const displayedUsers = users.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
   return (
     <div>
       <div className={styles.participantContainer}>
         <strong className={styles.elementsCursHeader}>
           GESTIÓ DE PARTICIPANTS
         </strong>
-        {users.length > 0 ? (
-          users.map((user) => (
+        {displayedUsers.length > 0 ? (
+          displayedUsers.map((user) => (
             <div key={user.niu} className={styles.participantCard}>
               <div className={styles.participantDetails}>
                 <p>
@@ -216,8 +231,8 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
               )}
 
               {deleteModal && (
-                <div className={styles.modal}>
-                  <div className={styles.modalContent}>
+                <div className={styles.modalEliminateParticipant}>
+                  <div className={styles.modalContentEliminateParticipant}>
                     <h3>Segur que vols eliminar a aquest alumne?</h3>
                     <div className={styles.modalActions}>
                       <button
@@ -240,9 +255,72 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
           </div>
         )}
 
+        {totalPages > 1 && (
+          <div className={styles.pagination}>
+            <button
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+              style={{ background: "none" }}
+            >
+              <FaArrowLeft />
+            </button>
+            <span>
+              Pàgina {currentPage} de {totalPages}
+            </span>
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              style={{ background: "none" }}
+            >
+              <FaArrowRight />
+            </button>
+          </div>
+        )}
+
         {Role_User !== "alumne" && (
           <>
             <div className={styles.addParticipants}>
+              <button
+                onClick={() => setShowModal(true)}
+                className={styles.addParticipantButton}
+                style={{ marginBottom: "10px" }}
+              >
+                Afegir participant
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+
+      {showModal && (
+        <div className={styles.modalBackdropParticipant}>
+          <div className={styles.modalContentParticipant}>
+            <div>
+              <h2>Afegir Participant</h2>
+              <label htmlFor="niu">NIU de l'usuari:</label>
+              <input
+                type="text"
+                id="niu"
+                value={newNiu}
+                onChange={(e) => setNewNiu(e.target.value)}
+                className={styles.inputField}
+              />
+              <div className={styles.modalActions}>
+                <button
+                  onClick={handleAddParticipant}
+                  style={{ backgroundColor: "green", color: "white" }}
+                >
+                  Afegir
+                </button>
+                <button
+                  style={{ backgroundColor: "red", color: "white" }}
+                  onClick={() => setShowModal(false)}
+                >
+                  Cancel·lar
+                </button>
+              </div>
+
+              <hr></hr>
               <div>
                 <h2>Importar usuaris amb fitxer CSV</h2>
                 <input
@@ -253,36 +331,11 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
                 <button
                   onClick={handleCsvUpload}
                   className={styles.addParticipantButton}
+                  style={{ marginTop: "10px" }}
                 >
                   Importar CSV
                 </button>
               </div>
-              <button
-                onClick={() => setShowModal(true)}
-                className={styles.addParticipantButton}
-              >
-                Afegir participant
-              </button>
-            </div>
-          </>
-        )}
-      </div>
-
-      {showModal && (
-        <div className={styles.modalBackdrop}>
-          <div className={styles.modalContent}>
-            <h2>Afegir Participant</h2>
-            <label htmlFor="niu">NIU de l'usuari:</label>
-            <input
-              type="text"
-              id="niu"
-              value={newNiu}
-              onChange={(e) => setNewNiu(e.target.value)}
-              className={styles.inputField}
-            />
-            <div className={styles.modalActions}>
-              <button onClick={handleAddParticipant}>Afegir</button>
-              <button onClick={() => setShowModal(false)}>Cancel·lar</button>
             </div>
           </div>
         </div>

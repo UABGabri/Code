@@ -64,6 +64,15 @@ function Dashboard({ id_User, role_User }) {
 
   //Funció asíncrona per esborrar assignatures. Es fa de forma asíncrona per qüestió del CASCADE.
   const handleDeleteSubject = async () => {
+    if (
+      !assignatures.some(
+        (assignatura) => assignatura.id_assignatura === parseInt(deleteId)
+      )
+    ) {
+      alert("No pots eliminar una assignatura on no estiguis matriculat");
+      return;
+    }
+
     try {
       const res = await axios.delete("http://localhost:8081/deleteSubject", {
         params: { id_subject: deleteId },

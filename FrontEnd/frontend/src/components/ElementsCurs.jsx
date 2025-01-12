@@ -145,8 +145,6 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
 
   //Funció d'eliminació d'un tema.
   const handleDeleteTheme = (id_tema) => {
-    //const idTema = id_tema;
-
     axios
       .delete("http://localhost:8081/deleteTheme", { data: { id_tema } })
       .then((response) => {
@@ -322,7 +320,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                       className={styles.deleteTheme}
                       onClick={() => handleDeleteTheme(tema.id_tema)}
                     >
-                      Eliminar
+                      Eliminar Tema
                     </button>
                   )}
                 </div>
@@ -346,6 +344,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
               placeholder="Nom del tema"
               className={styles.temaInput}
               required
+              maxLength={12}
               pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
               title="El nom del tema ha de contenir elements vàlids."
             />

@@ -23,7 +23,7 @@ function CreateQuizz() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8081/recoverTemasAssignatura", {
+      .get("http://localhost:8081/recoverTemasAssignaturaPreguntes", {
         params: { Id_Assignatura: id_assignatura },
       })
       .then((response) => setTemes(response.data))
@@ -56,7 +56,7 @@ function CreateQuizz() {
   };
 
   const confirmCreateQuiz = () => {
-    const durationNormal = parseInt(duracio) * 60; //canvi a segons per facilitar temporitzador
+    const durationNormal = parseInt(duracio) * 60;
 
     console.log(durationNormal);
     axios
@@ -184,7 +184,9 @@ function CreateQuizz() {
 
             <button
               onClick={() => {
-                navigate("/manualTest", { state: { id_assignatura } });
+                navigate("/manualTest", {
+                  state: { id_assignatura, id_professor, id_tema, tipus },
+                });
               }}
               className={styles.colorButt}
             >

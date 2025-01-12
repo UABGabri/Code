@@ -25,6 +25,7 @@ function AddSubjectModal({ id_User, onClose }) {
         if (res.data.Status === "Failed") {
           alert(res.data.Messages);
         } else {
+          alert("Assignatura afegida correctament");
           window.location.reload(); // Si tot va bé, recarregar
         }
       })

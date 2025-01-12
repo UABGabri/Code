@@ -348,14 +348,12 @@ function CustomTest() {
                 x
               </button>
               <h1>Estàs segur que vols eliminar el test?</h1>
-              <button
-                className={styles.deleteTestButtonConfirm}
-                onClick={eliminarTest}
-              >
+              <button className={styles.addButton} onClick={eliminarTest}>
                 Eliminar
               </button>
               <button
-                className={styles.cancelButton}
+                className={styles.addButton}
+                style={{ backgroundColor: "red", marginLeft: "10px" }}
                 onClick={() => setShowDeleteModal(false)}
               >
                 Cancel·lar
@@ -433,15 +431,12 @@ function CustomTest() {
                   </label>
 
                   <div style={{ gap: "20px", display: "flex" }}>
-                    <button
-                      type="submit"
-                      className={styles.deleteTestButtonConfirm}
-                    >
+                    <button type="submit" className={styles.addButton}>
                       Aplicar Canvis
                     </button>
                     <button
                       type="button"
-                      className={styles.cancelButton}
+                      className={styles.deleteButton}
                       onClick={() => setShowInfoTest(false)}
                     >
                       Cancel·lar

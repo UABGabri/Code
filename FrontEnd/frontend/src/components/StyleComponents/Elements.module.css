@@ -205,7 +205,7 @@
   background-color: darkgreen;
 }
 
-.modalBackdrop {
+.modalBackdropParticipant {
   position: fixed;
   top: 0;
   left: 0;
@@ -218,7 +218,7 @@
   z-index: 1000;
 }
 
-.modalContent {
+.modalContentParticipant {
   background: white;
   padding: 20px 30px;
   border-radius: 10px;
@@ -226,7 +226,7 @@
   width: 400px;
 }
 
-.modalContent h2 {
+.modalContentParticipant h2 {
   margin-bottom: 20px;
   font-size: 20px;
 }
@@ -264,6 +264,27 @@
 
 .modalActions button:last-child:hover {
   background-color: #e04343;
+}
+
+
+.modalEliminateParticipant {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContentEliminateParticipant {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
 }
 
 /*FI SECCIO PARTICIPANT*/
@@ -457,18 +478,19 @@ hr {
 .temaContent {
   margin-top: 10px;
   padding-left: 20px;
-  gap: 150px;
+  gap: 10px;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   position: relative;
+
  
  
 }
 
 .deleteTheme {
   position: absolute;
-  bottom: 10px;
-  right: 10px;
+  bottom: 1px;
+  right: 20px;
   background-color: white;
   color: red;
   border: 1px solid red;
@@ -477,6 +499,7 @@ hr {
   cursor: pointer;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease;
+  
 }
 
 .deleteTheme:hover {
@@ -499,7 +522,7 @@ hr {
   list-style: none;
   padding-left: 0;
   justify-content: center;
-
+  margin-bottom: 50px;
   display: flex;
   flex-direction: column;
 }
