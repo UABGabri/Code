@@ -766,9 +766,23 @@ app.get('/recoverQuestions', (req, res)=>{
     const id_assignatura = req.query.Id_Assignatura;
     parseInt(id_assignatura);
     
-    const sql = `SELECT * FROM preguntes 
-    JOIN temes ON preguntes.id_tema = temes.id_tema 
-    WHERE  temes.id_assignatura = ?`;
+    const sql = `SELECT 
+    preguntes.*, 
+    temes.nom_tema, 
+    GROUP_CONCAT(DISTINCT conceptes.nom_concepte ORDER BY conceptes.nom_concepte ASC) AS conceptes
+    FROM 
+        preguntes
+    JOIN 
+        temes ON preguntes.id_tema = temes.id_tema
+    LEFT JOIN 
+      preguntes_conceptes ON preguntes_conceptes.id_pregunta = preguntes.id_pregunta
+    LEFT JOIN 
+        conceptes ON conceptes.id_concepte = preguntes_conceptes.id_concepte
+    WHERE 
+     temes.id_assignatura = ?
+    GROUP BY 
+    preguntes.id_pregunta, temes.nom_tema;
+`;
 
     db.query(sql,[id_assignatura], (error, result)=>{
 
@@ -779,6 +793,35 @@ app.get('/recoverQuestions', (req, res)=>{
             return res.json(result); 
           }
     })
+})
+
+
+
+app.get('/recoverQuestionsAlumni', (req, res)=>{ 
+
+    const id_assignatura = req.query.Id_Assignatura;
+    const id_user = req.query.Id_User;
+
+
+    const sql = `SELECT p.*, temes.nom_tema
+        FROM preguntes p
+        JOIN temes ON p.id_tema = temes.id_tema
+        WHERE p.id_creador = ? 
+        AND temes.id_assignatura = ? 
+        AND p.estat = 'pendent';
+    `
+
+    db.query(sql,[id_user, id_assignatura], (error, result)=>{
+
+        if (error) {
+            console.error("Error en la consulta:", error);
+            return res.json({ Status: "Failed" });
+          } else {
+            return res.json(result); 
+          }
+    })
+
+
 })
 
 

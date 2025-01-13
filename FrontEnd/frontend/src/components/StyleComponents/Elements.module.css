@@ -69,6 +69,31 @@
     
     
   }
+
+  .editionMode{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .editionContent{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: white;
+    padding: 10px 30px;
+    border-radius: 10px;
+    text-align: center;
+    width: 400px;
+  }
   
   .questionDetails p {
     margin: 5px 0;
@@ -77,7 +102,7 @@
  
 
   .editInput{
-    width: 800px; 
+    width: 200px; 
     overflow: hidden; 
     text-overflow: ellipsis; 
     white-space: nowrap;

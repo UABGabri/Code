@@ -14,37 +14,44 @@ import {
 
 function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
   const [questions, setQuestions] = useState([]);
-  const [editingQuestionId, setEditingQuestionId] = useState(null);
-  const [editedQuestion, setEditedQuestion] = useState({});
+  const [editingQuestion, setEditingQuestion] = useState(null);
+  const [selectedEditingQuestion, setSelectedEditingQuestion] = useState({});
+  const [editedQuestion, setEditedQuestion] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [actionType, setActionType] = useState("");
   const [questionIdToAct, setQuestionIdToAct] = useState(null);
+
   const navigate = useNavigate();
-
   const [numberQuestionsPendent, setNumberQuestionsPendent] = useState(0);
-
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-
   const [filterText, setFilterText] = useState("");
   const [selectedTopic, setSelectedTopic] = useState("");
-  const [selectedFilterType, setSelectedFilterType] = useState(""); // Nuevo estado para el tipo de filtro
+  const [selectedFilterType, setSelectedFilterType] = useState("");
 
   //Funció de recuperació del número de preguntes en estat pendent de l'usuari
   useEffect(() => {
     axios
       .get("http://localhost:8081/pendentQuestions", { params: { Id_User } })
       .then((res) => {
-        if (res.status === 200) {
+        if (res.data.Status === "Sucess") {
           setNumberQuestionsPendent(parseInt(res.data.count));
+        } else {
+          alert("Error al recuperar les preguntes pendents");
         }
       })
       .catch((err) => console.error("Error a la sol·licitud:", err));
   }, [Id_User]);
 
   const handleButton = () => {
-    if (numberQuestionsPendent >= 3) {
-      alert("No pots navegar perquè tens 3 o més preguntes pendents.");
+    if (Role_User === "alumne") {
+      if (numberQuestionsPendent >= 3) {
+        alert("No pots navegar perquè tens 3 o més preguntes pendents.");
+      } else {
+        navigate("/addQuestion", {
+          state: { Id_User, Id_Assignatura, Role_User },
+        });
+      }
     } else {
       navigate("/addQuestion", {
         state: { Id_User, Id_Assignatura, Role_User },
@@ -53,14 +60,25 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
   };
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8081/recoverQuestions", {
-        params: { Id_Assignatura },
-      })
-      .then((res) => {
-        setQuestions(res.data);
-      })
-      .catch((err) => console.error("Error a la sol·licitud:", err));
+    if (Role_User === "professor") {
+      axios
+        .get("http://localhost:8081/recoverQuestions", {
+          params: { Id_Assignatura },
+        })
+        .then((res) => {
+          setQuestions(res.data);
+        })
+        .catch((err) => console.error("Error a la sol·licitud:", err));
+    } else {
+      axios
+        .get("http://localhost:8081/recoverQuestionsAlumni", {
+          params: { Id_Assignatura, Id_User },
+        })
+        .then((res) => {
+          setQuestions(res.data);
+        })
+        .catch((err) => console.error("Error a la sol·licitud:", err));
+    }
   }, [Id_Assignatura]);
 
   const handleTopicChange = (e) => {
@@ -116,7 +134,18 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
     handleCloseModal();
   };
 
-  const handleEdit = (question) => {};
+  //Funció per obrir el modal de la edició i obtenir la seva informació
+  const handleEdit = (question) => {
+    setEditedQuestion(true);
+    console.log(question);
+    setSelectedEditingQuestion(question);
+  };
+
+  //Funció per cancel·lar la edició
+  const handleCancel = () => {
+    setEditingQuestion(null);
+    setEditedQuestion({});
+  };
 
   const handleSave = (idPregunta) => {
     if (
@@ -140,14 +169,9 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
             q.id_pregunta === idPregunta ? { ...q, ...editedQuestion } : q
           )
         );
-        setEditingQuestionId(null);
+        setEditingQuestion(null);
       })
       .catch((err) => console.error("Error actualitzant la pregunta:", err));
-  };
-
-  const handleCancel = () => {
-    setEditingQuestionId(null);
-    setEditedQuestion({});
   };
 
   const handleDelete = (idPregunta) => {
@@ -185,37 +209,41 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
   return (
     <div className={styles.questionsContainer}>
       <strong className={styles.elementsCursHeader}>GESTIÓ DE PREGUNTES</strong>
+      {Role_User === "professor" && (
+        <>
+          <div className={styles.filterContainer}>
+            <label style={{ marginLeft: "10px", marginRight: "10px" }}>
+              Filtrar Preguntes per Estat:{" "}
+            </label>
+            <select
+              value={selectedFilterType}
+              onChange={handleFilterTypeChange}
+              className={styles.filterInput}
+            >
+              <option value="banc">Banc de Preguntes</option>
+              <option value="pendent">Avaluació</option>
+            </select>
 
-      <div className={styles.filterContainer}>
-        <label style={{ marginLeft: "10px", marginRight: "10px" }}>
-          Filtrar Preguntes per Estat:{" "}
-        </label>
-        <select
-          value={selectedFilterType}
-          onChange={handleFilterTypeChange}
-          className={styles.filterInput}
-        >
-          <option value="banc">Banc de Preguntes</option>
-          <option value="pendent">Avaluació</option>
-        </select>
-
-        <label style={{ marginLeft: "10px", marginRight: "10px" }}>
-          Filtrar per Tema:{" "}
-        </label>
-        <select
-          value={selectedTopic}
-          onChange={handleTopicChange}
-          className={styles.filterInput}
-        >
-          <option value="">Tots els temes</option>
-          {Array.from(new Set(questions.map((q) => q.nom_tema))).map((tema) => (
-            <option key={tema} value={tema}>
-              {tema}
-            </option>
-          ))}
-        </select>
-      </div>
-
+            <label style={{ marginLeft: "10px", marginRight: "10px" }}>
+              Filtrar per Tema:{" "}
+            </label>
+            <select
+              value={selectedTopic}
+              onChange={handleTopicChange}
+              className={styles.filterInput}
+            >
+              <option value="">Tots els temes</option>
+              {Array.from(new Set(questions.map((q) => q.nom_tema))).map(
+                (tema) => (
+                  <option key={tema} value={tema}>
+                    {tema}
+                  </option>
+                )
+              )}
+            </select>
+          </div>
+        </>
+      )}
       <div className={styles.questionsList}>
         {displayedQuestions.map((question) => (
           <div key={question.id_pregunta} className={styles.questionCard}>
@@ -226,47 +254,12 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
               <p>
                 <strong>Dificultat:</strong> {question.dificultat}
               </p>
-              {editingQuestionId === question.id_pregunta ? (
-                <>
-                  <p>
-                    <strong>Pregunta:</strong>
-                    <input
-                      type="text"
-                      value={editedQuestion.pregunta}
-                      onChange={(e) =>
-                        setEditedQuestion({
-                          ...editedQuestion,
-                          pregunta: e.target.value,
-                        })
-                      }
-                      className={styles.editInput}
-                    />
-                  </p>
-                  <p>
-                    <strong>Resposta:</strong>
-                    <input
-                      type="text"
-                      value={editedQuestion.solucio_correcta}
-                      onChange={(e) =>
-                        setEditedQuestion({
-                          ...editedQuestion,
-                          solucio_correcta: e.target.value,
-                        })
-                      }
-                      className={styles.editInput}
-                    />
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p>
-                    <strong>Pregunta:</strong> {question.pregunta}
-                  </p>
-                  <p>
-                    <strong>Resposta:</strong> {question.solucio_correcta}
-                  </p>
-                </>
-              )}
+              <p>
+                <strong>Pregunta:</strong> {question.pregunta}
+              </p>
+              <p>
+                <strong>Resposta:</strong> {question.solucio_correcta}
+              </p>
             </div>
 
             {Role_User !== "alumne" && (
@@ -303,7 +296,6 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
           </div>
         ))}
       </div>
-
       <div className={styles.paginationContainer}>
         <button
           onClick={() => handlePageChange(-1)}
@@ -325,7 +317,6 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
           <FaArrowRight />
         </button>
       </div>
-
       <button className={styles.addQuestionButton} onClick={handleButton}>
         Afegeix Pregunta
       </button>
@@ -354,6 +345,145 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
             </div>
           </div>
         </div>
+      )}
+
+      {editedQuestion && (
+        <>
+          <div className={styles.editionMode}>
+            <div className={styles.editionContent}>
+              <h1>Editar Pregunta</h1>
+
+              <p>
+                <strong>Tema:</strong>{" "}
+              </p>
+
+              <input
+                type="text"
+                value={selectedEditingQuestion.nom_tema}
+                onChange={(e) =>
+                  setSelectedEditingQuestion({
+                    ...selectedEditingQuestion,
+                    nom_tema: e.target.value,
+                  })
+                }
+                className={styles.editInput}
+              />
+
+              <p>
+                <strong>Conceptes:</strong>
+              </p>
+              <input
+                type="text"
+                value={selectedEditingQuestion.conceptes}
+                onChange={(e) =>
+                  setSelectedEditingQuestion({
+                    ...selectedEditingQuestion,
+                    conceptes: e.target.value,
+                  })
+                }
+                className={styles.editInput}
+              />
+
+              <p>
+                <strong>Pregunta:</strong>{" "}
+              </p>
+              <input
+                type="text"
+                value={selectedEditingQuestion.pregunta}
+                onChange={(e) =>
+                  setSelectedEditingQuestion({
+                    ...selectedEditingQuestion,
+                    pregunta: e.target.value,
+                  })
+                }
+                className={styles.editInput}
+              />
+
+              <p>
+                <strong>Dificultat:</strong>{" "}
+              </p>
+
+              <select>
+                <option>Fàcil</option>
+                <option>Mitjà</option>
+                <option>Difícil</option>
+              </select>
+              <p>
+                <strong>Resposta Correcta:</strong>{" "}
+              </p>
+
+              <input
+                type="text"
+                value={selectedEditingQuestion.solucio_correcta}
+                onChange={(e) =>
+                  setSelectedEditingQuestion({
+                    ...selectedEditingQuestion,
+                    solucio_correcta: e.target.value,
+                  })
+                }
+                className={styles.editInput}
+              />
+
+              <p>
+                <strong>Resposta Incorrecta:</strong>
+              </p>
+              <input
+                type="text"
+                value={selectedEditingQuestion.solucio_erronia1}
+                onChange={(e) =>
+                  setSelectedEditingQuestion({
+                    ...selectedEditingQuestion,
+                    solucio_erronia1: e.target.value,
+                  })
+                }
+                className={styles.editInput}
+              />
+
+              <p>
+                <strong>Resposta Incorrecta 2:</strong>
+              </p>
+              <input
+                type="text"
+                value={selectedEditingQuestion.solucio_erronia2}
+                onChange={(e) =>
+                  setSelectedEditingQuestion({
+                    ...selectedEditingQuestion,
+                    solucio_erronia2: e.target.value,
+                  })
+                }
+                className={styles.editInput}
+              />
+
+              <p>
+                <strong>Resposta Incorrecta 3:</strong>{" "}
+              </p>
+              <input
+                type="text"
+                value={selectedEditingQuestion.solucio_erronia3}
+                onChange={(e) =>
+                  setSelectedEditingQuestion({
+                    ...selectedEditingQuestion,
+                    solucio_erronia3: e.target.value,
+                  })
+                }
+                className={styles.editInput}
+              />
+
+              <div>
+                <button
+                  onClick={() =>
+                    handleSave(selectedEditingQuestion.id_pregunta)
+                  }
+                >
+                  Guardar
+                </button>
+                <button onClick={() => setEditedQuestion(false)}>
+                  Cancel·lar
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
