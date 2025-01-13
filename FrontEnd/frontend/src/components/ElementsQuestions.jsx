@@ -144,23 +144,22 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
   //Funció per cancel·lar la edició
   const handleCancel = () => {
     setEditingQuestion(null);
-    setEditedQuestion({});
+    setEditedQuestion(false);
   };
 
+  //Funció de update de la edició -> falta repassar el id dels conceptes perquè funcioni del tot i del tema (que canvii)
   const handleSave = (idPregunta) => {
-    if (
-      !editedQuestion.pregunta.trim() ||
-      !editedQuestion.solucio_correcta.trim()
-    ) {
-      alert("Tant la pregunta com la resposta són obligatoris.");
-      return;
-    }
-
+    console.log(selectedEditingQuestion);
+    /*
     axios
       .put("http://localhost:8081/updateQuestion", {
         id_pregunta: idPregunta,
-        pregunta: editedQuestion.pregunta,
-        solucio_correcta: editedQuestion.solucio_correcta,
+        pregunta: selectedEditingQuestion.pregunta,
+        solucio_correcta: selectedEditingQuestion.solucio_correcta,
+        solucio_erronia1: selectedEditingQuestion.solucio_erronia1,
+        solucio_erronia2: selectedEditingQuestion.solucio_erronia1,
+        solucio_erronia3: selectedEditingQuestion.solucio_erronia1,
+        dificultat: selectedEditingQuestion.dificultat,
         Id_Assignatura,
       })
       .then(() => {
@@ -172,6 +171,8 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
         setEditingQuestion(null);
       })
       .catch((err) => console.error("Error actualitzant la pregunta:", err));
+
+      */
   };
 
   const handleDelete = (idPregunta) => {
@@ -347,140 +348,155 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
         </div>
       )}
 
+      {/*Edició de les preguntes*/}
       {editedQuestion && (
         <>
           <div className={styles.editionMode}>
             <div className={styles.editionContent}>
               <h1>Editar Pregunta</h1>
 
-              <p>
-                <strong>Tema:</strong>{" "}
-              </p>
-
-              <input
-                type="text"
-                value={selectedEditingQuestion.nom_tema}
-                onChange={(e) =>
-                  setSelectedEditingQuestion({
-                    ...selectedEditingQuestion,
-                    nom_tema: e.target.value,
-                  })
-                }
-                className={styles.editInput}
-              />
-
-              <p>
-                <strong>Conceptes:</strong>
-              </p>
-              <input
-                type="text"
-                value={selectedEditingQuestion.conceptes}
-                onChange={(e) =>
-                  setSelectedEditingQuestion({
-                    ...selectedEditingQuestion,
-                    conceptes: e.target.value,
-                  })
-                }
-                className={styles.editInput}
-              />
-
-              <p>
-                <strong>Pregunta:</strong>{" "}
-              </p>
-              <input
-                type="text"
-                value={selectedEditingQuestion.pregunta}
-                onChange={(e) =>
-                  setSelectedEditingQuestion({
-                    ...selectedEditingQuestion,
-                    pregunta: e.target.value,
-                  })
-                }
-                className={styles.editInput}
-              />
-
-              <p>
-                <strong>Dificultat:</strong>{" "}
-              </p>
-
-              <select>
-                <option>Fàcil</option>
-                <option>Mitjà</option>
-                <option>Difícil</option>
-              </select>
-              <p>
-                <strong>Resposta Correcta:</strong>{" "}
-              </p>
-
-              <input
-                type="text"
-                value={selectedEditingQuestion.solucio_correcta}
-                onChange={(e) =>
-                  setSelectedEditingQuestion({
-                    ...selectedEditingQuestion,
-                    solucio_correcta: e.target.value,
-                  })
-                }
-                className={styles.editInput}
-              />
-
-              <p>
-                <strong>Resposta Incorrecta:</strong>
-              </p>
-              <input
-                type="text"
-                value={selectedEditingQuestion.solucio_erronia1}
-                onChange={(e) =>
-                  setSelectedEditingQuestion({
-                    ...selectedEditingQuestion,
-                    solucio_erronia1: e.target.value,
-                  })
-                }
-                className={styles.editInput}
-              />
-
-              <p>
-                <strong>Resposta Incorrecta 2:</strong>
-              </p>
-              <input
-                type="text"
-                value={selectedEditingQuestion.solucio_erronia2}
-                onChange={(e) =>
-                  setSelectedEditingQuestion({
-                    ...selectedEditingQuestion,
-                    solucio_erronia2: e.target.value,
-                  })
-                }
-                className={styles.editInput}
-              />
-
-              <p>
-                <strong>Resposta Incorrecta 3:</strong>{" "}
-              </p>
-              <input
-                type="text"
-                value={selectedEditingQuestion.solucio_erronia3}
-                onChange={(e) =>
-                  setSelectedEditingQuestion({
-                    ...selectedEditingQuestion,
-                    solucio_erronia3: e.target.value,
-                  })
-                }
-                className={styles.editInput}
-              />
-
-              <div>
-                <button
-                  onClick={() =>
-                    handleSave(selectedEditingQuestion.id_pregunta)
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSave(selectedEditingQuestion.id_pregunta);
+                }}
+              >
+                <p>
+                  <strong>Tema:</strong>{" "}
+                </p>
+                <select
+                  className={styles.filterInput}
+                  value={selectedEditingQuestion.nom_tema}
+                  onChange={(e) =>
+                    setSelectedEditingQuestion({
+                      ...selectedEditingQuestion,
+                      nom_tema: e.target.value,
+                    })
                   }
                 >
-                  Guardar
-                </button>
-                <button onClick={() => setEditedQuestion(false)}>
-                  Cancel·lar
-                </button>
-              </div>
+                  {Array.from(new Set(questions.map((q) => q.nom_tema))).map(
+                    (tema) => (
+                      <option key={tema} value={tema}>
+                        {tema}
+                      </option>
+                    )
+                  )}
+                </select>
+
+                <p>
+                  <strong>Conceptes:</strong>
+                </p>
+                <input
+                  type="text"
+                  value={selectedEditingQuestion.conceptes}
+                  onChange={(e) =>
+                    setSelectedEditingQuestion({
+                      ...selectedEditingQuestion,
+                      conceptes: e.target.value,
+                    })
+                  }
+                  className={styles.editInput}
+                />
+
+                <p>
+                  <strong>Pregunta:</strong>{" "}
+                </p>
+                <input
+                  type="text"
+                  value={selectedEditingQuestion.pregunta}
+                  onChange={(e) =>
+                    setSelectedEditingQuestion({
+                      ...selectedEditingQuestion,
+                      pregunta: e.target.value,
+                    })
+                  }
+                  className={styles.editInput}
+                />
+
+                <p>
+                  <strong>Dificultat:</strong>{" "}
+                </p>
+                <select
+                  value={selectedEditingQuestion.dificultat}
+                  onChange={(e) =>
+                    setSelectedEditingQuestion({
+                      ...selectedEditingQuestion,
+                      dificultat: e.target.value,
+                    })
+                  }
+                >
+                  <option>Fàcil</option>
+                  <option>Mitjà</option>
+                  <option>Difícil</option>
+                </select>
+
+                <p>
+                  <strong>Resposta Correcta:</strong>{" "}
+                </p>
+                <input
+                  type="text"
+                  value={selectedEditingQuestion.solucio_correcta}
+                  onChange={(e) =>
+                    setSelectedEditingQuestion({
+                      ...selectedEditingQuestion,
+                      solucio_correcta: e.target.value,
+                    })
+                  }
+                  className={styles.editInput}
+                />
+
+                <p>
+                  <strong>Resposta Incorrecta:</strong>
+                </p>
+                <input
+                  type="text"
+                  value={selectedEditingQuestion.solucio_erronia1}
+                  onChange={(e) =>
+                    setSelectedEditingQuestion({
+                      ...selectedEditingQuestion,
+                      solucio_erronia1: e.target.value,
+                    })
+                  }
+                  className={styles.editInput}
+                />
+
+                <p>
+                  <strong>Resposta Incorrecta 2:</strong>
+                </p>
+                <input
+                  type="text"
+                  value={selectedEditingQuestion.solucio_erronia2}
+                  onChange={(e) =>
+                    setSelectedEditingQuestion({
+                      ...selectedEditingQuestion,
+                      solucio_erronia2: e.target.value,
+                    })
+                  }
+                  className={styles.editInput}
+                />
+
+                <p>
+                  <strong>Resposta Incorrecta 3:</strong>{" "}
+                </p>
+                <input
+                  type="text"
+                  value={selectedEditingQuestion.solucio_erronia3}
+                  onChange={(e) =>
+                    setSelectedEditingQuestion({
+                      ...selectedEditingQuestion,
+                      solucio_erronia3: e.target.value,
+                    })
+                  }
+                  className={styles.editInput}
+                />
+
+                <div>
+                  <button type="submit">Guardar</button>{" "}
+                  <button type="button" onClick={() => handleCancel()}>
+                    Cancel·lar
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </>
