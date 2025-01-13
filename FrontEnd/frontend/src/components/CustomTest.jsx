@@ -156,6 +156,7 @@ function CustomTest() {
   //Funció d'aplicar canvis
   const aplicarCanvis = () => {
     let clauAux;
+    let cancelUser = false;
 
     if (tipus === "avaluatiu") {
       let userInput;
@@ -165,6 +166,7 @@ function CustomTest() {
 
         if (userInput === null) {
           alert("No es va introduir cap clau.");
+          cancelUser = true;
           break;
         }
 
@@ -183,8 +185,16 @@ function CustomTest() {
       setClau(null);
     }
 
+    if (cancelUser) {
+      return;
+    }
+
     if (clauAux) {
       setClau(clauAux);
+    } else {
+      if (tipus === "avaluatiu") {
+        alert("No s'ha introduït cap clau.");
+      }
     }
 
     const minutes = duration * 60;

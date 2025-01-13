@@ -24,11 +24,13 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
   const [numberQuestionsPendent, setNumberQuestionsPendent] = useState(0);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 2;
+  const itemsPerPage = 5;
 
   const [filterText, setFilterText] = useState("");
   const [selectedTopic, setSelectedTopic] = useState("");
+  const [selectedFilterType, setSelectedFilterType] = useState(""); // Nuevo estado para el tipo de filtro
 
+  //Funció de recuperació del número de preguntes en estat pendent de l'usuari
   useEffect(() => {
     axios
       .get("http://localhost:8081/pendentQuestions", { params: { Id_User } })
@@ -55,24 +57,31 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
       .get("http://localhost:8081/recoverQuestions", {
         params: { Id_Assignatura },
       })
-      .then((res) => setQuestions(res.data))
+      .then((res) => {
+        setQuestions(res.data);
+      })
       .catch((err) => console.error("Error a la sol·licitud:", err));
   }, [Id_Assignatura]);
-
-  const handleFilterChange = (e) => {
-    setFilterText(e.target.value.toLowerCase());
-    setCurrentPage(1);
-  };
 
   const handleTopicChange = (e) => {
     setSelectedTopic(e.target.value);
     setCurrentPage(1);
   };
 
+  const handleFilterTypeChange = (e) => {
+    setSelectedFilterType(e.target.value);
+    setCurrentPage(1);
+  };
+
   const filteredQuestions = questions.filter(
     (q) =>
       q.pregunta.toLowerCase().includes(filterText) &&
-      (selectedTopic ? q.nom_tema === selectedTopic : true)
+      (selectedTopic ? q.nom_tema === selectedTopic : true) &&
+      (selectedFilterType
+        ? selectedFilterType === "banc"
+          ? q.estat === "acceptada"
+          : q.estat === "pendent"
+        : true)
   );
 
   const totalPages = Math.ceil(filteredQuestions.length / itemsPerPage);
@@ -107,13 +116,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
     handleCloseModal();
   };
 
-  const handleEdit = (question) => {
-    setEditingQuestionId(question.id_pregunta);
-    setEditedQuestion({
-      pregunta: question.pregunta,
-      solucio_correcta: question.solucio_correcta,
-    });
-  };
+  const handleEdit = (question) => {};
 
   const handleSave = (idPregunta) => {
     if (
@@ -185,15 +188,17 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
 
       <div className={styles.filterContainer}>
         <label style={{ marginLeft: "10px", marginRight: "10px" }}>
-          Filtrar preguntes:{" "}
+          Filtrar Preguntes per Estat:{" "}
         </label>
-        <input
-          type="text"
-          placeholder="Filtrar preguntes..."
-          value={filterText}
-          onChange={handleFilterChange}
+        <select
+          value={selectedFilterType}
+          onChange={handleFilterTypeChange}
           className={styles.filterInput}
-        />
+        >
+          <option value="banc">Banc de Preguntes</option>
+          <option value="pendent">Avaluació</option>
+        </select>
+
         <label style={{ marginLeft: "10px", marginRight: "10px" }}>
           Filtrar per Tema:{" "}
         </label>
@@ -263,31 +268,18 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                 </>
               )}
             </div>
+
             {Role_User !== "alumne" && (
               <div className={styles.actionButtonsContainer}>
-                {editingQuestionId === question.id_pregunta ? (
+                <button
+                  className={styles.editButton}
+                  onClick={() => handleEdit(question)}
+                >
+                  <FaEdit />
+                </button>
+
+                {question.estat === "pendent" && (
                   <>
-                    <button
-                      className={styles.saveButton}
-                      onClick={() => handleSave(question.id_pregunta)}
-                    >
-                      <FaSave />
-                    </button>
-                    <button
-                      className={styles.cancelButton}
-                      onClick={handleCancel}
-                    >
-                      <FaTimes />
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      className={styles.editButton}
-                      onClick={() => handleEdit(question)}
-                    >
-                      <FaEdit />
-                    </button>
                     <button
                       className={styles.acceptButton}
                       onClick={() =>

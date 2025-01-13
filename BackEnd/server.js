@@ -768,7 +768,7 @@ app.get('/recoverQuestions', (req, res)=>{
     
     const sql = `SELECT * FROM preguntes 
     JOIN temes ON preguntes.id_tema = temes.id_tema 
-    WHERE preguntes.estat = 'pendent' AND temes.id_assignatura = ?`;
+    WHERE  temes.id_assignatura = ?`;
 
     db.query(sql,[id_assignatura], (error, result)=>{
 
