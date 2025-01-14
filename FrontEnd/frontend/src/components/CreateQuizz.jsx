@@ -114,6 +114,7 @@ function CreateQuizz() {
                       (tema) =>
                         !seleccions.some((sel) => sel.id === tema.id_tema)
                     )
+                    .sort((a, b) => a.nom_tema.localeCompare(b.nom_tema))
                     .map((tema) => (
                       <option key={tema.id_tema} value={tema.id_tema}>
                         {tema.nom_tema}

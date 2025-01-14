@@ -26,11 +26,11 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
   const [numberQuestionsPendent, setNumberQuestionsPendent] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-  const [filterText, setFilterText] = useState("");
+
   const [selectedTopic, setSelectedTopic] = useState("");
   const [selectedFilterType, setSelectedFilterType] = useState("");
 
-  //Funció de recuperació del número de preguntes en estat pendent de l'usuari
+  //Funció de recuperació del número de preguntes en estat pendent de l'usuari per evitar més de tres preguntes sent alumne
   useEffect(() => {
     axios
       .get("http://localhost:8081/pendentQuestions", { params: { Id_User } })
@@ -74,7 +74,6 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
               params: { Id_Assignatura },
             })
             .then((res) => {
-              console.log(res.data);
               setTopics(res.data);
             });
         })
@@ -101,18 +100,36 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
     setCurrentPage(1);
   };
 
-  const filteredQuestions = questions.filter(
-    (q) =>
-      q.pregunta.toLowerCase().includes(filterText) &&
-      (selectedTopic ? q.nom_tema === selectedTopic : true) &&
-      (selectedFilterType
-        ? selectedFilterType === "banc"
-          ? q.estat === "acceptada"
-          : q.estat === "pendent"
-        : true)
-  );
+  const filteredQuestions = questions.filter((q) => {
+    if (selectedTopic === "" && selectedFilterType === "") {
+      return true;
+    }
+
+    if (selectedFilterType === "") {
+      return q.nom_tema === selectedTopic;
+    }
+
+    if (selectedFilterType === "banc") {
+      if (selectedTopic === "") {
+        return q.estat === "acceptada";
+      } else {
+        return q.estat === "acceptada" && q.nom_tema === selectedTopic;
+      }
+    }
+
+    if (selectedFilterType === "pendent") {
+      if (selectedTopic === "") {
+        return q.estat === "pendent";
+      }
+
+      return q.estat === "pendent" && q.nom_tema === selectedTopic;
+    }
+
+    return true;
+  });
 
   const totalPages = Math.ceil(filteredQuestions.length / itemsPerPage);
+
   const displayedQuestions = filteredQuestions.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -159,9 +176,6 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
 
   //Funció de update de la edició -> falta repassar el id dels conceptes perquè funcioni del tot i del tema (que canvii)
   const handleSave = () => {
-    console.log(selectedEditingQuestion);
-
-    /*
     axios
       .put("http://localhost:8081/updateQuestion", {
         id_pregunta: selectedEditingQuestion.id_pregunta,
@@ -175,10 +189,19 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
         dificultat: selectedEditingQuestion.dificultat,
         Id_Assignatura,
       })
-      .then(() => {})
-      .catch((err) => console.error("Error actualitzant la pregunta:", err));
+      .then((res) => {
+        if (res.data.Status === "Sucess") {
+          alert("Canvis efectuats");
+        }
 
-      */
+        axios
+          .get("http://localhost:8081/recoverQuestions", {
+            params: { Id_Assignatura },
+          })
+          .then((res) => setQuestions(res.data))
+          .catch((err) => console.error("Error a la sol·licitud:", err));
+      })
+      .catch((err) => console.error("Error actualitzant la pregunta:", err));
   };
 
   //Funció d'avaluació eliminació de les preguntes
@@ -229,7 +252,8 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
               onChange={handleFilterTypeChange}
               className={styles.filterInput}
             >
-              <option value="banc">Banc de Preguntes</option>
+              <option value="">Totes les Preguntes</option>
+              <option value="banc">Acceptades</option>
               <option value="pendent">Avaluació</option>
             </select>
 
@@ -242,13 +266,14 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
               className={styles.filterInput}
             >
               <option value="">Tots els temes</option>
-              {Array.from(new Set(questions.map((q) => q.nom_tema))).map(
-                (tema) => (
+
+              {Array.from(new Set(questions.map((q) => q.nom_tema)))
+                .sort()
+                .map((tema) => (
                   <option key={tema} value={tema}>
                     {tema}
                   </option>
-                )
-              )}
+                ))}
             </select>
           </div>
         </>
@@ -280,6 +305,15 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                   <FaEdit />
                 </button>
 
+                <button
+                  className={styles.deleteButton}
+                  onClick={() =>
+                    handleOpenModal("delete", question.id_pregunta)
+                  }
+                >
+                  <FaTimes />
+                </button>
+
                 {question.estat === "pendent" && (
                   <>
                     <button
@@ -289,14 +323,6 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                       }
                     >
                       <FaCheck />
-                    </button>
-                    <button
-                      className={styles.deleteButton}
-                      onClick={() =>
-                        handleOpenModal("delete", question.id_pregunta)
-                      }
-                    >
-                      <FaTimes />
                     </button>
                   </>
                 )}
@@ -326,7 +352,11 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
           <FaArrowRight />
         </button>
       </div>
-      <button className={styles.addQuestionButton} onClick={handleButton}>
+      <button
+        className={styles.addQuestionButton}
+        onClick={handleButton}
+        style={{ marginBottom: "10px" }}
+      >
         Afegeix Pregunta
       </button>
 
