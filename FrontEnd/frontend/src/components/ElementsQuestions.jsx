@@ -20,6 +20,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
   const [showModal, setShowModal] = useState(false);
   const [actionType, setActionType] = useState("");
   const [questionIdToAct, setQuestionIdToAct] = useState(null);
+  const [topics, setTopics] = useState({});
 
   const navigate = useNavigate();
   const [numberQuestionsPendent, setNumberQuestionsPendent] = useState(0);
@@ -67,6 +68,15 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
         })
         .then((res) => {
           setQuestions(res.data);
+
+          axios
+            .get("http://localhost:8081/recoverTemesAssignatura", {
+              params: { Id_Assignatura },
+            })
+            .then((res) => {
+              console.log(res.data);
+              setTopics(res.data);
+            });
         })
         .catch((err) => console.error("Error a la sol·licitud:", err));
     } else {
@@ -137,7 +147,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
   //Funció per obrir el modal de la edició i obtenir la seva informació
   const handleEdit = (question) => {
     setEditedQuestion(true);
-    console.log(question);
+    //console.log(question);
     setSelectedEditingQuestion(question);
   };
 
@@ -148,33 +158,30 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
   };
 
   //Funció de update de la edició -> falta repassar el id dels conceptes perquè funcioni del tot i del tema (que canvii)
-  const handleSave = (idPregunta) => {
+  const handleSave = () => {
     console.log(selectedEditingQuestion);
+
     /*
     axios
       .put("http://localhost:8081/updateQuestion", {
-        id_pregunta: idPregunta,
+        id_pregunta: selectedEditingQuestion.id_pregunta,
+        nom_tema: selectedEditingQuestion.nom_tema,
         pregunta: selectedEditingQuestion.pregunta,
         solucio_correcta: selectedEditingQuestion.solucio_correcta,
         solucio_erronia1: selectedEditingQuestion.solucio_erronia1,
-        solucio_erronia2: selectedEditingQuestion.solucio_erronia1,
-        solucio_erronia3: selectedEditingQuestion.solucio_erronia1,
+        solucio_erronia2: selectedEditingQuestion.solucio_erronia2,
+        solucio_erronia3: selectedEditingQuestion.solucio_erronia3,
+        conceptes: selectedEditingQuestion.conceptes,
         dificultat: selectedEditingQuestion.dificultat,
         Id_Assignatura,
       })
-      .then(() => {
-        setQuestions((prevQuestions) =>
-          prevQuestions.map((q) =>
-            q.id_pregunta === idPregunta ? { ...q, ...editedQuestion } : q
-          )
-        );
-        setEditingQuestion(null);
-      })
+      .then(() => {})
       .catch((err) => console.error("Error actualitzant la pregunta:", err));
 
       */
   };
 
+  //Funció d'avaluació eliminació de les preguntes
   const handleDelete = (idPregunta) => {
     axios
       .delete("http://localhost:8081/deleteQuestion", {
@@ -190,6 +197,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
       .catch((err) => console.error("Error en eliminar la pregunta:", err));
   };
 
+  //Funció d'avaluació de les preguntes
   const handleStatusChange = (idPregunta, nouEstat) => {
     axios
       .put("http://localhost:8081/updateQuestionAccept", {
@@ -358,7 +366,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  handleSave(selectedEditingQuestion.id_pregunta);
+                  handleSave();
                 }}
               >
                 <p>
@@ -373,14 +381,14 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                       nom_tema: e.target.value,
                     })
                   }
+                  placeholder="Selecciona un tema"
+                  required
                 >
-                  {Array.from(new Set(questions.map((q) => q.nom_tema))).map(
-                    (tema) => (
-                      <option key={tema} value={tema}>
-                        {tema}
-                      </option>
-                    )
-                  )}
+                  {topics.map((tema) => (
+                    <option key={tema.id_tema} value={tema.nom_tema}>
+                      {tema.nom_tema}
+                    </option>
+                  ))}
                 </select>
 
                 <p>
@@ -395,21 +403,9 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                       conceptes: e.target.value,
                     })
                   }
-                  className={styles.editInput}
-                />
-
-                <p>
-                  <strong>Pregunta:</strong>{" "}
-                </p>
-                <input
-                  type="text"
-                  value={selectedEditingQuestion.pregunta}
-                  onChange={(e) =>
-                    setSelectedEditingQuestion({
-                      ...selectedEditingQuestion,
-                      pregunta: e.target.value,
-                    })
-                  }
+                  placeholder="Conceptes separats per comes"
+                  required
+                  pattern="^[A-Za-zÀ-ÿ0-9\s,]+$"
                   className={styles.editInput}
                 />
 
@@ -424,11 +420,31 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                       dificultat: e.target.value,
                     })
                   }
+                  required
                 >
                   <option>Fàcil</option>
                   <option>Mitjà</option>
                   <option>Difícil</option>
                 </select>
+
+                <p>
+                  <strong>Pregunta:</strong>{" "}
+                </p>
+                <input
+                  type="text"
+                  value={selectedEditingQuestion.pregunta}
+                  onChange={(e) =>
+                    setSelectedEditingQuestion({
+                      ...selectedEditingQuestion,
+                      pregunta: e.target.value,
+                    })
+                  }
+                  className={styles.editInput}
+                  placeholder="Insereix la teva pregunta"
+                  required
+                  pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
+                  maxLength={200}
+                />
 
                 <p>
                   <strong>Resposta Correcta:</strong>{" "}
@@ -442,7 +458,11 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                       solucio_correcta: e.target.value,
                     })
                   }
-                  className={styles.editInput}
+                  placeholder="Solució correcta"
+                  required
+                  pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
+                  maxLength={15}
+                  className={styles.selectInput}
                 />
 
                 <p>
@@ -458,6 +478,9 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                     })
                   }
                   className={styles.editInput}
+                  pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
+                  placeholder="Solució erronea"
+                  maxLength={15}
                 />
 
                 <p>
@@ -473,6 +496,9 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                     })
                   }
                   className={styles.editInput}
+                  pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
+                  placeholder="Solució erronea"
+                  maxLength={15}
                 />
 
                 <p>
@@ -488,6 +514,9 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                     })
                   }
                   className={styles.editInput}
+                  pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
+                  placeholder="Solució erronea"
+                  maxLength={15}
                 />
 
                 <div>

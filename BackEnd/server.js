@@ -152,12 +152,7 @@ app.get('/', verifyUser, (req, res) => {
     return res.json({ Status: "Success", name: req.name, niu:req.niu, role:req.role});
 });
 
-
-
   
-  
-  
-
 //Funció per fer un logout eliminant les possibles cookies
 app.get('/logout', (req, res) => {
 
@@ -346,9 +341,7 @@ app.post('/registerSubject', async (req, res) => {
 
 
 
-
 //Funció de recuperació dels temes associats a una assignatura pel curs
-
 app.get('/recoverTemesAssignatura', (req, res) => {
 
     const idAssignatura = parseInt(req.query.Id_Assignatura, 10); 
@@ -415,8 +408,6 @@ app.delete('/deleteSubject', (req, res) => {
     });
   });
   
-
-
 
 //Funció d'eliminació d'un tema
 app.delete('/deleteTheme', (req, res)=>{
@@ -654,42 +645,161 @@ app.post('/addQuestion', async (req, res) => {
 
 
 
-app.put("/updateQuestion", (req, res)=>{
+app.put("/updateQuestion", (req, res) => {
+    const {
+      id_pregunta,
+      nom_tema,
+      pregunta,
+      solucio_correcta,
+      solucio_erronia1,
+      solucio_erronia2,
+      solucio_erronia3,
+      conceptes,
+      dificultat,
+      Id_Assignatura
+    } = req.body;
+  
 
-    const id_Question = req.body.id_pregunta;
-    const question = req.body.pregunta;    
-    const answer = req.body.solucio_correcta;
+    const sqlSelectTopic = "SELECT id_tema FROM temes WHERE nom_tema = ? AND id_assignatura = ?";
+    // Pas 1: Recuperem l'ID del tema per posteriors execucions
+    db.query(sqlSelectTopic,[nom_tema, Id_Assignatura],(err, temaResult) => {
 
-   const sqlUpdate = "UPDATE preguntes SET pregunta = ?, solucio_correcta = ? WHERE id_pregunta = ?"
-   
-    db.query(sqlUpdate,[question, answer, id_Question], (error, result)=>{
-
-        if (error) {
-            
-            console.error("Error a la consulta:", error);
-            return res.json({ Status: "Failed" });
-        }else {
-       
-            const id_assignatura = req.body.Id_Assignatura;
-            parseInt(id_assignatura);
-    
-            const sql = `SELECT * FROM preguntes 
-            JOIN temes ON preguntes.id_tema = temes.id_tema 
-            WHERE preguntes.estat = 'pendent' AND temes.id_assignatura = ?`;
-
-            db.query(sql,[id_assignatura], (error, result)=>{
-
-                if (error) {
-                    console.error("Error en la consulta:", error);
-                    return res.json({ Status: "Failed" });
-                } else {
-                    return res.json(result); 
-                }
-            })                     
+        if (err) {
+          console.error("Error recuperant el tema:", err);
+          return res.json({ Status: "Error", error: "Error al recuperar el tema" });
         }
-    })
-        
-})
+  
+        if (temaResult.length === 0) {
+          
+          return res.json({ Estat: "Error", error: "El tema especificat no existeix." });
+        }
+  
+        const id_tema = temaResult[0].id_tema;
+  
+
+        const sqlUpdateQuestion =  `UPDATE preguntes SET pregunta = ?, solucio_correcta = ?, solucio_erronia1 = ?, 
+            solucio_erronia2 = ?, solucio_erronia3 = ?, dificultat = ?, id_tema = ?
+            WHERE id_pregunta = ?`
+
+        // Pas 2: Actualitzem la pregunta
+        db.query(
+            sqlUpdateQuestion,[pregunta,solucio_correcta,solucio_erronia1,solucio_erronia2,solucio_erronia3,dificultat,id_tema,id_pregunta],(err) => {
+            if (err) {
+              console.error("Error actualitzant la pregunta:", err);
+              return res.json({ Stauts: "Error", error: "Error al actualitzar la pregunta" });
+            }
+  
+            // Pas 3: Processar els conceptes. Aqui pot haver bifuració segons si existeix o no el concepte i el id del tema escollit.
+
+            const conceptesArray = conceptes.split(",").map((c) => c.trim());
+            const conceptIds = [];
+  
+            let conceptesProcessats = 0;
+            const totalConceptes = conceptesArray.length;
+  
+            conceptesArray.forEach((concepte) => {
+              // Comprovem si el concepte ja existeix a la base de dades
+
+              const sqlConcepteExist = "SELECT id_concepte FROM conceptes WHERE nom_concepte = ?";
+
+              db.query(sqlConcepteExist,[concepte],(err, conceptResult) => {
+                  if (err) {
+                    console.error("Error recuperant el concepte:", err);
+                    return res.json({ Status: "Error", error: "Error al recuperar el concepte" });
+                  }
+  
+                  let conceptId;
+                  if (conceptResult.length > 0) {
+                    // Si el concepte existeix, agafem el seu ID per posteriro ús
+                    conceptId = conceptResult[0].id_concepte;
+                  } else {
+                    // Si no existeix, afegim el concepte a la base de dades
+
+                    const sqlInsertConcepte =  "INSERT INTO conceptes (nom_concepte) VALUES (?)"
+
+                    db.query(sqlInsertConcepte,[concepte], (err, insertResult) => {
+                        if (err) {
+                          console.error("Error afegint el concepte:", err);
+                          return res.json({ Status: "Error", error: "Error al afegir el concepte" });
+                        }
+  
+                        conceptId = insertResult.insertId;
+  
+                        // Verifiquem si cal crear una relació amb el tema (pot haver ja una)
+
+                        const sqlConcepteTema = "SELECT * FROM conceptes_temes WHERE id_concepte = ? AND id_tema = ?";
+                        db.query(sqlConcepteTema,[conceptId, id_tema],(err, conceptTemaResult) => {
+                            if (err) {
+                              console.error("Error verificació de la relació:", err);
+                              return res.json({ Status: "Error", error: "Error al verificar la relació amb el tema" });
+                            }
+  
+                            if (conceptTemaResult.length === 0) {
+                              // Si no existeix, creem la relació
+
+                              const sqlInsertConcepteTema = "INSERT INTO conceptes_temes (id_concepte, id_tema) VALUES (?, ?)";
+                              db.query(sqlInsertConcepteTema,[conceptId, id_tema],(err) => {
+                                  if (err) {
+                                    console.error("Error creant la relació:", err);
+                                    return res.json({ Status: "Error", error: "Error al afegir la relació amb el tema" });
+                                  }
+                                }
+                              );
+                            }
+                          }
+                        );
+                      }
+                    );
+                  }
+  
+                  // Afegim el concepte a la llista per a la relació amb la pregunta
+                  conceptIds.push(conceptId);
+                  conceptesProcessats++;
+  
+                  // Si ja hem processat tots els conceptes, passem a actualitzar les relacions de la pregunta
+                  if (conceptesProcessats === totalConceptes) {
+                    // Pas 4: Actualitzar les relacions a `preguntes_conceptes`
+
+                    const sqlDeletePreguntesConceptes =  "DELETE FROM preguntes_conceptes WHERE id_pregunta = ?";
+                    db.query(sqlDeletePreguntesConceptes,[id_pregunta],(err) => {
+                        if (err) {
+                          console.error("Error eliminant les relacions antigues:", err);
+                          return res.json({ Status: "Error", error: "Error al eliminar les relacions antigues" });
+                        }
+  
+                        // Inserim les noves relacions amb els conceptes
+                        let insertsPendents = conceptIds.length;
+                        const sqlInsertPreguntesConceptes = "INSERT INTO preguntes_conceptes (id_pregunta, id_concepte) VALUES (?, ?)";
+
+
+                        conceptIds.forEach((conceptId) => {
+                          db.query(sqlInsertPreguntesConceptes,[id_pregunta, conceptId],
+                            (err) => {
+                              if (err) {
+                                console.error("Error inserint la relació de concepte:", err);
+                                return res.json({ Status: "Error", error: "Error al inserir les noves relacions" });
+                              }
+  
+                              insertsPendents--;
+  
+                              // Si hem insertat totes les relacions, retornem la resposta d'èxit
+                              if (insertsPendents === 0) {
+                                res.json({ Status: "Èxit", missatge: "Pregunta actualitzada correctament." });
+                              }
+                            }
+                          );
+                        });
+                      }
+                    );
+                  }
+                }
+              );
+            });
+          }
+        );
+      }
+    );
+  });
 
 
 
@@ -796,7 +906,6 @@ app.get('/recoverQuestions', (req, res)=>{
 })
 
 
-
 app.get('/recoverQuestionsAlumni', (req, res)=>{ 
 
     const id_assignatura = req.query.Id_Assignatura;
@@ -825,9 +934,7 @@ app.get('/recoverQuestionsAlumni', (req, res)=>{
 })
 
 
-
-
-//Funció d'actualització d'estat de les preguntes a la taula preguntes de la base de dades
+//Funció d'actualització d'estat de les preguntes a la taula preguntes de la base de dades NO TOCAR
 app.put('/updateQuestionAccept', (req, res) =>{
 
    
@@ -850,7 +957,6 @@ app.put('/updateQuestionAccept', (req, res) =>{
           }
     })
     
-
 })
 
 //Funció de recuperació dels alumnes assistents a una assignatura
@@ -984,7 +1090,7 @@ app.get("/checkStudentInSubject", (req, res) => {
 
 
 
-  app.post("/addProfessorToSubject", async (req, res) => {
+app.post("/addProfessorToSubject", async (req, res) => {
     const { niu, Id_Assignatura } = req.body;
 
     const sql = 'INSERT INTO professors_assignatures (id_professor, id_assignatura) VALUES (?, ?)';
@@ -1405,10 +1511,6 @@ app.put('/updateTestCustom', (req, res) =>{
 })
 
 
-
-
-
-
 //Funció de recuperació de totes les preguntes
 app.get('/recoverPreguntes', (req, res) => {
 
@@ -1473,8 +1575,6 @@ app.get('/recoverPreguntesTema', (req, res) => {
 });
 
 
-
-
 //Funció creació de test manual pel professor
 
 app.post('/createTest', async (req, res) => {
@@ -1517,8 +1617,6 @@ app.post('/createTest', async (req, res) => {
         }
     );
 });
-
-
 
 
 //Funció creació test automàtic
@@ -1607,8 +1705,6 @@ app.post('/createQuizz', (req, res) => {
 
 
 
-
-
 app.post('/insertQuestionsTest', (req, res) => {
 
     const idTest = req.body.id_test;
@@ -1663,8 +1759,6 @@ db.query(sql, [idTema], (error, result) => {
 });
 
 })
-
-
 
 
 //Funció per validar clau accés a Test
@@ -1733,8 +1827,7 @@ app.post("/updateTestQuestions", (req, res) => {
   });
 
 
-
-  app.delete("/deleteTest", (req, res) =>{
+app.delete("/deleteTest", (req, res) =>{
 
 
     const id_test = req.query.idTest;
@@ -1756,7 +1849,6 @@ app.post("/updateTestQuestions", (req, res) => {
 
 
   })
-
 
 
 //Funció de recuperació de 10 preguntes per test amb probabilitats.
@@ -1925,8 +2017,6 @@ app.post("/import-csv", upload.single("file"), async (req, res) => {
 
   
   
-
-
   
 
 //Funció d'escolta del servidor 
