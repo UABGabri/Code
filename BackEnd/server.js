@@ -1,5 +1,5 @@
 import express from "express";
-import mysql, { createConnection } from "mysql";
+import mysql from "mysql"; /*{ createConnection } */ 
 import cors from "cors";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
@@ -7,9 +7,9 @@ import cookieParser from "cookie-parser";
 import multer from "multer";
 import fs from 'fs';
 import csvParser from 'csv-parser';
-import { type } from "os";
+//import { type } from "os";
 
-
+//mysql://root:bjZVQpiVCOmCYLfWhXCPaaYrDxeAxltn@autorack.proxy.rlwy.net:51488/railway
 
 const salt = 10;
 const saltRounds = 10;
@@ -26,11 +26,19 @@ app.use(cors({
 app.use(cookieParser());
 
 //Connexió amb la base de dades MySQL.  
-const db = mysql.createConnection({
+
+/*const db = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "Ga21012002",
     database: "web_examen_tfg"
+});*/ 
+
+const db = mysql.createConnection({
+    host: "mysql://root:bjZVQpiVCOmCYLfWhXCPaaYrDxeAxltn@autorack.proxy.rlwy.net:51488/railway",
+    user: "root",
+    password: "bjZVQpiVCOmCYLfWhXCPaaYrDxeAxltn",
+    database: "railway"
 });
 
 
