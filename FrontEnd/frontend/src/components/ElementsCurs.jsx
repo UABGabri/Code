@@ -27,7 +27,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
   //Funció de recuperació dels temes de la assignatura.
   useEffect(() => {
     axios
-      .get("http://localhost:8081/recoverTemesAssignatura", {
+      .get("http://localhost:8081/recoverTopicsSubject", {
         params: { Id_Assignatura },
       })
       .then((response) => {
@@ -81,7 +81,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
     }
 
     axios
-      .post("http://localhost:8081/createTema", {
+      .post("http://localhost:8081/createTopic", {
         Id_Assignatura,
         name: newTemaName,
       })
