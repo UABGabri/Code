@@ -15,7 +15,7 @@ function Modulespage() {
   // Recupera informació de l'usuari quan es carrega el component
   useEffect(() => {
     axios
-      .get("http://localhost:8081/")
+      .get("http://localhost:8081/verify")
       .then((res) => {
         if (res.data.Status === "Success") {
           setAuth(true);
