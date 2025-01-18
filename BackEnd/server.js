@@ -1,5 +1,5 @@
 import express from "express";
-import mysql from "mysql"; /*{ createConnection } */ 
+import mysql from "mysql"; 
 import cors from "cors";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
@@ -16,6 +16,7 @@ const saltRounds = 10;
 
 const upload = multer({ dest: "uploads/" });
 
+
 const app = express();
 app.use(express.json());
 app.use(cors({
@@ -23,36 +24,48 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE'],// Metodes permesos
     credentials: true // Credencials necessaris
 }));
-app.use(cookieParser());
 
-//Connexió amb la base de dades MySQL.  
 
-/*const db = mysql.createConnection({
+app.use(cookieParser());  //Cookies
+
+
+
+//Funció d'escolta del servidor 
+app.listen(8081, () => {
+    console.log("Running Server...");
+});
+
+
+
+
+
+const db = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "Ga21012002",
     database: "web_examen_tfg"
-});*/ 
+}); 
 
+/*
 const db = mysql.createConnection({
     host: "mysql://root:bjZVQpiVCOmCYLfWhXCPaaYrDxeAxltn@autorack.proxy.rlwy.net:51488/railway",
     user: "root",
     password: "bjZVQpiVCOmCYLfWhXCPaaYrDxeAxltn",
     database: "railway"
 });
-
-
+*/
 //Funció per registrar usuaris a la taula MySQl users. Valida si existeix NIU i Email.
 app.post('/register', (req, res) => {
     const { niu, username, password, role, gmail } = req.body;
 
-    // Verificar que todos los campos estén presentes
+    // Verificar que tots els camps són correctes
     if (!niu || !username || !password || !role || !gmail) {
         return res.json({ error: "Tots els camps es requereixen" });
     }
 
-    // Verificar si el NIU ya existe
+    // Verificar si el NIU ja  existeix
     const checkNiuSql = "SELECT * FROM usuaris WHERE niu = ?";
+
     db.query(checkNiuSql, [niu], (err, result) => {
         if (err) return res.json({ Error: err.message });
 
@@ -60,7 +73,6 @@ app.post('/register', (req, res) => {
         if (result.length > 0) {
             return res.json({ error: "El NIU ja existeix" });
         }
-
  
         const checkEmailSql = "SELECT * FROM usuaris WHERE email = ?";
         db.query(checkEmailSql, [gmail], (err, result) => {
@@ -79,6 +91,8 @@ app.post('/register', (req, res) => {
                 if (err) return res.json({ Error: "Error hashing password" });
 
                 const values = [niu, username, hash, role, gmail];
+
+
                 db.query(sql, [values], (err, result) => {
                     if (err) return res.json({ Error: err.message });
                     return res.json({ Status: "Succeeded" });
@@ -92,23 +106,24 @@ app.post('/register', (req, res) => {
 
 //Funció per realitzar login. Utilitza jwt token per poder accedir de forma segura 
 app.post('/login', (req, res) => {  
-    const db = mysql.createConnection({
-        host: "localhost",
-        user: "root",
-        password: "Ga21012002",
-        database: "web_examen_tfg"
-    });
+  
+    const {niu, password} = req.body;
+
+    if(!niu || !password){
+        return res.json({ error: "Tots els camps es requereixen" });
+    }
 
     const sql = 'SELECT * FROM usuaris WHERE niu = ?';
 
-    db.query(sql, [req.body.niu], (err, data) => {
+    db.query(sql, [niu], (err, data) => {
 
         if (err) {
             return res.json({ Error: "Error al iniciar sessió" });
         }
 
         if (data.length > 0) {
-            bcrypt.compare(req.body.password.toString(), data[0].password, (err, response) => {
+            bcrypt.compare(password.toString(), data[0].password, (err, response) => {
+
                 if (err) {
                     return res.json({ Error: "Error intern" });
                 }
@@ -120,7 +135,7 @@ app.post('/login', (req, res) => {
 
                     res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'None' });
 
-                    res.json({ Status: "Success" });
+                    return res.json({ Status: "Success" });
 
                 } else {
                     // Retornant error en cas de contrasenya incorrecta
@@ -155,8 +170,8 @@ const verifyUser = (req, res, next) => {
     }
 };
 
-//Funció per verificar al usuari, el seu rol i id
-app.get('/', verifyUser, (req, res) => {
+//Funció per verificar al usuari, el seu rol i id. Empra el middleware verifyUser
+app.get('/verify', verifyUser, (req, res) => {
     return res.json({ Status: "Success", name: req.name, niu:req.niu, role:req.role});
 });
 
@@ -257,103 +272,141 @@ app.put('/updateUser', (req, res) => {
 
 //Funció que serveix per la inserció i associació amb els professors i alumnes de una materia a la base de dades
 app.post('/registerSubject', async (req, res) => {
-    const id_User = req.body.id_User;
-    const id_Subject = req.body.id_Subject;
-    const subject_Name = req.body.subject_Name;
+    const { id_User, id_Subject, subject_Name, passwordSubject} = req.body;
 
-    //console.log(id_User, id_Subject, subject_Name)
+    if (!id_User || !id_Subject || !subject_Name) {
+        return res.json({ Status: "Failed", Messages: "Falten dades obligatòries." });
+    }
 
-    
-    const sqlInsert = "INSERT INTO assignatures (id_assignatura, nom_assignatura) VALUES (?, ?)";
-    const sqlCheckExistence = "SELECT * FROM assignatures WHERE id_assignatura = ?"; // Consulta per comprovar si ja existeix l'ID de l'assignatura
-    const sqlComprobant = "SELECT * FROM usuaris WHERE niu = ?"; // Consulta per comprovar si el professor existeix
-
-    const errors = [];
-    const success = [];
-
-    // Funció per comprovar si ja existeix l'ID de l'assignatura
-    const checkIfSubjectExists = () => {
-        return new Promise((resolve, reject) => {
-            db.query(sqlCheckExistence, [id_Subject], (err, result) => {
-                if (err) {
-                    errors.push("Error al comprovar la existència de l'assignatura");
-                    reject();
-                } else if (result.length > 0) {
-                    errors.push("Error: Ja existeix una assignatura amb aquest ID.");
-                    reject();
-                } else {
-                    resolve();
-                }
-            });
-        });
-    };
-
-    // Funció per insertar l'assignatura a la base de dades
-    const insertSubject = () => {
-        return new Promise((resolve, reject) => {
-            db.query(sqlInsert, [id_Subject, subject_Name], (err) => {
-                if (err) {
-                    errors.push("Error en inserir l'assignatura");
-                    reject();
-                } else {
-                    success.push("Assignatura inserida correctament");
-                    resolve();
-                }
-            });
-        });
-    };
-
-    // Funció per afegir el professor a la taula professors_assignatures
-    const checkAndInsertProfessor = (niu) => {
-        return new Promise((resolve, reject) => {
-            db.query(sqlComprobant, [id_User, id_Subject], (err, result) => {
-                if (err || result.length === 0) {
-                    errors.push("Error, usuari professor no existent: " + niu);
-                    reject();
-                } else {
-                    const sqlProfessorInsert = "INSERT INTO professors_assignatures (id_professor, id_assignatura) VALUES (?, ?)";
-                    db.query(sqlProfessorInsert, [id_User, id_Subject], (err) => {
-                        if (err) {
-                            errors.push("Error, professor no afegit a la taula professors_assignatures: " + niu);
-                            reject();
-                        } else {
-                            success.push("Professor inserit correctament: " + niu);
-                            resolve();
-                        }
-                    });
-                }
-            });
-        });
-    };
+    const sqlInsert = "INSERT INTO assignatures (id_assignatura, nom_assignatura, password) VALUES (?, ?,?)";
+    const sqlCheckExistence = "SELECT * FROM assignatures WHERE id_assignatura = ?";
+    const sqlCheckProfessor = "SELECT * FROM usuaris WHERE niu = ?";
+    const sqlProfessorInsert = "INSERT INTO professors_assignatures (id_professor, id_assignatura) VALUES (?, ?)";
 
     try {
-        // Primer, comprovem si l'assignatura ja existeix
-        await checkIfSubjectExists();
+        // Comprovar si ja existeix l'assignatura
+        const existingSubject = await new Promise((resolve, reject) => {
+            db.query(sqlCheckExistence, [id_Subject], (err, result) => {
+                if (err) reject("Error al comprovar l'existència de l'assignatura.");
+                else resolve(result);
+            });
+        });
 
-        // Insertar l'assignatura a la taula assignatures
-        await insertSubject();
-
-        // Afegir el professor a la taula professors_assignatures
-        await Promise.all(checkAndInsertProfessor (id_User));
-
-      
-        if (errors.length > 0) {
-            return res.json({ Status: "Failed", Messages: errors });
-        } else {
-            return res.json({ Status: "Success", Messages: success });
+        if (existingSubject.length > 0) {
+            return res.json({ Status: "Failed", Messages: "Ja existeix una assignatura amb aquest ID." });
         }
+
+        // Comprovar si el professor existeix
+        const existingProfessor = await new Promise((resolve, reject) => {
+            db.query(sqlCheckProfessor, [id_User], (err, result) => {
+                if (err) reject("Error al comprovar l'existència del professor.");
+                else resolve(result);
+            });
+        });
+
+        if (existingProfessor.length === 0) {
+            return res.json({ Status: "Failed", Messages: "El professor no existeix." });
+        }
+
+        // Inserir l'assignatura
+        await new Promise((resolve, reject) => {
+            db.query(sqlInsert, [id_Subject, subject_Name, passwordSubject], (err) => {
+                if (err) reject("Error en inserir l'assignatura.");
+                else resolve();
+            });
+        });
+
+        // Inserir el professor a la taula professors_assignatures
+        await new Promise((resolve, reject) => {
+            db.query(sqlProfessorInsert, [id_User, id_Subject], (err) => {
+                if (err) reject("Error en associar el professor amb l'assignatura.");
+                else resolve();
+            });
+        });
+
+        // Tot ha anat bé
+        return res.json({ Status: "Success", Messages: "Assignatura i professor afegits correctament." });
     } catch (error) {
-        return res.json({ Status: "Failed", Messages: errors });
+        // Retorna errors capturats
+        console.error("Error durant l'execució:", error);
+        return res.json({ Status: "Failed", Messages: error });
     }
 });
 
+app.post('/accessSubject', async (req, res) =>{
+
+
+    const { id_User, id_Subject, accessPassword, userRole } = req.body;
+
+    console.log(id_User, id_Subject, accessPassword, userRole)
+
+    if (!id_User || !id_Subject || !accessPassword || !userRole) {
+        return res.json({ Status: "Failed", Messages: "Falten dades obligatòries." });
+    }
+
+    const sqlCheckSubject = "SELECT * FROM assignatures WHERE id_assignatura = ?";
+    const sqlInsertProfessor = "INSERT INTO professors_assignatures (id_professor, id_assignatura) VALUES (?, ?)";
+    const sqlInsertStudent = "INSERT INTO alumnes_assignatures (id_alumne, id_assignatura) VALUES (?, ?)";
+    const sqlCheckEnrollmentProfessor = "SELECT * FROM professors_assignatures WHERE id_professor = ? AND id_assignatura = ?";
+    const sqlCheckEnrollmentStudent = "SELECT * FROM alumnes_assignatures WHERE id_alumne = ? AND id_assignatura = ?";
+
+
+    
+
+    try {
+        const subjectResult = await new Promise((resolve, reject) => {
+            db.query(sqlCheckSubject, [id_Subject], (err, result) => {
+                if (err) reject("Error al comprovar l'existència de l'assignatura.");
+                else resolve(result);
+            });
+        });
+
+        if (subjectResult.length === 0) {
+            return res.json({ Status: "Failed", Messages: "L'assignatura no existeix." });
+        }
+
+        const subject = subjectResult[0];
+        if (subject.password !== accessPassword) {
+            return res.json({ Status: "Failed", Messages: "La contrasenya no és correcta." });
+        }
+
+           const enrollmentCheckQuery = userRole === "professor" ? sqlCheckEnrollmentProfessor : sqlCheckEnrollmentStudent;
+
+           const enrollmentResult = await new Promise((resolve, reject) => {
+               db.query(enrollmentCheckQuery, [id_User, id_Subject], (err, result) => {
+                   if (err) reject("Error al comprovar si l'usuari ja està inscrit.");
+                   else resolve(result);
+               });
+           });
+   
+           if (enrollmentResult.length > 0) {
+               return res.json({ Status: "Failed", Messages: "L'usuari ja està inscrit en aquesta assignatura." });
+           }
+   
+           const insertQuery = userRole === "professor" ? sqlInsertProfessor : sqlInsertStudent;
+   
+           await new Promise((resolve, reject) => {
+               db.query(insertQuery, [id_User, id_Subject], (err) => {
+                   if (err) reject("Error en afegir l'usuari a l'assignatura.");
+                   else resolve();
+               });
+           });
+   
+          
+           return res.json({ Status: "Success", Messages: "Usuari inscrit correctament a l'assignatura." });
+   
+       } catch (error) {
+           return res.json({ Status: "Failed", Messages: error });
+       }
+
+})
 
 
 //Funció de recuperació dels temes associats a una assignatura pel curs
-app.get('/recoverTemesAssignatura', (req, res) => {
+app.get('/recoverTopicsSubject', (req, res) => {
 
     const idAssignatura = parseInt(req.query.Id_Assignatura, 10); 
-    //console.log(idAssignatura)
+    
 
     if (!idAssignatura) {
         return res.json({ success: false, message: "Id_Assignatura no proporcionat o inválid" });
@@ -373,36 +426,62 @@ app.get('/recoverTemesAssignatura', (req, res) => {
 
 //Funció creació d'un tema per una assignatura
 
-app.post('/createTema', (req,res) => {
+app.post('/createTopic', (req,res) => {
 
     const { Id_Assignatura, name } = req.body;
 
    
-
     if (!name) {
       return res.json({ success: false, message: "El nom és obligatori" });
     }
   
     const sql = "INSERT INTO temes (id_assignatura, nom_tema) VALUES (?, ?)";
+    const sqlRecover = "SELECT * FROM temes WHERE id_assignatura = ?"
+
     db.query(sql, [Id_Assignatura, name], (error, result) => {
       if (error) {
         console.error("Error al inserir el tema:", error);
-        return res.json({ success: false, message: "Error en crear el tema porque si" });
-      }
-  
-      return res.json({ success: true, message: "Tema creat amb èxit" });
+        return res.json({ success: false, message: "Error en crear el tema" });
+      }else{
+ 
+        db.query(sqlRecover, [Id_Assignatura], (error, result) => {
+
+            if(error)
+                return res.json({ success: false, message: "Error en recuperar els temes" });
+            
+            else{
+
+                db.query(sqlRecover, [Id_Assignatura], (error, result) => {
+
+                    if(error)
+                        return res.json({ success: false, message: "Error en recuperar els temes" });
+                    
+                    else
+                        return res.json({ success: true, message: "Tema creat amb èxit", result });
+                    
+                })
+            }
+        })
+    }
     });
 
-})
+});
+
 
 
 //Funció d'eliminació d'una assignatura. 
 app.delete('/deleteSubject', (req, res) => {
-    const id_subject = parseInt(req.query.id_subject);
+
+    const {id_subject, password} = req.query;
   
-    const sql = "DELETE FROM assignatures WHERE id_assignatura = ?";
+
+    if(!id_subject)
+        return res.json({Status:"Error", message:"Id de l'assignatura mal definit"})
+
+    const sql = "DELETE FROM assignatures WHERE id_assignatura = ? AND password = ?";
   
-    db.query(sql, [id_subject], (error, result) => {
+    db.query(sql, [id_subject, password], (error, result) => {
+
       if (error) {
         console.error("Error al eliminar l'assignatura:", error);
         return res.json({ success: false, message: "Error al eliminar l'assignatura" });
@@ -411,27 +490,37 @@ app.delete('/deleteSubject', (req, res) => {
       if (result.affectedRows > 0) {
         return res.json({ success: true, message: "Assignatura eliminada correctament!" });
       } else if (result.affectedRows === 0) {
-        return res.json({ success: false, message: "No existeix la assignatura" });
+        return res.json({ success: false, message: "Contrasenya Incorrecta" });
       }
     });
   });
   
 
 //Funció d'eliminació d'un tema
-app.delete('/deleteTheme', (req, res)=>{
+app.delete('/deleteTopic', (req, res)=>{
 
-    const id_tema = parseInt(req.body.id_tema);
+    const {id_tema, Id_Assignatura} = req.query;
 
+    if(!id_tema || !Id_Assignatura)
+        return res.json({Status:"Failed", message:"Falten dades"})
 
     const sql= "DELETE FROM temes WHERE id_tema = ?";
 
+    const sqlRecoverTopics = "SELECT * FROM temes WHERE id_assignatura = ?"
+
     db.query(sql, [id_tema], (error, result) => {
         if (error) {
-          console.error("Error al eliminar el tema", error);
           return res.json({ success: false, message: "Error en eliminar el tema" });
+        } else {
+ 
+          db.query(sqlRecoverTopics, [Id_Assignatura], (error, result) => {
+            if (error) {
+              return res.json({ success: false, message: "Error en recuperar els temes" });
+            } else {
+              return res.json({ success: true, message: "Tema eliminat amb èxit", result });
+            }
+          });
         }
-    
-        return res.json({ success: true, message: "Tema eliminat amb èxit" });
       });
 
 
@@ -937,19 +1026,35 @@ app.get('/recoverAtendees', (req, res) => {
     const id_assignatura = parseInt(req.query.Id_Assignatura);
 
     const sql = `
-        SELECT usuaris.niu, 
-               usuaris.username, 
-               usuaris.email, 
-               'alumne' AS role, 
-               AVG(resultats.nota) AS notes
-        FROM usuaris 
-        JOIN alumnes_assignatures ON usuaris.niu = alumnes_assignatures.id_alumne 
-        LEFT JOIN resultats ON usuaris.niu = resultats.id_alumne AND resultats.id_assignatura = ?
-        WHERE alumnes_assignatures.id_assignatura = ?
-        GROUP BY usuaris.niu
+
+            SELECT 
+                usuaris.niu, 
+                usuaris.username, 
+                usuaris.email, 
+                'alumne' AS role, 
+                AVG(resultats.nota) AS notes
+            FROM usuaris 
+            JOIN alumnes_assignatures ON usuaris.niu = alumnes_assignatures.id_alumne 
+            LEFT JOIN resultats ON usuaris.niu = resultats.id_alumne AND resultats.id_assignatura = ?
+            WHERE alumnes_assignatures.id_assignatura = ?
+            GROUP BY usuaris.niu
+
+UNION
+
+
+            SELECT 
+                usuaris.niu, 
+                usuaris.username, 
+                usuaris.email, 
+                'professor' AS role, 
+                NULL AS notes 
+            FROM usuaris 
+            JOIN professors_assignatures ON usuaris.niu = professors_assignatures.id_professor
+            WHERE professors_assignatures.id_assignatura = ?
+
     `;
 
-    db.query(sql, [id_assignatura, id_assignatura], (error, result) => {
+    db.query(sql, [id_assignatura, id_assignatura, id_assignatura], (error, result) => {
         if (error) {
             console.error("Error en la consulta:", error);
             return res.json({ Status: "Failed" });
@@ -1002,8 +1107,9 @@ app.get('/recoverGrades', (req, res) => {
 */
 
 
-/*REPASSAR AQUÍ PERQUE NO FUNCIONA*/ 
+
 app.get("/checkUserExists", async (req, res) => {
+
     const id_niu = parseInt(req.query.niu, 10); 
 
     if (isNaN(id_niu)) {
@@ -1073,18 +1179,42 @@ app.post("/addProfessorToSubject", async (req, res) => {
             return res.json({ success: false });
         }
         else{
-            const sqlSelect = `SELECT usuaris.*, 'alumne' AS role 
+            const sqlSelect = ` SELECT 
+                usuaris.niu, 
+                usuaris.username, 
+                usuaris.email, 
+                'alumne' AS role, 
+                AVG(resultats.nota) AS notes
             FROM usuaris 
             JOIN alumnes_assignatures ON usuaris.niu = alumnes_assignatures.id_alumne 
-            WHERE alumnes_assignatures.id_assignatura = ? `;
+            LEFT JOIN resultats ON usuaris.niu = resultats.id_alumne AND resultats.id_assignatura = ?
+            WHERE alumnes_assignatures.id_assignatura = ?
+            GROUP BY usuaris.niu
 
-            db.query(sqlSelect, [Id_Assignatura], (error, resultSelect) => {
+            UNION
+
+
+            SELECT 
+                usuaris.niu, 
+                usuaris.username, 
+                usuaris.email, 
+                'professor' AS role, 
+                NULL AS notes 
+            FROM usuaris 
+            JOIN professors_assignatures ON usuaris.niu = professors_assignatures.id_professor
+            WHERE professors_assignatures.id_assignatura = ?
+
+     `
+
+           
+
+            db.query(sqlSelect, [Id_Assignatura, Id_Assignatura, Id_Assignatura], (error, result) => {
 
             if(error){
                 return res.json({ success: false})
             }
 
-        return res.json({ success: true, resultSelect});
+        return res.json({ success: true, result});
         })
         }
        
@@ -1104,18 +1234,40 @@ app.post("/addStudentToSubject", async (req, res) => {
         }
         else{
 
-            const sqlSelect = `SELECT usuaris.*, 'alumne' AS role 
-                        FROM usuaris 
-                        JOIN alumnes_assignatures ON usuaris.niu = alumnes_assignatures.id_alumne 
-                        WHERE alumnes_assignatures.id_assignatura = ? `;
+            const sqlSelect = ` SELECT 
+            usuaris.niu, 
+            usuaris.username, 
+            usuaris.email, 
+            'alumne' AS role, 
+            AVG(resultats.nota) AS notes
+        FROM usuaris 
+        JOIN alumnes_assignatures ON usuaris.niu = alumnes_assignatures.id_alumne 
+        LEFT JOIN resultats ON usuaris.niu = resultats.id_alumne AND resultats.id_assignatura = ?
+        WHERE alumnes_assignatures.id_assignatura = ?
+        GROUP BY usuaris.niu
 
-            db.query(sqlSelect, [Id_Assignatura], (error, resultSelect) => {
+        UNION
+
+
+        SELECT 
+            usuaris.niu, 
+            usuaris.username, 
+            usuaris.email, 
+            'professor' AS role, 
+            NULL AS notes 
+        FROM usuaris 
+        JOIN professors_assignatures ON usuaris.niu = professors_assignatures.id_professor
+        WHERE professors_assignatures.id_assignatura = ?
+
+ `
+
+            db.query(sqlSelect, [Id_Assignatura, Id_Assignatura, Id_Assignatura], (error, result) => {
 
                 if(error){
                     return res.json({ success: false})
                 }
 
-                return res.json({ success: true, resultSelect});
+                return res.json({ success: true, result});
             })
 
 
@@ -1154,7 +1306,8 @@ app.delete('/leaveSubject', (req,res) =>{
     const role = req.query.role_User;
     let deleteSql;
 
-    console.log(id_assignatura, id_participant, role)
+    if(!id_participant || !id_assignatura || !role)
+        return res.json({ Status: "Failed", message:"Falten dades" });
 
     if(role === 'alumne'){
          deleteSql = `DELETE FROM alumnes_assignatures WHERE id_alumne = ? AND id_assignatura = ?`;
@@ -1171,9 +1324,7 @@ app.delete('/leaveSubject', (req,res) =>{
         }else{
             return res.json({ Status: "Success" });
         }
-
     });
-
 })
 
 
@@ -1183,44 +1334,98 @@ app.delete('/eliminateStudent', (req, res) => {
     const id_assignatura = req.query.Id_Assignatura;
 
     const deleteSql = `DELETE FROM alumnes_assignatures WHERE id_alumne = ? AND id_assignatura = ?`;
-    const fetchSql = `SELECT u.niu, u.username, u.email, u.role FROM alumnes_assignatures aa JOIN usuaris u ON aa.id_alumne = u.niu WHERE aa.id_assignatura = ?`;
+    const fetchSql = `
+        SELECT 
+            usuaris.niu, 
+            usuaris.username, 
+            usuaris.email, 
+            'alumne' AS role, 
+            AVG(resultats.nota) AS notes
+        FROM usuaris 
+        JOIN alumnes_assignatures ON usuaris.niu = alumnes_assignatures.id_alumne 
+        LEFT JOIN resultats ON usuaris.niu = resultats.id_alumne AND resultats.id_assignatura = ?
+        WHERE alumnes_assignatures.id_assignatura = ?
+        GROUP BY usuaris.niu
 
-    db.query(deleteSql, [id_participant, id_assignatura], (deleteError) => {
-        if (deleteError) {
-            console.error("Error a la consulta:", deleteError);
-            return res.json({ Status: "Failed" });
+        UNION
+
+        SELECT 
+            usuaris.niu, 
+            usuaris.username, 
+            usuaris.email, 
+            'professor' AS role, 
+            NULL AS notes 
+        FROM usuaris 
+        JOIN professors_assignatures ON usuaris.niu = professors_assignatures.id_professor
+        WHERE professors_assignatures.id_assignatura = ?
+    `;
+
+    db.query(deleteSql, [id_participant, id_assignatura], (error) => {
+        if (error) {
+            console.error("Error a la consulta de DELETE:", error);
+            return res.json({ Status: "Failed", message: error.message });
         }
-        db.query(fetchSql, [id_assignatura], (fetchError, updatedUsers) => {
-            if (fetchError) {
-                console.error("Error al recuperar els usuaris:", fetchError);
-                return res.json({ Status: "Failed" });
+        
+        db.query(fetchSql, [id_assignatura, id_assignatura, id_assignatura], (error, result) => {
+            if (error) {
+                console.error("Error al recuperar els usuaris:", error);
+                return res.json({ Status: "Failed", message: error.message });
             }
-            return res.json(updatedUsers);
+            return res.json({ Status: "Success", result });
         });
     });
 });
 
 app.delete('/eliminateTeacher', (req, res) => {
+
     const id_participant = req.query.id;
     const id_assignatura = req.query.Id_Assignatura;
 
-    const deleteSql = `DELETE FROM professors_assignatures WHERE id_professor = ? AND id_assignatura = ? `;
-    const fetchSql = `SELECT * FROM professors_assignatures`;
+    const deleteSql = `DELETE FROM professors_assignatures WHERE id_professor = ? AND id_assignatura = ?`;
+    const fetchSql = `
+        SELECT 
+            usuaris.niu, 
+            usuaris.username, 
+            usuaris.email, 
+            'alumne' AS role, 
+            AVG(resultats.nota) AS notes
+        FROM usuaris 
+        JOIN alumnes_assignatures ON usuaris.niu = alumnes_assignatures.id_alumne 
+        LEFT JOIN resultats ON usuaris.niu = resultats.id_alumne AND resultats.id_assignatura = ?
+        WHERE alumnes_assignatures.id_assignatura = ?
+        GROUP BY usuaris.niu
 
-    db.query(deleteSql, [id_participant, id_assignatura], (deleteError) => {
-        if (deleteError) {
-            console.error("Error a la consulta:", deleteError);
-            return res.json({ Status: "Failed" });
+        UNION
+
+        SELECT 
+            usuaris.niu, 
+            usuaris.username, 
+            usuaris.email, 
+            'professor' AS role, 
+            NULL AS notes 
+        FROM usuaris 
+        JOIN professors_assignatures ON usuaris.niu = professors_assignatures.id_professor
+        WHERE professors_assignatures.id_assignatura = ?
+    `;
+
+    
+    db.query(deleteSql, [id_participant, id_assignatura], (error) => {
+        if (error) {
+            console.error("Error a la consulta de DELETE:", error);
+            return res.json({ Status: "Failed", message: error.message });
         }
-        db.query(fetchSql, (fetchError, updatedUsers) => {
-            if (fetchError) {
-                console.error("Error al recuperar els usuaris:", fetchError);
-                return res.json({ Status: "Failed" });
+
+        
+        db.query(fetchSql, [id_assignatura, id_assignatura, id_assignatura], (error, result) => {
+            if (error) {
+                console.error("Error al recuperar els usuaris:", error);
+                return res.json({ Status: "Failed", message: error.message });
             }
-            return res.json(updatedUsers);
+            return res.json({ Status: "Success", result });
         });
     });
 });
+
 
 app.get('/recuperarPreguntesPerConceptes', (req, res) => {
     const { conceptesSeleccionats } = req.query; 
@@ -1991,12 +2196,6 @@ app.post("/import-csv", upload.single("file"), async (req, res) => {
   
   
   
-
-//Funció d'escolta del servidor 
-app.listen(8081, () => {
-    console.log("Running Server...");
-});
-
 
 
 
