@@ -432,7 +432,7 @@ app.post('/createTopic', (req,res) => {
     const { Id_Assignatura, name } = req.body;
 
    
-    if (!name) {
+    if (!name || !Id_Assignatura) {
       return res.json({ success: false, message: "El nom és obligatori" });
     }
   
@@ -1925,22 +1925,24 @@ app.post('/insertQuestionsTest', (req, res) => {
 
 
 //Funció de recuperació dels tests del tema
-app.get('/recoverTestsTema', (req, res) =>{
+app.get('/recoverTestsTopics', (req, res) =>{
 
 
-const idTema = req.query.id_tema;
+    const idTema = parseInt(req.query.id_tema);
 
-parseInt(idTema, 10);
-const sql = 'SELECT id_test, nom_test, tipus FROM tests WHERE id_tema = ?'
-
-db.query(sql, [idTema], (error, result) => {
-    if (error) {
-        console.error("Error a la consulta:", error);
+    if(!idTema)
         return res.json({ status: "Failed" });
-    } else {
-        return res.json({ status: "Success", result });
-    }
-});
+
+    const sql = 'SELECT id_test, nom_test, tipus FROM tests WHERE id_tema = ?'
+
+    db.query(sql, [idTema], (error, result) => {
+        if (error) {
+            console.error("Error a la consulta:", error);
+            return res.json({ status: "Failed" });
+        } else {
+            return res.json({ status: "Success", result });
+        }
+    });
 
 })
 
@@ -1950,6 +1952,8 @@ app.post('/validateTestAccess', (req, res) => {
 
     const { id_test, access_key } = req.body;
 
+    if(!id_test || !access_key)
+        return res.json({ status: "Failed", message: "Manquen dades" });
 
     const sql = 'SELECT id_test FROM tests WHERE id_test = ? AND clau_acces = ?';
 

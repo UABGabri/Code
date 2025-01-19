@@ -16,14 +16,6 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
   const [openTema, setOpenTema] = useState({});
   const navigate = useNavigate();
 
-  //Funció que permet deixar oberts els temes.
-  useEffect(() => {
-    const storedOpenTema = JSON.parse(localStorage.getItem("openTema"));
-    if (storedOpenTema) {
-      setOpenTema(storedOpenTema);
-    }
-  }, []);
-
   //Funció de recuperació dels temes de la assignatura.
   useEffect(() => {
     axios
@@ -31,10 +23,11 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
         params: { Id_Assignatura },
       })
       .then((response) => {
-        setTemes(response.data);
+        if (!response.data.success) {
+          setTemes(response.data);
+        }
       })
-      .catch((error) => {
-        console.error("Error al recuperar els temes:", error);
+      .catch(() => {
         alert("Error al recuperar els temes.");
       });
   }, [Id_Assignatura]);
@@ -43,7 +36,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
   useEffect(() => {
     temes.forEach((tema) => {
       axios
-        .get("http://localhost:8081/recoverTestsTema", {
+        .get("http://localhost:8081/recoverTestsTopics", {
           params: { id_tema: tema.id_tema },
         })
         .then((response) => {
@@ -67,8 +60,8 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
             }));
           }
         })
-        .catch((error) => {
-          console.error("Error al recuperar els tests:", error);
+        .catch(() => {
+          alert("Error al recuperar els tests");
         });
     });
   }, [temes]);
@@ -87,15 +80,11 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
       })
       .then((response) => {
         if (response.data.success) {
-          setTemes([
-            ...temes,
-            { id_tema: response.data.id_tema, nom_tema: newTemaName },
-          ]);
+          setTemes(response.data.result);
           setNewTemaName("");
         } else {
           alert("Error en crear el tema");
         }
-        window.location.reload();
       })
       .catch((error) => {
         console.error("Error en crear el tema:", error);
@@ -137,7 +126,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
             state: { idTest: selectedTest.id_test, Id_User },
           });
         } else {
-          console.error("El test seleccionat és invàlid o manca 'id_test'");
+          alert("El test seleccionat és invàlid o manca 'id_test'");
         }
       }
     }
@@ -146,10 +135,13 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
   //Funció d'eliminació d'un tema.
   const handleDeleteTheme = (id_tema) => {
     axios
-      .delete("http://localhost:8081/deleteTheme", { data: { id_tema } })
+      .delete("http://localhost:8081/deleteTopic", {
+        params: { id_tema, Id_Assignatura },
+      })
       .then((response) => {
         alert("Tema eliminat amb èxit!");
-        window.location.reload();
+
+        setTemes(response.data.result);
       })
       .catch((error) => {
         console.error("Error eliminant el tema", error);
@@ -249,7 +241,6 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                         <button
                           className={styles.buttonAddTest}
                           onClick={() => {
-                            //console.log(tema.id_tema);
                             navigate("/createQuizz", {
                               state: {
                                 id_assignatura: Id_Assignatura,
