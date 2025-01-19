@@ -11,9 +11,13 @@ function Dashboard({ id_User, role_User }) {
   const [assignatures, setAssignatures] = useState([]);
   const [addModal, setAddModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [accessModal, setAccessModal] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState("");
+  const [accessId, setAccessId] = useState("");
+  const [accessPassword, setAccessPassword] = useState("");
   const navigate = useNavigate();
+  const [error, setError] = useState("");
 
   //Funció auxiliar per la obtenció de tota la informació de les assignatures relacionades amb un usuari.
   const fetchAssignatures = async () => {
@@ -23,7 +27,11 @@ function Dashboard({ id_User, role_User }) {
         roleUser: role_User,
       });
 
-      return res.data;
+      if (res.data.Status === "Success") {
+        return res.data.result;
+      } else {
+        setError("Error al recuperar les assignatures.");
+      }
     } catch (err) {
       console.error("Error en la sol·licitud:", err);
       return [];
@@ -62,6 +70,39 @@ function Dashboard({ id_User, role_User }) {
     setDeleteId("");
   };
 
+  const openAccessModal = () => {
+    setAccessModal(true);
+  };
+
+  const closeAccessModal = () => {
+    setAccessModal(false);
+  };
+
+  const handleAccessSubject = async () => {
+    if (!accessId || !accessPassword) return alert("Manquen dades");
+
+    try {
+      const res = await axios.post("http://localhost:8081/accessSubject", {
+        id_User,
+        id_Subject: accessId,
+        accessPassword,
+        userRole: role_User,
+      });
+
+      if (res.data.success) {
+        alert(res.data.Messages);
+      } else {
+        alert(res.data.Messages);
+      }
+
+      closeAccessModal();
+
+      window.location.reload();
+    } catch (err) {
+      console.error("Error eliminant l'assignatura:", err);
+      alert("No s'ha pogut eliminar l'assignatura.");
+    }
+  };
   //Funció asíncrona per esborrar assignatures. Es fa de forma asíncrona per qüestió del CASCADE.
   const handleDeleteSubject = async () => {
     if (
@@ -75,7 +116,7 @@ function Dashboard({ id_User, role_User }) {
 
     try {
       const res = await axios.delete("http://localhost:8081/deleteSubject", {
-        params: { id_subject: deleteId },
+        params: { id_subject: deleteId, password: accessPassword },
       });
 
       if (res.data.success) {
@@ -87,6 +128,7 @@ function Dashboard({ id_User, role_User }) {
       setAssignatures((prev) =>
         prev.filter((assignatura) => assignatura.id_assignatura !== deleteId)
       );
+
       closeDeleteModal();
 
       window.location.reload();
@@ -123,6 +165,10 @@ function Dashboard({ id_User, role_User }) {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  if (error) {
+    return <p>Error al retornar assignatures</p>;
+  }
+
   return (
     <div>
       <Headercap />
@@ -132,21 +178,27 @@ function Dashboard({ id_User, role_User }) {
 
       <div className={styles.container}>
         <div className={styles.columnsContainer}>
-          {currentAssignatures.map((assignatura) => (
-            <div
-              key={assignatura.id_assignatura}
-              className={styles.assignaturaCard}
-              onClick={() =>
-                handleSelectAssignatura(
-                  assignatura.id_assignatura,
-                  assignatura.nom_assignatura
-                )
-              }
-            >
-              <h3>{assignatura.nom_assignatura}</h3>
-              <p>ID: {assignatura.id_assignatura}</p>
-            </div>
-          ))}
+          {assignatures.length === 0 ? (
+            <p className={styles.noAssignaturesMessage}>
+              No hi ha assignatures disponibles.
+            </p>
+          ) : (
+            currentAssignatures.map((assignatura) => (
+              <div
+                key={assignatura.id_assignatura}
+                className={styles.assignaturaCard}
+                onClick={() =>
+                  handleSelectAssignatura(
+                    assignatura.id_assignatura,
+                    assignatura.nom_assignatura
+                  )
+                }
+              >
+                <h3>{assignatura.nom_assignatura}</h3>
+                <p>ID: {assignatura.id_assignatura}</p>
+              </div>
+            ))
+          )}
         </div>
 
         <div className={styles.pagination}>
@@ -171,21 +223,88 @@ function Dashboard({ id_User, role_User }) {
 
         <div className={styles.buttonsContainer}>
           {role_User === "professor" && (
-            <button onClick={openAddModal} className={styles.addButton}>
-              Afegir Assignatura
-            </button>
-          )}
+            <>
+              <button onClick={openAddModal} className={styles.addButton}>
+                Afegir Assignatura
+              </button>
 
-          {role_User === "professor" && (
-            <button onClick={openDeleteModal} className={styles.deleteButton}>
-              Eliminar Assignatura
-            </button>
+              <button onClick={openDeleteModal} className={styles.deleteButton}>
+                Eliminar Assignatura
+              </button>
+            </>
           )}
         </div>
+
+        <button
+          onClick={openAccessModal}
+          className={styles.addButton}
+          style={{ marginTop: "20px" }}
+        >
+          Accedir Assignatura
+        </button>
       </div>
 
       {addModal && (
         <AddSubjectModal id_User={id_User} onClose={closeAddModal} />
+      )}
+
+      {accessModal && (
+        <div className={styles.modalOver}>
+          <div className={styles.modalContent}>
+            <h2 className={styles.modalTitle}>Accedir Assignatura</h2>
+
+            <form
+              className={styles.modalForm}
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleAccessSubject();
+              }}
+            >
+              <div className={styles.formGroup}>
+                <label htmlFor="accessId">
+                  Introdueix l'ID de l'assignatura:
+                </label>
+                <input
+                  type="text"
+                  id="accessId"
+                  value={accessId}
+                  required
+                  pattern="^\d{4}$"
+                  title="L'ID necessita 4 dígits"
+                  maxLength={4}
+                  onChange={(e) => setAccessId(e.target.value)}
+                  className={styles.inputField}
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="password">Password de l'assignatura:</label>
+                <input
+                  type="password"
+                  id="password"
+                  value={accessPassword}
+                  required
+                  maxLength={10}
+                  onChange={(e) => setAccessPassword(e.target.value)}
+                  className={styles.inputField}
+                />
+              </div>
+
+              <div className={styles.buttonDeleteModal}>
+                <button type="submit" className={styles.addButtonModal}>
+                  Acceptar
+                </button>
+                <button
+                  type="button"
+                  onClick={closeAccessModal}
+                  className={styles.cancelButtonModal}
+                >
+                  Cancel·lar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
 
       {deleteModal && (
@@ -197,13 +316,7 @@ function Dashboard({ id_User, role_User }) {
               className={styles.modalForm}
               onSubmit={(e) => {
                 e.preventDefault();
-                if (/^\d{4}$/.test(deleteId)) {
-                  setConfirmDelete(true);
-                } else {
-                  alert(
-                    "Si us plau, introdueix un ID d'assignatura vàlid de 4 dígits."
-                  );
-                }
+                setConfirmDelete(true);
               }}
             >
               {!confirmDelete ? (
@@ -221,6 +334,19 @@ function Dashboard({ id_User, role_User }) {
                       title="L'ID necessita 4 dígits"
                       minLength={4}
                       onChange={(e) => setDeleteId(e.target.value)}
+                      className={styles.inputField}
+                    />
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label htmlFor="password">Password de l'assignatura:</label>
+                    <input
+                      type="password"
+                      id="password"
+                      value={accessPassword}
+                      required
+                      maxLength={10}
+                      onChange={(e) => setAccessPassword(e.target.value)}
                       className={styles.inputField}
                     />
                   </div>
@@ -269,8 +395,8 @@ function Dashboard({ id_User, role_User }) {
 }
 
 Dashboard.propTypes = {
-  id_User: PropTypes.number.isRequired,
-  role_User: PropTypes.string.isRequired,
+  id_User: PropTypes.number,
+  role_User: PropTypes.string,
 };
 
 export default Dashboard;

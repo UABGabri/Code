@@ -6,6 +6,7 @@ import axios from "axios";
 function AddSubjectModal({ id_User, onClose }) {
   const [subject_Name, setSubject_Name] = useState("");
   const [id_Subject, setIdSubject] = useState("");
+  const [passwordSubject, setPasswordSubject] = useState("");
   const [errorMessage, setErrorMessage] = useState(""); // Per mostrar missatges d'error
 
   // Funció per enviar el formulari i registrar l'assignatura
@@ -16,9 +17,9 @@ function AddSubjectModal({ id_User, onClose }) {
       id_User,
       id_Subject,
       subject_Name,
+      passwordSubject,
     };
 
-    // Enviament de la sol·licitud per registrar l'assignatura
     axios
       .post("http://localhost:8081/registerSubject", values)
       .then((res) => {
@@ -53,7 +54,7 @@ function AddSubjectModal({ id_User, onClose }) {
               required
               pattern="^\d{4}$"
               title="L'ID necessita 4 dígits"
-              minLength={4}
+              maxLength={4}
             />
           </div>
           <div className={styles.formGroup}>
@@ -64,7 +65,20 @@ function AddSubjectModal({ id_User, onClose }) {
               onChange={(e) => setSubject_Name(e.target.value)}
               placeholder="Ex: Matemàtiques"
               required
+              maxLength={15}
               pattern="^[A-Za-zÀ-ÿ\s]+$"
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Contrasenya:</label>
+            <input
+              type="password"
+              value={passwordSubject}
+              onChange={(e) => setPasswordSubject(e.target.value)}
+              required
+              maxLength={10}
+              pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
             />
           </div>
 

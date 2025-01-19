@@ -7,7 +7,8 @@ function Modulespage() {
   const [role, setRole] = useState("");
   const [auth, setAuth] = useState(false);
   const [message, setMessage] = useState("");
-  const [niu, setNiu] = useState("");
+  const [niu, setNiu] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   // Configura axios perquè inclogui les cookies en totes les sol·licituds
   axios.defaults.withCredentials = true;
@@ -25,12 +26,18 @@ function Modulespage() {
           setAuth(false);
           setMessage(res.data.Error || "Unknown error");
         }
+        setLoading(false);
       })
       .catch((err) => {
         console.error("Error a la solicitud:", err);
         setMessage("Error al recuperar les dades de l'usuari.");
+        setLoading(false);
       });
   }, []);
+
+  if (loading) {
+    return <div>Carregant...</div>;
+  }
 
   if (!auth || !niu || !role) {
     return (

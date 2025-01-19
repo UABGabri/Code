@@ -340,6 +340,8 @@ app.post('/accessSubject', async (req, res) =>{
 
     console.log(id_User, id_Subject, accessPassword, userRole)
 
+    console.log(id_User, id_Subject, accessPassword, userRole)
+
     if (!id_User || !id_Subject || !accessPassword || !userRole) {
         return res.json({ Status: "Failed", Messages: "Falten dades obligatòries." });
     }
@@ -349,7 +351,6 @@ app.post('/accessSubject', async (req, res) =>{
     const sqlInsertStudent = "INSERT INTO alumnes_assignatures (id_alumne, id_assignatura) VALUES (?, ?)";
     const sqlCheckEnrollmentProfessor = "SELECT * FROM professors_assignatures WHERE id_professor = ? AND id_assignatura = ?";
     const sqlCheckEnrollmentStudent = "SELECT * FROM alumnes_assignatures WHERE id_alumne = ? AND id_assignatura = ?";
-
 
     
 
@@ -532,6 +533,11 @@ app.post('/recoverSubjects', (req, res) => {
     const id_User = req.body.idUser;
     const role_User = req.body.roleUser;
 
+    console.log(id_User, role_User)
+
+    if(!id_User || !role_User)
+        return res.json({Status:"Failed", message:"Manquen dades"})
+
 
     if(role_User === "professor"){
 
@@ -546,7 +552,7 @@ app.post('/recoverSubjects', (req, res) => {
               console.error("Error en la consulta:", error);
               return res.json({ Status: "Failed" });
             } else {
-              return res.json(result); 
+                return res.json({Status:"Success", result}); 
             }
           });
 
@@ -563,7 +569,7 @@ app.post('/recoverSubjects', (req, res) => {
               console.error("Error en la consulta:", error);
               return res.json({ Status: "Failed" });
             } else {
-              return res.json(result); 
+              return res.json({Status:"Success", result}); 
             }
           });
     }
