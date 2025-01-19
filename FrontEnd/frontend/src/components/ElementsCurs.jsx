@@ -214,7 +214,6 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                   {openTema[tema.id_tema] ? <FaChevronUp /> : <FaChevronDown />}
                 </button>
               </div>
-              <hr />
 
               {openTema[tema.id_tema] && (
                 <div className={styles.temaContent}>

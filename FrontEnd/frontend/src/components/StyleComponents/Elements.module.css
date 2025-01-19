@@ -490,12 +490,16 @@
 }
 
 .temaItem {
-  margin-bottom: 20px;  
+  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
   margin-left: 100px;
-  
   margin-right: 100px;
+  border: 2px solid ;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .temaHeader {
