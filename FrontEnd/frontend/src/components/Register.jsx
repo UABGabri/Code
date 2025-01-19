@@ -166,6 +166,7 @@ function Register() {
                 id="password"
                 placeholder="Introdueix la teva contrasenya"
                 required
+                minLength={8}
                 maxLength={10}
                 title="La contrasenya ha de tenir entre 8 i 10 caràcters"
               />
@@ -181,6 +182,7 @@ function Register() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="form-control"
                 id="confirmPassword"
+                minLength={8}
                 maxLength={10}
                 required
                 placeholder="Confirma la contrasenya"

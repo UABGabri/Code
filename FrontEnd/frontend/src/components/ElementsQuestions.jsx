@@ -60,6 +60,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
     }
   };
 
+  //Funció de renderitzat de la funció.
   useEffect(() => {
     if (Role_User === "professor") {
       axios
@@ -67,10 +68,15 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
           params: { Id_Assignatura },
         })
         .then((res) => {
-          setQuestions(res.data);
+          console.log(res);
+          if (res.data.Status === "Empty") setQuestions(res.data.result);
+
+          if (res.data.Status === "Success") {
+            setQuestions(res.data.result);
+          }
 
           axios
-            .get("http://localhost:8081/recoverTemesAssignatura", {
+            .get("http://localhost:8081/recoverTopicsSubject", {
               params: { Id_Assignatura },
             })
             .then((res) => {
@@ -164,7 +170,6 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
   //Funció per obrir el modal de la edició i obtenir la seva informació
   const handleEdit = (question) => {
     setEditedQuestion(true);
-    //console.log(question);
     setSelectedEditingQuestion(question);
   };
 
@@ -279,79 +284,89 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
         </>
       )}
       <div className={styles.questionsList}>
-        {displayedQuestions.map((question) => (
-          <div key={question.id_pregunta} className={styles.questionCard}>
-            <div className={styles.questionDetails}>
-              <p>
-                <strong>Tema:</strong> {question.nom_tema}
-              </p>
-              <p>
-                <strong>Dificultat:</strong> {question.dificultat}
-              </p>
-              <p>
-                <strong>Pregunta:</strong> {question.pregunta}
-              </p>
-              <p>
-                <strong>Resposta:</strong> {question.solucio_correcta}
-              </p>
-            </div>
-
-            {Role_User !== "alumne" && (
-              <div className={styles.actionButtonsContainer}>
-                <button
-                  className={styles.editButton}
-                  onClick={() => handleEdit(question)}
-                >
-                  <FaEdit />
-                </button>
-
-                <button
-                  className={styles.deleteButton}
-                  onClick={() =>
-                    handleOpenModal("delete", question.id_pregunta)
-                  }
-                >
-                  <FaTimes />
-                </button>
-
-                {question.estat === "pendent" && (
-                  <>
-                    <button
-                      className={styles.acceptButton}
-                      onClick={() =>
-                        handleOpenModal("accept", question.id_pregunta)
-                      }
-                    >
-                      <FaCheck />
-                    </button>
-                  </>
-                )}
+        {displayedQuestions.length > 0 ? (
+          displayedQuestions.map((question) => (
+            <div key={question.id_pregunta} className={styles.questionCard}>
+              <div className={styles.questionDetails}>
+                <p>
+                  <strong>Tema:</strong> {question.nom_tema}
+                </p>
+                <p>
+                  <strong>Dificultat:</strong> {question.dificultat}
+                </p>
+                <p>
+                  <strong>Pregunta:</strong> {question.pregunta}
+                </p>
+                <p>
+                  <strong>Resposta:</strong> {question.solucio_correcta}
+                </p>
               </div>
-            )}
+
+              {Role_User !== "alumne" && (
+                <div className={styles.actionButtonsContainer}>
+                  <button
+                    className={styles.editButton}
+                    onClick={() => handleEdit(question)}
+                  >
+                    <FaEdit />
+                  </button>
+
+                  <button
+                    className={styles.deleteButton}
+                    onClick={() =>
+                      handleOpenModal("delete", question.id_pregunta)
+                    }
+                  >
+                    <FaTimes />
+                  </button>
+
+                  {question.estat === "pendent" && (
+                    <>
+                      <button
+                        className={styles.acceptButton}
+                        onClick={() =>
+                          handleOpenModal("accept", question.id_pregunta)
+                        }
+                      >
+                        <FaCheck />
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          ))
+        ) : (
+          <div className={styles.noAtendeesMessage}>
+            <strong style={{ color: "red" }}>Sense Preguntes </strong>
           </div>
-        ))}
+        )}
       </div>
-      <div className={styles.paginationContainer}>
-        <button
-          onClick={() => handlePageChange(-1)}
-          disabled={currentPage === 1}
-          className={styles.paginationButton}
-          style={{ background: "none" }}
-        >
-          <FaArrowLeft />
-        </button>
-        <span style={{ marginBottom: "10px" }}>
-          Pàgina {currentPage} de {totalPages}
-        </span>
-        <button
-          onClick={() => handlePageChange(1)}
-          disabled={currentPage === totalPages}
-          className={styles.paginationButton}
-          style={{ background: "none" }}
-        >
-          <FaArrowRight />
-        </button>
-      </div>
+
+      {totalPages > 1 && (
+        <div className={styles.paginationContainer}>
+          <button
+            onClick={() => handlePageChange(-1)}
+            disabled={currentPage === 1}
+            className={styles.paginationButton}
+            style={{ background: "none" }}
+          >
+            <FaArrowLeft />
+          </button>
+          <span style={{ marginBottom: "10px" }}>
+            Pàgina {currentPage} de {totalPages}
+          </span>
+          <button
+            onClick={() => handlePageChange(1)}
+            disabled={currentPage === totalPages}
+            className={styles.paginationButton}
+            style={{ background: "none" }}
+          >
+            <FaArrowRight />
+          </button>
+        </div>
+      )}
+
       <button
         className={styles.addQuestionButton}
         onClick={handleButton}

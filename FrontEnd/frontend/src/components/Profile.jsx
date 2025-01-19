@@ -14,7 +14,6 @@ function Profile() {
   });
 
   const history = useNavigate();
-  const [error, setError] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -22,10 +21,10 @@ function Profile() {
     axios
       .get("http://localhost:8081/user", { withCredentials: true })
       .then((res) => {
-        setValues(res.data.user);
+        if (res.data.Status === "Success") setValues(res.data.user);
       })
       .catch((err) => {
-        console.error("Error a la sol·licitud:", err);
+        alert(err);
       });
   }, []);
 
@@ -41,20 +40,19 @@ function Profile() {
     e.preventDefault();
 
     if (values.password !== confirmPassword) {
-      setError("Si us plau, introdueix contrasenyes coincidents.");
-      alert(error);
+      alert("Si us plau, introdueix contrasenyes coincidents.");
       return;
     } else {
       axios
         .put("http://localhost:8081/updateUser", values, {
           withCredentials: true,
         })
-        .then(() => {})
+        .then((res) => {
+          if (res.data.Status === "Success") alert("Canvis efectuats");
+        })
         .catch((err) => {
           console.error(err);
         });
-
-      history(-1);
     }
   };
 
@@ -72,15 +70,15 @@ function Profile() {
         params: { values },
         withCredentials: true,
       })
-      .then(() => {
-        localStorage.clear();
-        sessionStorage.clear();
-
-        history("/login");
+      .then((res) => {
+        if (res.data.Status === "Success") {
+          localStorage.clear();
+          sessionStorage.clear();
+          history("/login");
+        }
       })
       .catch((err) => {
-        console.error(err);
-        alert("S'ha produït un error en intentar donar-se de baixa.");
+        alert(err);
       });
   };
 
@@ -110,6 +108,7 @@ function Profile() {
               value={values.username}
               onChange={handleInputChange}
               required
+              maxLength={15}
               pattern="^[A-Za-zÀ-ÿ\s]+$"
               title="Nom amb lletres de l'alfabet"
               className={styles.inputProfile}
@@ -128,6 +127,7 @@ function Profile() {
               title="Introdueix un correu electrònic vàlid"
               className={styles.inputProfile}
               placeholder="Correu electrònic"
+              maxLength={30}
             />
           </div>
 
@@ -140,7 +140,8 @@ function Profile() {
               required
               id="password"
               minLength={8}
-              title="Es necessiten almenys 8 caràcters"
+              maxLength={10}
+              title="Es necessiten almenys entre 8 i 10 caràcters"
               className={styles.inputProfile}
               placeholder="Nova Contrasenya"
             />
@@ -155,7 +156,11 @@ function Profile() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               className={styles.inputProfile}
               id="confirmPassword"
+              required
+              minLength={8}
+              maxLength={10}
               placeholder="Confirma la contrasenya"
+              title="Es necessiten almenys entre 8 i 10 caràcters"
             />
           </div>
 

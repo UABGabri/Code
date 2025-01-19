@@ -201,15 +201,7 @@ app.get('/user', (req, res) => {
     
         const niu = decoded.niu;
 
-        //console.log(decoded);
         
-        const db = mysql.createConnection({
-            host: "localhost",
-            user: "root",
-            password: "Ga21012002",
-            database: "web_examen_tfg"
-
-        });
 
         const sql = 'SELECT * FROM usuaris WHERE niu = ?';
 
@@ -218,7 +210,7 @@ app.get('/user', (req, res) => {
             if (result.length > 0) {
 
                 
-                return res.json({ user: result[0], Status: "Succeeded" });
+                return res.json({ user: result[0], Status: "Success" });
             } else {
                 return res.json({ Error: "Usuari no trobat" });
             }
@@ -251,7 +243,6 @@ app.put('/updateUser', (req, res) => {
         if (!username || !email || !password) {
             return res.json({ Error: "Tots els camps són obligatoris" });
         }
-
      
         bcrypt.hash(password.toString(), salt, (err, hash) => {
             if (err) return res.json({ Error: "Error encriptant la contrasenya" });
@@ -947,8 +938,10 @@ app.get('/recoverTemasAssignaturaPreguntes', (req, res) => {
 //Funció de recuperació preguntes per ser avaluades pel professor
 app.get('/recoverQuestions', (req, res)=>{ 
 
-    const id_assignatura = req.query.Id_Assignatura;
-    parseInt(id_assignatura);
+    const id_assignatura = parseInt(req.query.Id_Assignatura);
+    
+    if(!id_assignatura)
+        return res.json({ Status: "Failed" });
     
     const sql = `SELECT 
                     preguntes.*, 
@@ -968,7 +961,10 @@ app.get('/recoverQuestions', (req, res)=>{
             console.error("Error en la consulta:", error);
             return res.json({ Status: "Failed" });
           } else {
-            return res.json(result); 
+
+            if(result.length === 0)
+                return res.json({Status:"Empty", result: []})
+            return res.json({Status:"Success", result}); 
           }
     })
 })
@@ -1297,17 +1293,20 @@ app.post("/addStudentToSubject", async (req, res) => {
 app.delete('/deleteUser', (req, res) =>{
 
     const id_user = req.query.values.niu;
-    
+
+    if(!id_user)
+        return
+
     const deleteSql = 'DELETE FROM usuaris WHERE niu = ?';
 
     db.query(deleteSql, [id_user], (error, result) => {
         if (error) {
-            console.error("Error al eliminar a l'alumne:", error);
-            return res.json({ success: false });
+        
+            return res.json({ Status: "Failed" });
         }
 
         res.clearCookie('token', { httpOnly: true, secure: true, sameSite: 'None' });
-        return res.json({ success: true });
+        return res.json({Status: "Success" });
     });
 
  
