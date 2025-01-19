@@ -1031,6 +1031,9 @@ app.put('/updateQuestionAccept', (req, res) =>{
 app.get('/recoverAtendees', (req, res) => {
     const id_assignatura = parseInt(req.query.Id_Assignatura);
 
+    if(!id_assignatura)
+        return res.json({ Status: "Failed" });
+
     const sql = `
 
             SELECT 
@@ -1062,10 +1065,10 @@ UNION
 
     db.query(sql, [id_assignatura, id_assignatura, id_assignatura], (error, result) => {
         if (error) {
-            console.error("Error en la consulta:", error);
-            return res.json({ Status: "Failed" });
+        
+            return res.json({ Status: "Failed", message: error });
         }
-        res.json(result);
+        res.json({ Status: "Success", result });
     });
 });
 
@@ -1118,7 +1121,7 @@ app.get("/checkUserExists", async (req, res) => {
 
     const id_niu = parseInt(req.query.niu, 10); 
 
-    if (isNaN(id_niu)) {
+    if (!id_niu) {
         return res.json({ exists: false, error: "Invalid NIU format" });
     }
 
@@ -1144,15 +1147,18 @@ app.get("/checkUserExists", async (req, res) => {
 app.get("/checkProfessorInSubject", (req, res) => {
     const { niu, Id_Assignatura } = req.query;
 
+    if(!niu || !Id_Assignatura)
+        return res.json({Status:"Failed"})
+
     const sql =
         "SELECT COUNT(*) AS count FROM professors_assignatures WHERE id_professor = ? AND id_assignatura = ?";
     db.query(sql, [niu, Id_Assignatura], (error, result) => {
         if (error) {
             console.error("Error en la consulta:", error);
-            return res.status(500).json({ exists: false, error: "Database query failed" });
+            return res.json({ Status: "Failed", error: "Database query failed" });
         }
         const exists = result[0].count > 0;
-        res.json({ exists });
+        res.json({ Status:"Success" });
     });
 });
 
@@ -1178,6 +1184,9 @@ app.get("/checkStudentInSubject", (req, res) => {
 app.post("/addProfessorToSubject", async (req, res) => {
     const { niu, Id_Assignatura } = req.body;
 
+    if(!niu || !Id_Assignatura)
+        return res.json({Status:"Failed"})
+
     const sql = 'INSERT INTO professors_assignatures (id_professor, id_assignatura) VALUES (?, ?)';
     db.query(sql, [niu, Id_Assignatura], (error, result) => {
         if (error) {
@@ -1199,7 +1208,6 @@ app.post("/addProfessorToSubject", async (req, res) => {
 
             UNION
 
-
             SELECT 
                 usuaris.niu, 
                 usuaris.username, 
@@ -1209,10 +1217,7 @@ app.post("/addProfessorToSubject", async (req, res) => {
             FROM usuaris 
             JOIN professors_assignatures ON usuaris.niu = professors_assignatures.id_professor
             WHERE professors_assignatures.id_assignatura = ?
-
      `
-
-           
 
             db.query(sqlSelect, [Id_Assignatura, Id_Assignatura, Id_Assignatura], (error, result) => {
 
@@ -1231,6 +1236,9 @@ app.post("/addProfessorToSubject", async (req, res) => {
 
 app.post("/addStudentToSubject", async (req, res) => {
     const { niu, Id_Assignatura } = req.body;
+
+    if(!niu || !Id_Assignatura)
+        return res.json({Status:"Failed"})
 
     const sql = 'INSERT INTO alumnes_assignatures (id_alumne, id_assignatura) VALUES (?, ?)';
     db.query(sql, [niu, Id_Assignatura], (error, result) => {
@@ -1254,7 +1262,6 @@ app.post("/addStudentToSubject", async (req, res) => {
 
         UNION
 
-
         SELECT 
             usuaris.niu, 
             usuaris.username, 
@@ -1266,7 +1273,6 @@ app.post("/addStudentToSubject", async (req, res) => {
         WHERE professors_assignatures.id_assignatura = ?
 
  `
-
             db.query(sqlSelect, [Id_Assignatura, Id_Assignatura, Id_Assignatura], (error, result) => {
 
                 if(error){
@@ -1275,8 +1281,6 @@ app.post("/addStudentToSubject", async (req, res) => {
 
                 return res.json({ success: true, result});
             })
-
-
         }
        
     });
@@ -1338,6 +1342,10 @@ app.delete('/leaveSubject', (req,res) =>{
 app.delete('/eliminateStudent', (req, res) => {
     const id_participant = req.query.id;
     const id_assignatura = req.query.Id_Assignatura;
+
+
+    if(!id_participant || !id_assignatura)
+        return res.json({ Status: "Failed"});
 
     const deleteSql = `DELETE FROM alumnes_assignatures WHERE id_alumne = ? AND id_assignatura = ?`;
     const fetchSql = `
@@ -2069,6 +2077,7 @@ app.get("/recoverPreguntaRandom", (req, res) => {
 
 
 app.post("/import-csv", upload.single("file"), async (req, res) => {
+
     const filePath = req.file.path;
     const results = [];
     const errors = [];
@@ -2088,7 +2097,7 @@ app.post("/import-csv", upload.single("file"), async (req, res) => {
                     const subjectId = parseInt(req.body.Id_Assignatura, 10); // ID de l'assignatura
 
                     for (const { NIU, username, email, password, role } of results) {
-                        // Validacions de camps
+                      
                         if (!NIU || !username || !email || !password || !role) {
                             errors.push(`Fila amb NIU ${NIU || "desconegut"}: Camps incomplets.`);
                             continue;
@@ -2173,7 +2182,7 @@ app.post("/import-csv", upload.single("file"), async (req, res) => {
                         (err, result) => {
                             if (err) {
                                 console.error("Error en la consulta SELECT:", err);
-                                return res.status(500).json({ 
+                                return res.json({ 
                                     status: "error", 
                                     message: "Error al recuperar els usuaris.", 
                                     error: err 
@@ -2182,7 +2191,7 @@ app.post("/import-csv", upload.single("file"), async (req, res) => {
                     
                             // Resposta final
                             res.json({
-                                status: "success",
+                                status: "Success",
                                 message: "Importació completada.",
                                 newUsers, 
                                 errors, 

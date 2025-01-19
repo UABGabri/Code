@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 import styles from "./StyleComponents/Elements.module.css";
-import { FaArrowLeft, FaArrowRight, FaInfo } from "react-icons/fa6";
+import { FaArrowLeft, FaArrowRight, FaInfo, FaTrash } from "react-icons/fa6";
 
 function ElementsParticipants({ Id_Assignatura, Role_User }) {
   const [users, setUsers] = useState([]);
@@ -11,10 +11,10 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
   const [userInfo, setUserInfo] = useState(null);
   const [newNiu, setNewNiu] = useState("");
   const [csvFile, setCsvFile] = useState(null);
-
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const [filter, setFilter] = useState("");
+  const [filterRole, setFilterRole] = useState("Tots");
 
   //Funció de recuperació dels participants
   useEffect(() => {
@@ -24,7 +24,11 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
       })
       .then((res) => {
         console.log(res);
-        setUsers(res.data);
+        if (res.data.Status === "Success") {
+          setUsers(res.data.result);
+        } else {
+          alert(res.data.message);
+        }
       })
       .catch((err) => {
         console.error("Error a la sol·licitud:", err);
@@ -35,9 +39,9 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
   const [userToDelete, setUserToDelete] = useState(null);
 
   //Funció per obrir modal d'eliminació
-  const handleOpenModal = (niu) => {
+  const handleOpenModal = (userDel) => {
     setDeleteModal(true);
-    setUserToDelete(niu);
+    setUserToDelete(userDel);
   };
 
   // Funció per tancar el modal d'eliminació
@@ -52,7 +56,12 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
   };
 
   //Funció d'eliminació dels participants
-  const handleEliminateParticipant = (niu, role) => {
+  const handleEliminateParticipant = () => {
+    console.log("Alo", userToDelete);
+
+    const niu = userToDelete.niu;
+    const role = userToDelete.role;
+
     const endpoint =
       role === "professor"
         ? "http://localhost:8081/eliminateTeacher"
@@ -63,14 +72,14 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
         params: { id: niu, Id_Assignatura },
       })
       .then((res) => {
-        if (Array.isArray(res.data)) {
-          setUsers(res.data);
+        if (res.data.Status === "Success") {
+          setUsers(res.data.result);
         } else {
           alert("Error al actualitzar la llista de participants.");
         }
       })
-      .catch((err) => {
-        console.error("Error a la sol·licitud:", err);
+      .catch(() => {
+        alert("Error al servidor");
       });
 
     handleCloseModal();
@@ -102,15 +111,13 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-      if (response.data.status === "success") {
-        //console.log(response.data);
+      if (response.data.status === "Success") {
         alert("Importació completada correctament!");
-        setUsers(response.data.participants); // Actualitzar la llista d'usuaris amb les noves dades
+        setUsers(response.data.participants);
       } else {
         alert("Error a la importació: " + response.data.message);
       }
-    } catch (err) {
-      console.error("Error a la importació del fitxer CSV:", err);
+    } catch {
       alert("Hi ha hagut un error a la importació del fitxer.");
     }
   };
@@ -124,6 +131,8 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
         params: { niu: newNiu },
       })
       .then((res) => {
+        console.log(res);
+
         if (res.data.exists) {
           const role = res.data.role;
 
@@ -137,7 +146,7 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
               params: { niu: newNiu, Id_Assignatura },
             })
             .then((checkRes) => {
-              if (checkRes.data.exists) {
+              if (checkRes.data.Status === "Failed") {
                 alert(
                   "Aquest participant ja està registrat en aquesta assignatura!"
                 );
@@ -153,20 +162,17 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
                     Id_Assignatura,
                   })
                   .then((addRes) => {
-                    //console.log(addRes);
-                    setUsers(addRes.data.resultSelect);
+                    setUsers(addRes.data.result);
                     setShowModal(false);
                     setNewNiu("");
                     alert("Participant afegit correctament!");
                   })
-                  .catch((err) => {
-                    console.error("Error a l'afegir el participant:", err);
+                  .catch(() => {
                     alert("Hi ha hagut un error al afegir el participant.");
                   });
               }
             })
-            .catch((err) => {
-              console.error("Error a la verificació del participant:", err);
+            .catch(() => {
               alert(
                 "Hi ha hagut un error al verificar si el participant ja està registrat."
               );
@@ -175,8 +181,7 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
           alert("Aquest NIU no existeix a la base de dades d'usuaris!");
         }
       })
-      .catch((err) => {
-        console.error("Error a la verificació del NIU:", err);
+      .catch(() => {
         alert("Hi ha hagut un error al verificar el NIU.");
       });
 
@@ -185,7 +190,26 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
 
   // Filtratge de participants pel nom
   const filteredUsers = users.filter((user) => {
-    return user.username.toLowerCase().includes(filter.toLowerCase()); // Filtra per nom
+    if (filter === "" && filterRole === "Tots") {
+      // If no filter is active, return all users
+      return true;
+    }
+
+    if (filter === "") {
+      // Filter by role only
+      return user.role.toLowerCase() === filterRole.toLowerCase();
+    }
+
+    if (filterRole === "Tots") {
+      // Filter by name only
+      return user.username.toLowerCase().includes(filter.toLowerCase());
+    }
+
+    // Filter by both name and role
+    return (
+      user.username.toLowerCase().includes(filter.toLowerCase()) &&
+      user.role.toLowerCase() === filterRole.toLowerCase()
+    );
   });
 
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
@@ -208,46 +232,56 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
         <strong className={styles.elementsCursHeader}>
           GESTIÓ DE PARTICIPANTS
         </strong>
-        <div style={{ marginBottom: "10px", gap: "30px" }}>
-          <label style={{ marginRight: "10px" }}>Filtrar per Nom: </label>
-          <input
-            type="text"
-            placeholder="Filtrar per nom"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className={styles.filterInput}
-          />
+
+        <div>
+          <div style={{ marginBottom: "10px", gap: "30px" }}>
+            <label style={{ marginRight: "10px" }}>Filtrar per Nom: </label>
+            <input
+              type="text"
+              placeholder="Filtrar per nom"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className={styles.filterInput}
+            />
+          </div>
+
+          <div style={{ marginBottom: "10px", gap: "30px" }}>
+            <label style={{ marginRight: "10px" }}>Filtrar per Rol: </label>
+            <select
+              type="text"
+              placeholder="Filtrar per rol"
+              value={filterRole}
+              onChange={(e) => setFilterRole(e.target.value)}
+              className={styles.filterInput}
+            >
+              <option value="Tots">Tots</option>
+              <option value="professor">Professors</option>
+              <option value="alumne">Alumnes</option>
+            </select>
+          </div>
         </div>
 
         {displayedUsers.length > 0 ? (
           displayedUsers.map((user) => (
             <div key={user.niu} className={styles.participantCard}>
-              <div className={styles.participantDetails}>
+              <div>
                 <p>
                   <strong>Nom:</strong> {user.username}
                 </p>
-
-                <p>
-                  <strong>Email:</strong> <a href="">{user.email}</a>
-                </p>
-                <p>
-                  <strong>Rol: </strong> {user.role}
-                </p>
               </div>
-
-              <div
-                onClick={() => handleOpenInformation(user)}
-                style={{ marginTop: "80px" }}
-              >
+              <p>
+                <strong>Rol: </strong> {user.role}
+              </p>
+              <div onClick={() => handleOpenInformation(user)}>
                 <FaInfo />
               </div>
 
               {Role_User !== "alumne" && (
                 <div
                   className={styles.deleteButtonParticipant}
-                  onClick={() => handleOpenModal(user.niu)}
+                  onClick={() => handleOpenModal(user)}
                 >
-                  Eliminar
+                  <FaTrash />
                 </div>
               )}
 
@@ -294,13 +328,19 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
                     <h3>Segur que vols eliminar a aquest alumne?</h3>
                     <div className={styles.modalActions}>
                       <button
-                        onClick={() =>
-                          handleEliminateParticipant(userToDelete, user.role)
-                        }
+                        onClick={() => {
+                          handleEliminateParticipant();
+                        }}
+                        className={styles.addParticipantButton}
                       >
                         Si
                       </button>
-                      <button onClick={handleCloseModal}>No</button>
+                      <button
+                        onClick={handleCloseModal}
+                        className={styles.cancelButtonModal}
+                      >
+                        No
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -366,13 +406,14 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
               <div className={styles.modalActions}>
                 <button
                   onClick={handleAddParticipant}
-                  style={{ backgroundColor: "green", color: "white" }}
+                  className={styles.addParticipantButton}
                 >
                   Afegir
                 </button>
                 <button
                   style={{ backgroundColor: "red", color: "white" }}
                   onClick={() => setShowModal(false)}
+                  className={styles.cancelButtonModal}
                 >
                   Cancel·lar
                 </button>
