@@ -1145,7 +1145,10 @@ app.get("/checkUserExists", async (req, res) => {
 
 
 app.get("/checkProfessorInSubject", (req, res) => {
+
     const { niu, Id_Assignatura } = req.query;
+
+    
 
     if(!niu || !Id_Assignatura)
         return res.json({Status:"Failed"})
@@ -1157,8 +1160,12 @@ app.get("/checkProfessorInSubject", (req, res) => {
             console.error("Error en la consulta:", error);
             return res.json({ Status: "Failed", error: "Database query failed" });
         }
+
         const exists = result[0].count > 0;
-        res.json({ Status:"Success" });
+
+        
+        if(exists > 0)
+            return res.json({ Status:"Success" });
     });
 });
 
@@ -1191,7 +1198,7 @@ app.post("/addProfessorToSubject", async (req, res) => {
     db.query(sql, [niu, Id_Assignatura], (error, result) => {
         if (error) {
             console.error("Error al afegir el professor:", error);
-            return res.json({ success: false });
+            return res.json({ Status: false });
         }
         else{
             const sqlSelect = ` SELECT 

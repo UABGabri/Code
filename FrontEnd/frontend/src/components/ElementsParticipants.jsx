@@ -12,7 +12,7 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
   const [newNiu, setNewNiu] = useState("");
   const [csvFile, setCsvFile] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 7;
   const [filter, setFilter] = useState("");
   const [filterRole, setFilterRole] = useState("Tots");
 
@@ -23,15 +23,14 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
         params: { Id_Assignatura },
       })
       .then((res) => {
-        console.log(res);
         if (res.data.Status === "Success") {
           setUsers(res.data.result);
         } else {
           alert(res.data.message);
         }
       })
-      .catch((err) => {
-        console.error("Error a la sol·licitud:", err);
+      .catch(() => {
+        alert("Error a la sol·licitud");
       });
   }, [Id_Assignatura]);
 
@@ -131,8 +130,6 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
         params: { niu: newNiu },
       })
       .then((res) => {
-        console.log(res);
-
         if (res.data.exists) {
           const role = res.data.role;
 
@@ -146,7 +143,8 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
               params: { niu: newNiu, Id_Assignatura },
             })
             .then((checkRes) => {
-              if (checkRes.data.Status === "Failed") {
+              console.log(checkRes);
+              if (checkRes.data.Status === "Success") {
                 alert(
                   "Aquest participant ja està registrat en aquesta assignatura!"
                 );
@@ -156,12 +154,14 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
                     ? "http://localhost:8081/addProfessorToSubject"
                     : "http://localhost:8081/addStudentToSubject";
 
+                console.log(newNiu, Id_Assignatura);
                 axios
                   .post(endpoint, {
                     niu: newNiu,
                     Id_Assignatura,
                   })
                   .then((addRes) => {
+                    console.log("Hello", addRes);
                     setUsers(addRes.data.result);
                     setShowModal(false);
                     setNewNiu("");
@@ -233,7 +233,7 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
           GESTIÓ DE PARTICIPANTS
         </strong>
 
-        <div>
+        <div className={styles.filterParticipants}>
           <div style={{ marginBottom: "10px", gap: "30px" }}>
             <label style={{ marginRight: "10px" }}>Filtrar per Nom: </label>
             <input
