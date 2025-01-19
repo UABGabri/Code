@@ -66,6 +66,8 @@ function Login() {
                   onChange={(e) =>
                     setValues({ ...values, niu: e.target.value })
                   }
+                  maxLength={7}
+                  required
                   pattern="^\d{7}$"
                   title="El NIU ha de ser un número de 7 dígits"
                 />
@@ -81,8 +83,8 @@ function Login() {
                   onChange={(e) =>
                     setValues({ ...values, password: e.target.value })
                   }
-                  minLength={8}
-                  title="La contrasenya ha de tenir 8 caràcters mínims"
+                  maxLength={10}
+                  title="La contrasenya ha de tenir entre 8 i 10 caràcters"
                 />
               </div>
 

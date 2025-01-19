@@ -20,13 +20,13 @@ function Register() {
 
   const navigate = useNavigate();
 
-  // Funció per validar el correu electrònic
+  // Funció per validar el correu electrònic.
   const validateEmail = (email) => {
     const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
     return emailPattern.test(email);
   };
 
-  // Canviar el rol segons el domini del correu
+  // Canviar el rol segons el domini del correu per facilitar assignació de rol.
   useEffect(() => {
     if (values.gmail) {
       const gmailDomain = values.gmail.split("@")[1];
@@ -108,6 +108,7 @@ function Register() {
                 id="username"
                 placeholder="Introdueix el teu nom de usuari"
                 required
+                maxLength={15}
                 pattern="^[A-Za-zÀ-ÿ\s]+$"
                 title="El nom només ha de tenir lletres"
               />
@@ -125,6 +126,7 @@ function Register() {
                 id="niu"
                 placeholder="Introdueix el teu NIU"
                 required
+                maxLength={7}
                 pattern="^\d{7}$"
                 title="El NIU ha de ser un número de 7 dígits"
               />
@@ -144,6 +146,7 @@ function Register() {
                 id="gmail"
                 placeholder="Introdueix el teu correu"
                 required
+                maxLength={30}
                 title="Introdueix un correu vàlid"
               />
             </div>
@@ -163,8 +166,8 @@ function Register() {
                 id="password"
                 placeholder="Introdueix la teva contrasenya"
                 required
-                minLength={8}
-                title="La contrasenya ha de tenir 8 caràcters mínims"
+                maxLength={10}
+                title="La contrasenya ha de tenir entre 8 i 10 caràcters"
               />
             </div>
 
@@ -178,6 +181,8 @@ function Register() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="form-control"
                 id="confirmPassword"
+                maxLength={10}
+                required
                 placeholder="Confirma la contrasenya"
               />
             </div>
