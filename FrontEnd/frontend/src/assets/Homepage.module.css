@@ -1,0 +1,130 @@
+.homecontainer {
+    display: flex;
+    height: 100%;
+    margin: 0;
+  }
+
+
+.logincontainer{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  
+}
+
+  .welcome{
+    color: green;
+    
+    font-size: 75px;
+
+  }
+
+  
+  .green {
+    background-color: green;
+    width: 25vw;
+    height: 100vh;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+
+    .logos{
+
+        font-size: 75px;
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    
+    
+        }
+
+   
+   
+  }
+
+ 
+  
+  .white {
+    background-color: white;
+    width: 75vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+   
+
+
+  }
+  
+  .buttcontainer {
+    display: flex;
+    margin-top: 20px;
+    gap: 50px;
+  }
+  
+  .homebtn {
+    padding: 10px 20px;
+    cursor: pointer;
+    color: white;
+    background-color: green;
+    border: 0;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 1rem;
+
+    font-size: 30px;
+  }
+
+  .homebtn:hover{
+    background-color: white;
+    color: black;
+  }
+
+  .loginbtn{
+
+    padding: 10px 20px;
+    cursor: pointer;
+    color: white;
+    background-color: green;
+    border: 0;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 1rem;
+
+    font-size: 15px;
+
+
+  }
+
+  .loginbtn:hover{
+    background-color: white;
+    color: black;
+  }
+
+
+  .registerbtncontainer{
+    display: flex;
+    gap: 10px; 
+  }
+  .registerbtn{
+    margin-top: 20px;
+    
+    padding: 10px 20px;
+    cursor: pointer;
+    color: white;
+    background-color: green;
+    border: 0;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 1rem;
+
+    font-size: 15px;
+
+  }
+
+  .registerbtn:hover{
+    background-color: white;
+    color: black;
+  }
+  
