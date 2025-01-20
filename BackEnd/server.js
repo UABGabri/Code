@@ -4,7 +4,7 @@ import cors from "cors";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import cookieParser from "cookie-parser";
-import multer from "multer";
+//import multer from "multer";
 import fs from 'fs';
 import csvParser from 'csv-parser';
 //import { type } from "os";
@@ -14,7 +14,7 @@ import csvParser from 'csv-parser';
 const salt = 10;
 const saltRounds = 10;
 
-const upload = multer({ dest: "uploads/" });
+//const upload = multer({ dest: "uploads/" });
 
 
 const app = express();
