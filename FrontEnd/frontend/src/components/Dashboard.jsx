@@ -228,7 +228,10 @@ function Dashboard({ id_User, role_User }) {
                 Afegir Assignatura
               </button>
 
-              <button onClick={openDeleteModal} className={styles.deleteButton}>
+              <button
+                onClick={openDeleteModal}
+                className={styles.cancelButtonModal}
+              >
                 Eliminar Assignatura
               </button>
             </>
@@ -332,7 +335,7 @@ function Dashboard({ id_User, role_User }) {
                       required
                       pattern="^\d{4}$"
                       title="L'ID necessita 4 dígits"
-                      minLength={4}
+                      maxLength={4}
                       onChange={(e) => setDeleteId(e.target.value)}
                       className={styles.inputField}
                     />

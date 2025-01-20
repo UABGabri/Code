@@ -29,7 +29,7 @@ function Login() {
       return;
     } else {
       axios
-        .post(`${import.meta.env.VITE_API_URL}/login`, values) //Sol·licitud POST al servidor amb els valors de l'usuari.
+        .post(`http://localhost:8081/login`, values) //Sol·licitud POST al servidor amb els valors de l'usuari.
         .then((res) => {
           if (res.data.Status === "Success") {
             navigate("/modules");

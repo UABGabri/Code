@@ -201,7 +201,7 @@ function CreateManualQuizz() {
             onChange={(e) => handleFilterChange("dificultat", e.target.value)}
             style={{ marginRight: "10px" }}
           >
-            <option value=""></option>
+            <option value="">Totes</option>
             <option value="Fàcil">Fàcil</option>
             <option value="Mitjà">Mitjà</option>
             <option value="Difícil">Difícil</option>

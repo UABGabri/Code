@@ -13,17 +13,18 @@ function CreateQuizz() {
   const [temes, setTemes] = useState([]);
   const [seleccions, setSeleccions] = useState([]);
   const [temaSeleccionat, setTemaSeleccionat] = useState("");
+  const [dificultatSeleccionada, setDificultatSeleccionada] = useState("");
+
   const [numeroPreguntes, setNumeroPreguntes] = useState(1);
   const [dataFinalitzacio, setDataFinalitzacio] = useState("");
   const [duracio, setDuracio] = useState("");
   const [isFinalModal, setIsFinalModalOpen] = useState(false);
   const { id_assignatura, id_professor, id_tema, tipus } = location.state || {};
-  const [errorSelect, setErrorSelect] = useState("");
   const [nomTest, setNomTest] = useState("");
 
   useEffect(() => {
     axios
-      .get("http://localhost:8081/recoverTemasAssignaturaPreguntes", {
+      .get("http://localhost:8081/recoverTopicSubjectQuestions", {
         params: { Id_Assignatura: id_assignatura },
       })
       .then((response) => setTemes(response.data))
@@ -31,24 +32,23 @@ function CreateQuizz() {
   }, [id_assignatura]);
 
   const addTopic = () => {
-    if (!temaSeleccionat) return;
-    const exists = seleccions.find(
-      (seleccio) => seleccio.id === parseInt(temaSeleccionat)
-    );
+    if (!temaSeleccionat || !dificultatSeleccionada) return;
 
-    if (!exists) {
-      const tema = temes.find((t) => t.id_tema === parseInt(temaSeleccionat));
-      setSeleccions((prev) => [
-        ...prev,
-        {
-          id: tema.id_tema,
-          nom_tema: tema.nom_tema,
-          preguntes: numeroPreguntes,
-        },
-      ]);
-      setTemaSeleccionat("");
-      setNumeroPreguntes(1);
-    }
+    const tema = temes.find((t) => t.id_tema === parseInt(temaSeleccionat));
+
+    setSeleccions((prev) => [
+      ...prev,
+      {
+        id: tema.id_tema,
+        nom_tema: tema.nom_tema,
+        dificultat: dificultatSeleccionada,
+        preguntes: numeroPreguntes,
+      },
+    ]);
+
+    setTemaSeleccionat("");
+    setDificultatSeleccionada("");
+    setNumeroPreguntes(1);
   };
 
   const createQuizz = () => {
@@ -59,6 +59,7 @@ function CreateQuizz() {
     const durationNormal = parseInt(duracio) * 60;
 
     console.log(durationNormal);
+
     axios
       .post("http://localhost:8081/createQuizz", {
         seleccions,
@@ -102,37 +103,45 @@ function CreateQuizz() {
           <strong className={styles.titleGenerator}>Creació de Tests</strong>
           <div className={styles.quizzContainerBody}>
             <div className={styles.formRandom}>
-              <div className={styles.formGroup}>
-                <label>Selecciona els temes:</label>
-                <select
-                  value={temaSeleccionat}
-                  onChange={(e) => setTemaSeleccionat(e.target.value)}
-                >
-                  <option value="">Selecciona els Temes</option>
-                  {temes
-                    .filter(
-                      (tema) =>
-                        !seleccions.some((sel) => sel.id === tema.id_tema)
-                    )
-                    .sort((a, b) => a.nom_tema.localeCompare(b.nom_tema))
-                    .map((tema) => (
+              <div className={styles.spaceFilters}>
+                <div className={styles.formGroup}>
+                  <label>Selecciona els temes:</label>
+                  <select
+                    value={temaSeleccionat}
+                    onChange={(e) => setTemaSeleccionat(e.target.value)}
+                  >
+                    <option value="">Selecciona els Temes</option>
+                    {temes.map((tema) => (
                       <option key={tema.id_tema} value={tema.id_tema}>
                         {tema.nom_tema}
                       </option>
                     ))}
-                </select>
+                  </select>
+                </div>
 
-                <button onClick={addTopic}>
-                  <FaPlus />
-                </button>
+                <div className={styles.formGroup}>
+                  <label>Dificultat:</label>
+                  <select
+                    value={dificultatSeleccionada}
+                    onChange={(e) => setDificultatSeleccionada(e.target.value)}
+                  >
+                    <option value="">Selecciona la Dificultat</option>
+                    <option value="Fàcil">Fàcil</option>
+                    <option value="Mitjà">Mitjà</option>
+                    <option value="Difícil">Difícil</option>
+                  </select>
+                  <button onClick={addTopic}>
+                    <FaPlus />
+                  </button>
+                </div>
               </div>
 
               <div className={styles.scrollTopics}>
                 <h3>Resum de Temes Seleccionats</h3>
                 <ul className={styles.selectedTopics}>
                   {seleccions.length > 0 ? (
-                    seleccions.map((seleccio) => (
-                      <li key={seleccio.id}>
+                    seleccions.map((seleccio, index) => (
+                      <li key={`${seleccio.id}-${index}`}>
                         {seleccio.nom_tema} - Preguntes:
                         <input
                           type="number"
@@ -141,8 +150,8 @@ function CreateQuizz() {
                           value={seleccio.preguntes}
                           onChange={(e) =>
                             setSeleccions((prev) =>
-                              prev.map((sel) =>
-                                sel.id === seleccio.id
+                              prev.map((sel, idx) =>
+                                idx === index
                                   ? {
                                       ...sel,
                                       preguntes: parseInt(e.target.value),
@@ -153,10 +162,11 @@ function CreateQuizz() {
                           }
                           className={styles.selectedTopic}
                         />
+                        <span> Dificultat: {seleccio.dificultat}</span>
                         <button
                           onClick={() =>
                             setSeleccions((prev) =>
-                              prev.filter((sel) => sel.id !== seleccio.id)
+                              prev.filter((_, idx) => idx !== index)
                             )
                           }
                         >
@@ -193,56 +203,68 @@ function CreateQuizz() {
           <div className={styles.modalContent}>
             <strong className={styles.titleGenerator}>Crear Test</strong>
 
-            <div className={styles.modalLabels}>
-              <label className={styles.inputLabel}>
-                Nom del Test:
-                <input
-                  type="text"
-                  className={styles.inputField}
-                  value={nomTest}
-                  onChange={(e) => setNomTest(e.target.value)}
-                />
-              </label>
+            <form onSubmit={confirmCreateQuiz}>
+              <div className={styles.modalLabels}>
+                <label className={styles.inputLabel}>
+                  Nom del Test:
+                  <input
+                    type="text"
+                    className={styles.inputField}
+                    value={nomTest}
+                    required
+                    maxLength={10}
+                    pattern="[a-zA-Z0-9]+"
+                    onChange={(e) => {
+                      const inputValue = e.target.value;
 
-              <label className={styles.inputLabel}>
-                Data de Finalització:
-                <input
-                  type="date"
-                  value={dataFinalitzacio}
-                  onChange={(e) => setDataFinalitzacio(e.target.value)}
-                  className={styles.inputField}
-                />
-              </label>
+                      setNomTest(inputValue);
+                    }}
+                    placeholder="Nom del test"
+                  />
+                </label>
 
-              <label className={styles.inputLabel}>
-                Duració del test:
-                <input
-                  type="text"
-                  value={duracio}
-                  onChange={(e) => {
-                    const inputValue = e.target.value;
+                <label className={styles.inputLabel}>
+                  Data de Finalització:
+                  <input
+                    type="date"
+                    required
+                    value={dataFinalitzacio}
+                    onChange={(e) => setDataFinalitzacio(e.target.value)}
+                    className={styles.inputField}
+                  />
+                </label>
 
-                    if (/^\d{0,3}$/.test(inputValue)) {
+                <label className={styles.inputLabel}>
+                  Duració del test:
+                  <input
+                    type="text"
+                    className={styles.inputField}
+                    value={duracio}
+                    required
+                    maxLength={3}
+                    placeholder="En minuts"
+                    pattern="\d{1,3}"
+                    onChange={(e) => {
+                      const inputValue = e.target.value;
                       setDuracio(inputValue);
-                    }
-                  }}
-                  className={styles.inputField}
-                  placeholder="En minuts"
-                />
-              </label>
-            </div>
+                    }}
+                  />
+                </label>
+              </div>
 
-            <div className={styles.modalButtons}>
-              <button onClick={confirmCreateQuiz} className={styles.colorButt}>
-                Crear
-              </button>
-              <button
-                onClick={() => setIsFinalModalOpen(false)}
-                className={styles.colorButtDel}
-              >
-                Cancelar
-              </button>
-            </div>
+              <div className={styles.modalButtons}>
+                <button type="submit" className={styles.colorButt}>
+                  Crear
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsFinalModalOpen(false)}
+                  className={styles.colorButtDel}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -10,40 +10,30 @@ import csvParser from 'csv-parser';
 import 'dotenv/config';
 
 
-//mysql://root:bjZVQpiVCOmCYLfWhXCPaaYrDxeAxltn@autorack.proxy.rlwy.net:51488/railway
-//domain: code-production-a812.up.railway.app
 
 const salt = 10;
 const saltRounds = 10;
 const upload = multer({ dest: "uploads/" });
-
 
 const app = express();
 
 app.use(express.json());
 
 app.use(cors({
-    origin: 'https://sparkling-torte-716cbe.netlify.app', //origen 
+    origin: 'http://localhost:5173', //origen https://sparkling-torte-716cbe.netlify.app
     methods: ['GET', 'POST', 'PUT', 'DELETE'],// Metodes permesos
     credentials: true // Credencials necessaris
 }));
 
 
+/*
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', 'https://sparkling-torte-716cbe.netlify.app');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.header('Access-Control-Allow-Credentials', 'true');
     next();
-});
-
-app.options('/register', (req, res) => {
-    res.header('Access-Control-Allow-Origin', 'https://sparkling-torte-716cbe.netlify.app');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    return res.status(200).send();
-});
+});*/
 
 
 app.use(cookieParser());  //Cookies
@@ -52,15 +42,23 @@ app.use(cookieParser());  //Cookies
 
 
 //Connexió a la base de dades Railway
-const db = mysql.createConnection({
 
+/*
+const db = mysql.createConnection({
     host: process.env.DB_HOST || '127.0.0.1',
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     port: process.env.DB_PORT,
 }); 
+*/
 
+const db = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "Ga21012002",
+    database: "web_examen_tfg"
+});
 
 db.connect((err) => {
     if (err) console.error("Error connecting to database:", err.message);
@@ -69,27 +67,12 @@ db.connect((err) => {
 
 const PORT = process.env.PORT || 8081;
 
-console.log('DB_HOST:', process.env.DB_HOST);
-console.log('DB_USER:', process.env.DB_USER);
-console.log('DB_USER:', process.env.DB_PASSWORD,);
-console.log('DB_USER:', process.env.DB_NAME);
-console.log('DB_PORT:', process.env.DB_PORT);
-console.log('DB_PORT:', process.env.PORT);
 
-app.listen(process.env.PORT, () => {
+app.listen(8081, () => {
     console.log(`Running Server on port ${process.env.PORT}...`);
 });
 
-
-/*
-const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "Ga21012002",
-    database: "web_examen_tfg"
-}); 
-*/
-
+ 
 //Funció per registrar usuaris a la taula MySQl users. Valida si existeix NIU i Email.
 app.post('/register', (req, res) => {
     const { niu, username, password, role, gmail } = req.body;
@@ -948,9 +931,11 @@ app.get('/recoverTemasAssignatura', (req, res)=>{
 
 
 //Funció de recuperació dels temes amb preguntes acceptades
-app.get('/recoverTemasAssignaturaPreguntes', (req, res) => {
+app.get('/recoverTopicSubjectQuestions', (req, res) => {
     const id_assignatura = req.query.Id_Assignatura;
   
+    if(!id_assignatura)
+        return res.json({ Status: "Failed" });
     
     const sql = `
       SELECT t.*
@@ -1108,49 +1093,6 @@ UNION
         res.json({ Status: "Success", result });
     });
 });
-
-
-/*
-//Funció de recuperació i normalització de les notes
-app.get('/recoverGrades', (req, res) => {
-    const id_assignatura = parseInt(req.query.Id_Assignatura);
-    const users = req.query.users;
-
-    const getGradesForUser = (userId, assignaturaId) => {
-        return db.query('SELECT notes FROM resultats WHERE id_alumne = ? AND id_assignatura = ?', [userId, assignaturaId])
-            .then(results => {
-                let totalGrade = 0;
-                results.forEach(result => {
-                    totalGrade += result.grade;
-                });
-                const averageGrade = (totalGrade / results.length) * 10;
-                return (averageGrade / 10) * 100;
-            });
-    };
-
-    const gradesPromises = users.map(userId => {
-        return getGradesForUser(userId, id_assignatura)
-            .then(grade => ({
-                userId,
-                grade
-            }))
-            .catch(error => {
-                return {
-                    userId,
-                    grade: null
-                };
-            });
-    });
-
-    Promise.all(gradesPromises)
-        .then(grades => {
-            res.json(grades);
-        })
-        .catch(err => {
-            res.send('Error al recuperar les notes.');
-        });
-});
-*/
 
 
 
@@ -1817,7 +1759,6 @@ app.get('/recoverPreguntesTema', (req, res) => {
 
 
 //Funció creació de test manual pel professor
-
 app.post('/createTest', async (req, res) => {
     const { nom_test, id_creador, id_assignatura, idTema, tipus, data_finalitzacio, duracio } = req.body;
 
@@ -1862,50 +1803,39 @@ app.post('/createTest', async (req, res) => {
 
 //Funció creació test automàtic
 app.post('/createQuizz', (req, res) => {
+
     const { seleccions, nom_test, id_creador, id_assignatura, id_tema, tipus, data_finalitzacio, durationNormal } = req.body;
 
-    // Validar la data de finalització
-    const dateRegex = /^\d{4}-\d{2}-\d{2}$/; // Format YYYY-MM-DD
-    if (!data_finalitzacio || !dateRegex.test(data_finalitzacio)) {
-        return res.json({ Status: "Failed", Message: "Data finalització no vàlida. Utilitza el format YYYY-MM-DD." });
+    if (!nom_test || !nom_test.match(/^[a-zA-Z0-9]+$/)) {
+        return res.json({ Status: "Failed", Message: "Nom del test no vàlid." });
     }
 
-    
-    const idCreador = parseInt(id_creador, 10);
-    const idAssignatura = parseInt(id_assignatura, 10);
     const duration = parseInt(durationNormal);
-    let clau_acces = null;
-
     const sqlInsertTestBase = `
         INSERT INTO tests 
         (nom_test, data_final, clau_acces, id_creador, id_assignatura, id_tema, tipus, temps) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-   
-    if (tipus === 'avaluatiu') {
-        clau_acces = Math.random().toString(36).substr(2, 8);
-    }
+    let clau_acces = tipus === 'avaluatiu' ? Math.random().toString(36).substr(2, 8) : null;
 
-    db.query(sqlInsertTestBase, [nom_test, data_finalitzacio, clau_acces, idCreador, idAssignatura, id_tema, tipus, duration], (error, result) => {
+    db.query(sqlInsertTestBase, [nom_test, data_finalitzacio, clau_acces, id_creador, id_assignatura, id_tema, tipus, duration], (error, result) => {
         if (error) {
             console.error("Error al crear el test:", error);
             return res.json({ Status: "Error al crear el test" });
         }
 
         const idTest = result.insertId;
-
-        // Generar preguntes per cada tema seleccionat
-        const queries = seleccions.map(({ id, preguntes }) => {
+        const queries = seleccions.map(({ id, dificultat, preguntes }) => {
             return new Promise((resolve, reject) => {
                 const sqlGetQuestions = `
                     SELECT id_pregunta 
                     FROM preguntes
-                    WHERE id_tema = ? 
+                    WHERE id_tema = ? AND dificultat = ?
                     ORDER BY RAND() LIMIT ?
                 `;
 
-                db.query(sqlGetQuestions, [id, preguntes], (error, questions) => {
+                db.query(sqlGetQuestions, [id, dificultat, preguntes], (error, questions) => {
                     if (error) {
                         console.error("Error al obtenir preguntes:", error);
                         return reject(error);
@@ -1920,7 +1850,6 @@ app.post('/createQuizz', (req, res) => {
                 const sqlInsertTestQuestions = `
                     INSERT INTO test_preguntes (id_test, id_pregunta) VALUES ?
                 `;
-
                 const allQuestionsFlattened = allQuestions.flat();
 
                 db.query(sqlInsertTestQuestions, [allQuestionsFlattened], (error) => {
@@ -1928,12 +1857,7 @@ app.post('/createQuizz', (req, res) => {
                         console.error("Error al associar preguntes al test:", error);
                         return res.json({ Status: "Error al processar les preguntes" });
                     }
-
-                    res.json({
-                        Status: "Test creat correctament",
-                        clau_acces,
-                        id_test: idTest,
-                    });
+                    res.json({ Status: "Test creat correctament", clau_acces, id_test: idTest });
                 });
             })
             .catch(error => {
@@ -1942,6 +1866,8 @@ app.post('/createQuizz', (req, res) => {
             });
     });
 });
+
+
 
 
 
