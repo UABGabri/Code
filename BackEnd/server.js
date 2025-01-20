@@ -23,7 +23,7 @@ const upload = multer({ dest: "uploads/" });
 const app = express();
 app.use(express.json());
 app.use(cors({
-    origin: '*', //origen 
+    origin: 'https://sparkling-torte-716cbe.netlify.app', //origen 
     methods: ['GET', 'POST', 'PUT', 'DELETE'],// Metodes permesos
     credentials: true // Credencials necessaris
 }));
