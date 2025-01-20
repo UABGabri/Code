@@ -39,7 +39,14 @@ app.use((req, res, next) => {
     next();
 });
 
-app.options('*', cors());
+app.options('/register', (req, res) => {
+    res.header('Access-Control-Allow-Origin', 'https://sparkling-torte-716cbe.netlify.app');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    return res.status(200).send();
+});
+
 
 app.use(cookieParser());  //Cookies
 
@@ -75,10 +82,6 @@ app.listen(PORT, () => {
 });
 
 
-
-
-
-
 /*
 const db = mysql.createConnection({
     host: "localhost",
@@ -94,7 +97,7 @@ app.post('/register', (req, res) => {
 
     // Verificar que tots els camps són correctes
     if (!niu || !username || !password || !role || !gmail) {
-        return res.json({ error: "Tots els camps es requereixen" });
+        return res.status(400).json({ error: "Tots els camps es requereixen" });
     }
 
     // Verificar si el NIU ja  existeix
@@ -105,16 +108,16 @@ app.post('/register', (req, res) => {
 
 
         if (result.length > 0) {
-            return res.json({ error: "El NIU ja existeix" });
+            return res.status(400).json({ error: "El NIU ja existeix" });
         }
  
         const checkEmailSql = "SELECT * FROM usuaris WHERE email = ?";
         db.query(checkEmailSql, [gmail], (err, result) => {
-            if (err) return res.json({ Error: err.message });
+            if (err) return res.status(400).json({ Error: err.message });
 
           
             if (result.length > 0) {
-                return res.json({ error: "El correu electrònic ja està registrat" });
+                return res.status(400).json({ error: "El correu electrònic ja està registrat" });
             }
 
        
@@ -122,14 +125,14 @@ app.post('/register', (req, res) => {
 
     
             bcryptjs.hash(password.toString(), salt, (err, hash) => {
-                if (err) return res.json({ Error: "Error hashing password" });
+                if (err) return res.status(400).json({ Error: "Error hashing password" });
 
                 const values = [niu, username, hash, role, gmail];
 
 
                 db.query(sql, [values], (err, result) => {
-                    if (err) return res.json({ Error: err.message });
-                    return res.json({ Status: "Succeeded" });
+                    if (err) return res.status(400).json({ Error: err.message });
+                    return res.status(200).json({ Status: "Succeeded" });
                 });
             });
         });
