@@ -7,6 +7,9 @@ import cookieParser from "cookie-parser";
 import multer from "multer";
 import fs from 'fs';
 import csvParser from 'csv-parser';
+import dotenv from "dotenv";
+
+dotenv.config()
 
 
 //mysql://root:bjZVQpiVCOmCYLfWhXCPaaYrDxeAxltn@autorack.proxy.rlwy.net:51488/railway
@@ -28,19 +31,23 @@ app.use(cors({
 app.use(cookieParser());  //Cookies
 
 //Funció d'escolta del servidor 
-app.listen(8081, () => {
-    console.log("Running Server...");
-});
 
 
 //Connexió a la base de dades Railway
 const db = mysql.createConnection({
-    host: ,
-    user: "root",
-    password: "bjZVQpiVCOmCYLfWhXCPaaYrDxeAxltn",
-    database: "deploy_web_tfg",
-    port: 51488,
+
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT,
 }); 
+
+const PORT = process.env.PORT || 8081;
+
+app.listen(PORT, () => {
+    console.log(`Running Server on port ${PORT}...`);
+});
 
 
 
