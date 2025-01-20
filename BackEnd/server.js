@@ -7,7 +7,7 @@ import cookieParser from "cookie-parser";
 import multer from "multer";
 import fs from 'fs';
 import csvParser from 'csv-parser';
-import dotenv from "dotenv";
+import 'dotenv/config';
 
 dotenv.config()
 
