@@ -186,6 +186,12 @@
 }
 
 
+.participantCard p {
+  margin: 0; 
+  flex: 1; 
+}
+
+
 .filterParticipants{
   display: flex;
   flex-direction: row;
@@ -543,12 +549,12 @@ hr {
 
   padding: 10px;
   background-color: #f0f0f0;
-  border: 1px solid #ccc;
+  border: 1px solid blue;
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.3s;
   margin-bottom: 10px;
-  color: green;
+  color: rgb(108, 108, 238);
 }
 
 .testItem:hover {

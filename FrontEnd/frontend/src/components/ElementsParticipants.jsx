@@ -264,23 +264,23 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
         {displayedUsers.length > 0 ? (
           displayedUsers.map((user) => (
             <div key={user.niu} className={styles.participantCard}>
-              <div>
-                <p>
-                  <strong>Nom:</strong> {user.username}
-                </p>
-              </div>
+              <p>
+                <strong>Nom:</strong> {user.username}
+              </p>
+
               <p>
                 <strong>Rol: </strong> {user.role}
               </p>
-              <div onClick={() => handleOpenInformation(user)}>
+
+              <div
+                onClick={() => handleOpenInformation(user)}
+                style={{ marginRight: "40px" }}
+              >
                 <FaInfo />
               </div>
 
               {Role_User !== "alumne" && (
-                <div
-                  className={styles.deleteButtonParticipant}
-                  onClick={() => handleOpenModal(user)}
-                >
+                <div onClick={() => handleOpenModal(user)}>
                   <FaTrash />
                 </div>
               )}
@@ -321,35 +321,35 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
                   </div>
                 </div>
               )}
-
-              {deleteModal && (
-                <div className={styles.modalEliminateParticipant}>
-                  <div className={styles.modalContentEliminateParticipant}>
-                    <h3>Segur que vols eliminar a aquest alumne?</h3>
-                    <div className={styles.modalActions}>
-                      <button
-                        onClick={() => {
-                          handleEliminateParticipant();
-                        }}
-                        className={styles.addParticipantButton}
-                      >
-                        Si
-                      </button>
-                      <button
-                        onClick={handleCloseModal}
-                        className={styles.cancelButtonModal}
-                      >
-                        No
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           ))
         ) : (
           <div className={styles.noAtendeesMessage}>
             <strong style={{ color: "red" }}>No Atendees </strong>
+          </div>
+        )}
+
+        {deleteModal && (
+          <div className={styles.modalEliminateParticipant}>
+            <div className={styles.modalContentEliminateParticipant}>
+              <h3>Segur que vols eliminar a aquest alumne?</h3>
+              <div className={styles.modalActions}>
+                <button
+                  onClick={() => {
+                    handleEliminateParticipant();
+                  }}
+                  className={styles.addParticipantButton}
+                >
+                  Si
+                </button>
+                <button
+                  onClick={handleCloseModal}
+                  className={styles.cancelButtonModal}
+                >
+                  No
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
