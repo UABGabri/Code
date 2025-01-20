@@ -28,6 +28,8 @@ function TestIALayout() {
           return acc;
         }, {});
 
+        //console.log(initialProbabilities);
+
         setProbabilities(initialProbabilities);
         fetchNextQuestion(initialProbabilities); // Carregar pregunta inicial
       })
@@ -59,7 +61,6 @@ function TestIALayout() {
     const temaSeleccionat =
       seleccionarTemaPerProbabilitat(currentProbabilities);
 
-    console.log(`Intentant recuperar pregunta per al tema: ${temaSeleccionat}`);
     axios
       .get("http://localhost:8081/recoverPreguntaRandom", {
         params: { temaSeleccionat },
@@ -67,6 +68,7 @@ function TestIALayout() {
       .then((response) => {
         if (response.data.length > 0) {
           const pregunta = response.data[0];
+
           setPreguntaActual(pregunta);
           setRespostesBarrejades(barrejarRespostes(pregunta));
           setLoading(false);
@@ -88,13 +90,18 @@ function TestIALayout() {
   };
 
   // Ajusta les probabilitats després de la resposta
-  const ajustarProbabilitats = (temaFallat) => {
+  const ajustarProbabilitats = (tema, esCorrecte) => {
     const novesProbabilitats = { ...probabilities };
-    novesProbabilitats[temaFallat] = Math.min(
-      novesProbabilitats[temaFallat] + 0.1,
-      1
-    );
 
+    if (esCorrecte) {
+      // Disminuir la probabilitat del tema seleccionat si encerta
+      novesProbabilitats[tema] = Math.max(novesProbabilitats[tema] - 0.05, 0.1);
+    } else {
+      // Incrementar la probabilitat del tema seleccionat si falla
+      novesProbabilitats[tema] = Math.min(novesProbabilitats[tema] + 0.05, 1);
+    }
+
+    // Normalitzar les probabilitats perquè la suma sigui 1
     const totalProbabilitats = Object.values(novesProbabilitats).reduce(
       (acc, prob) => acc + prob,
       0
@@ -133,11 +140,12 @@ function TestIALayout() {
     if (feedback) return; // No permetre nova selecció fins a la següent pregunta
 
     setSelectedAnswer(respostaUnica);
-    if (esCorrecta) {
-      setFeedback({ correct: true });
+    setFeedback({ correct: esCorrecta });
+
+    if (!esCorrecta) {
+      ajustarProbabilitats(preguntaActual.id_tema, false);
     } else {
-      setFeedback({ correct: false });
-      ajustarProbabilitats(preguntaActual.id_tema); // Només ajustar probabilitats
+      ajustarProbabilitats(preguntaActual.id_tema, true);
     }
   };
 

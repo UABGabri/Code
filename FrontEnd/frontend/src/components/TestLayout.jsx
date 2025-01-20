@@ -18,18 +18,23 @@ function TestLayout() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8081/recuperarPreguntesPerConceptes", {
+      .get("http://localhost:8081/recoverQuestionsConcepts", {
         params: { conceptesSeleccionats },
       })
       .then((response) => {
-        setPreguntes(response.data.Preguntes);
-        setRespostesBarrejades(
-          response.data.Preguntes.map((pregunta) => barrejarRespostes(pregunta))
-        );
-        setLoading(false);
+        if (response.data.Status === "Success") {
+          setPreguntes(response.data.Preguntes);
+          setRespostesBarrejades(
+            response.data.Preguntes.map((pregunta) =>
+              barrejarRespostes(pregunta)
+            )
+          );
+          setLoading(false);
+        } else {
+          history(-1);
+        }
       })
-      .catch((error) => {
-        console.error("Error al recuperar les preguntes:", error);
+      .catch(() => {
         setLoading(false);
       });
   }, [conceptesSeleccionats]);
@@ -172,7 +177,7 @@ function TestLayout() {
   return (
     <div className={styles.containerQuizz}>
       <div className={styles.containerElements}>
-        <h1>Qüestionari de Pràctica</h1>
+        <h1>Qüestionari</h1>
         <p className={styles.pregunta}>
           {preguntes[currentIndex].pregunta.length > 100
             ? preguntes[currentIndex].pregunta.slice(0, 70) + "..."

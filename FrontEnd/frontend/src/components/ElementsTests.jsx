@@ -22,16 +22,16 @@ function ElementsTests({ idAssignatura }) {
           const filteredConceptes = res.data.filter(
             (concept) => concept.value !== null && concept.label !== null
           );
-          console.log(filteredConceptes);
+
           setConceptes(filteredConceptes);
         })
         .catch((err) =>
-          console.error("Error al recuperar los conceptos:", err)
+          console.error("Error al recuperar els conceptes:", err)
         );
     }
   }, [idAssignatura]);
 
-  // Enviar formulari
+  // Enviar formulari creació de test
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -48,15 +48,12 @@ function ElementsTests({ idAssignatura }) {
 
     const parametersTest = {
       conceptesSeleccionats: conceptesSeleccionatsIds,
-      //idAssignatura,
     };
-
-    //console.log("Parámetros para el test: ", parametersTest);
 
     navigate("/testlayout", { state: { parametersTest } });
   };
 
-  // Generar test amb IA
+  // Generar tests amb IA
   const handleTestIA = () => {
     navigate("/testIA", { state: { idAssignatura } });
   };

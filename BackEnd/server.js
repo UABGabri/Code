@@ -1452,8 +1452,11 @@ app.delete('/eliminateTeacher', (req, res) => {
 });
 
 
-app.get('/recuperarPreguntesPerConceptes', (req, res) => {
+app.get('/recoverQuestionsConcepts', (req, res) => {
     const { conceptesSeleccionats } = req.query; 
+
+    if(!conceptesSeleccionats)
+        return res.json({ Status: "Failed"});
   
     const conceptesIds = conceptesSeleccionats.map(id => parseInt(id, 10));
   
@@ -1466,10 +1469,9 @@ app.get('/recuperarPreguntesPerConceptes', (req, res) => {
 
     db.query(query, [conceptesIds], (err, results) => {
       if (err) {
-        console.error("Error en recuperar les preguntes:", err);
-        return res.send("Error en recuperar les preguntes.");
+        return res.json({Status: "Failed", results:[]});
       }
-      res.json({ Preguntes: results });
+      res.json({ Status: "Success", Preguntes: results });
     });
   });
 
