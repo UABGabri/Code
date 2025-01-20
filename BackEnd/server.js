@@ -2,7 +2,7 @@ import express from "express";
 import mysql from "mysql"; 
 import cors from "cors";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
+import bcryptjs from "bcryptjs";
 import cookieParser from "cookie-parser";
 import multer from "multer";
 import fs from 'fs';
@@ -87,7 +87,7 @@ app.post('/register', (req, res) => {
             const sql = "INSERT INTO usuaris (niu, username, password, role, email) VALUES (?)";
 
     
-            bcrypt.hash(password.toString(), salt, (err, hash) => {
+            bcryptjs.hash(password.toString(), salt, (err, hash) => {
                 if (err) return res.json({ Error: "Error hashing password" });
 
                 const values = [niu, username, hash, role, gmail];
@@ -122,7 +122,7 @@ app.post('/login', (req, res) => {
         }
 
         if (data.length > 0) {
-            bcrypt.compare(password.toString(), data[0].password, (err, response) => {
+            bcryptjs.compare(password.toString(), data[0].password, (err, response) => {
 
                 if (err) {
                     return res.json({ Error: "Error intern" });
@@ -244,7 +244,7 @@ app.put('/updateUser', (req, res) => {
             return res.json({ Error: "Tots els camps són obligatoris" });
         }
      
-        bcrypt.hash(password.toString(), salt, (err, hash) => {
+        bcryptjs.hash(password.toString(), salt, (err, hash) => {
             if (err) return res.json({ Error: "Error encriptant la contrasenya" });
 
             const sql = 'UPDATE usuaris SET username = ?, email = ?, password = ? WHERE niu = ?';
@@ -2143,7 +2143,7 @@ app.post("/import-csv", upload.single("file"), async (req, res) => {
 
                         if (!userExists) {
                             // Inserir nou usuari
-                            const hashedPassword = await bcrypt.hash(password, saltRounds);
+                            const hashedPassword = await bcryptjs.hash(password, saltRounds);
                             promises.push(
                                 new Promise((resolve, reject) => {
                                     db.query(
