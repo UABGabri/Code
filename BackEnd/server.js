@@ -28,6 +28,8 @@ app.use(cors({
     credentials: true // Credencials necessaris
 }));
 
+app.options('*', cors());
+
 app.use(cookieParser());  //Cookies
 
 //Funció d'escolta del servidor 
