@@ -43,6 +43,12 @@ const db = mysql.createConnection({
     port: process.env.DB_PORT,
 }); 
 
+
+db.connect((err) => {
+    if (err) console.error("Error connecting to database:", err.message);
+    else console.log("Connected to database!");
+});
+
 const PORT = process.env.PORT || 8081;
 
 console.log('DB_HOST:', process.env.DB_HOST);
