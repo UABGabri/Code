@@ -8,6 +8,7 @@ import multer from "multer";
 import fs from 'fs';
 import csvParser from 'csv-parser';
 
+
 //mysql://root:bjZVQpiVCOmCYLfWhXCPaaYrDxeAxltn@autorack.proxy.rlwy.net:51488/railway
 //domain: code-production-a812.up.railway.app
 
@@ -34,14 +35,12 @@ app.listen(8081, () => {
 
 //Connexió a la base de dades Railway
 const db = mysql.createConnection({
-    host: "autorack.proxy.rlwy.net",
+    host: ,
     user: "root",
     password: "bjZVQpiVCOmCYLfWhXCPaaYrDxeAxltn",
     database: "deploy_web_tfg",
     port: 51488,
 }); 
-
-
 
 
 
