@@ -1845,6 +1845,8 @@ app.post('/createQuizz', (req, res) => {
             });
         });
 
+     
+
         Promise.all(queries)
             .then(allQuestions => {
                 const sqlInsertTestQuestions = `
@@ -1852,12 +1854,16 @@ app.post('/createQuizz', (req, res) => {
                 `;
                 const allQuestionsFlattened = allQuestions.flat();
 
+                console.log(allQuestionsFlattened)
+
                 db.query(sqlInsertTestQuestions, [allQuestionsFlattened], (error) => {
                     if (error) {
                         console.error("Error al associar preguntes al test:", error);
                         return res.json({ Status: "Error al processar les preguntes" });
+                    }else{
+                        return res.json({ Status: "Success", clau_acces, id_test: idTest });
                     }
-                    res.json({ Status: "Test creat correctament", clau_acces, id_test: idTest });
+                    
                 });
             })
             .catch(error => {

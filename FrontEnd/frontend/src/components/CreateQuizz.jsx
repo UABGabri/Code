@@ -9,12 +9,10 @@ import { FaPlus, FaTrash } from "react-icons/fa6";
 function CreateQuizz() {
   const navigate = useNavigate();
   const location = useLocation();
-
   const [temes, setTemes] = useState([]);
   const [seleccions, setSeleccions] = useState([]);
   const [temaSeleccionat, setTemaSeleccionat] = useState("");
   const [dificultatSeleccionada, setDificultatSeleccionada] = useState("");
-
   const [numeroPreguntes, setNumeroPreguntes] = useState(1);
   const [dataFinalitzacio, setDataFinalitzacio] = useState("");
   const [duracio, setDuracio] = useState("");
@@ -58,8 +56,6 @@ function CreateQuizz() {
   const confirmCreateQuiz = () => {
     const durationNormal = parseInt(duracio) * 60;
 
-    console.log(durationNormal);
-
     axios
       .post("http://localhost:8081/createQuizz", {
         seleccions,
@@ -72,17 +68,14 @@ function CreateQuizz() {
         durationNormal,
       })
       .then((response) => {
-        console.log(response.data.Status);
-
         const clau = response.data.clau_acces;
-        if (response.data.Status === "Test creat correctament") {
+
+        if (response.data.Status === "Success") {
           if (tipus === "avaluatiu") {
             alert("Test creat correctament amb clau: " + clau);
           } else {
             alert("Test creat correctament!");
           }
-
-          window.location.reload();
         } else {
           alert("Error al crear el test.");
         }
@@ -111,11 +104,12 @@ function CreateQuizz() {
                     onChange={(e) => setTemaSeleccionat(e.target.value)}
                   >
                     <option value="">Selecciona els Temes</option>
-                    {temes.map((tema) => (
-                      <option key={tema.id_tema} value={tema.id_tema}>
-                        {tema.nom_tema}
-                      </option>
-                    ))}
+                    {Array.isArray(temes) &&
+                      temes.map((tema) => (
+                        <option key={tema.id_tema} value={tema.id_tema}>
+                          {tema.nom_tema}
+                        </option>
+                      ))}
                   </select>
                 </div>
 
@@ -203,7 +197,12 @@ function CreateQuizz() {
           <div className={styles.modalContent}>
             <strong className={styles.titleGenerator}>Crear Test</strong>
 
-            <form onSubmit={confirmCreateQuiz}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                confirmCreateQuiz();
+              }}
+            >
               <div className={styles.modalLabels}>
                 <label className={styles.inputLabel}>
                   Nom del Test:
