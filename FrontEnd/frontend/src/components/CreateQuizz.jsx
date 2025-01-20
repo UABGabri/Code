@@ -79,6 +79,8 @@ function CreateQuizz() {
         } else {
           alert("Error al crear el test.");
         }
+
+        setIsFinalModalOpen(false);
       })
       .catch((error) => console.error("Error al crear el test:", error));
   };
