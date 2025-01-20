@@ -65,7 +65,7 @@ function Register() {
 
     // Registrar l'usuari al servidor
     axios
-      .post("http://localhost:8081/register", values)
+      .post(`${import.meta.env.VITE_API_URL}/register`, values)
       .then((res) => {
         if (res.data.error) {
           setError(res.data.error);
