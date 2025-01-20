@@ -540,8 +540,15 @@ hr {
 }
 
 .testItem {
+
+  padding: 10px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
   cursor: pointer;
-  color: #007bff;
+  transition: background-color 0.3s;
+  margin-bottom: 10px;
+  color: green;
 }
 
 .testItem:hover {

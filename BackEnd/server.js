@@ -11,6 +11,9 @@ import csvParser from 'csv-parser';
 
 //mysql://root:bjZVQpiVCOmCYLfWhXCPaaYrDxeAxltn@autorack.proxy.rlwy.net:51488/railway
 
+
+
+
 const salt = 10;
 const saltRounds = 10;
 
@@ -36,16 +39,22 @@ app.listen(8081, () => {
 });
 
 
+const db = mysql.createConnection({
+    host: "mysql.railway.internal",
+    user: "root",
+    password: "bjZVQpiVCOmCYLfWhXCPaaYrDxeAxltn",
+    database: "railway"
+}); 
 
 
-
+/*
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "Ga21012002",
     database: "web_examen_tfg"
 }); 
-
+*/
 /*
 const db = mysql.createConnection({
     host: "mysql://root:bjZVQpiVCOmCYLfWhXCPaaYrDxeAxltn@autorack.proxy.rlwy.net:51488/railway",
