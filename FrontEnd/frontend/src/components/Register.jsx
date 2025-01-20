@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import styles from "./StyleComponents/Homepage.module.css";
+import styles from "./Estils.module.css";
 
 function Register() {
   // Emmagatzemem les dades del formulari
