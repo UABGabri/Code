@@ -79,7 +79,7 @@ console.log('DB_PORT:', process.env.DB_PORT);
 console.log('DB_PORT:', process.env.PORT);
 
 app.listen(process.env.PORT, () => {
-    console.log(`Running Server on port ${PORT}...`);
+    console.log(`Running Server on port ${process.env.PORT}...`);
 });
 
 
