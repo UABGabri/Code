@@ -1,5 +1,5 @@
 import express from "express";
-import mysql from "mysql"; 
+import mysql from "mysql2"; 
 import cors from "cors";
 import jwt from "jsonwebtoken";
 import bcryptjs from "bcryptjs";
@@ -7,12 +7,8 @@ import cookieParser from "cookie-parser";
 import multer from "multer";
 import fs from 'fs';
 import csvParser from 'csv-parser';
-//import { type } from "os";
 
 //mysql://root:bjZVQpiVCOmCYLfWhXCPaaYrDxeAxltn@autorack.proxy.rlwy.net:51488/railway
-
-
-
 
 const salt = 10;
 const saltRounds = 10;
@@ -20,17 +16,16 @@ const saltRounds = 10;
 const upload = multer({ dest: "uploads/" });
 
 
+
 const app = express();
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:5173', //origen específic
+    origin: '*', //origen específic
     methods: ['GET', 'POST', 'PUT', 'DELETE'],// Metodes permesos
     credentials: true // Credencials necessaris
 }));
 
-
 app.use(cookieParser());  //Cookies
-
 
 
 //Funció d'escolta del servidor 
@@ -40,10 +35,11 @@ app.listen(8081, () => {
 
 
 const db = mysql.createConnection({
-    host: "mysql.railway.internal",
+    host: "autorack.proxy.rlwy.net",
     user: "root",
     password: "bjZVQpiVCOmCYLfWhXCPaaYrDxeAxltn",
-    database: "railway"
+    database: "deploy_web_tfg",
+    port: 51488,
 }); 
 
 
@@ -55,14 +51,7 @@ const db = mysql.createConnection({
     database: "web_examen_tfg"
 }); 
 */
-/*
-const db = mysql.createConnection({
-    host: "mysql://root:bjZVQpiVCOmCYLfWhXCPaaYrDxeAxltn@autorack.proxy.rlwy.net:51488/railway",
-    user: "root",
-    password: "bjZVQpiVCOmCYLfWhXCPaaYrDxeAxltn",
-    database: "railway"
-});
-*/
+
 //Funció per registrar usuaris a la taula MySQl users. Valida si existeix NIU i Email.
 app.post('/register', (req, res) => {
     const { niu, username, password, role, gmail } = req.body;
