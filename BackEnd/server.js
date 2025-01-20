@@ -9,24 +9,22 @@ import fs from 'fs';
 import csvParser from 'csv-parser';
 
 //mysql://root:bjZVQpiVCOmCYLfWhXCPaaYrDxeAxltn@autorack.proxy.rlwy.net:51488/railway
+//domain: code-production-a812.up.railway.app
 
 const salt = 10;
 const saltRounds = 10;
-
 const upload = multer({ dest: "uploads/" });
-
 
 
 const app = express();
 app.use(express.json());
 app.use(cors({
-    origin: '*', //origen específic
+    origin: '*', //origen 
     methods: ['GET', 'POST', 'PUT', 'DELETE'],// Metodes permesos
     credentials: true // Credencials necessaris
 }));
 
 app.use(cookieParser());  //Cookies
-
 
 //Funció d'escolta del servidor 
 app.listen(8081, () => {
@@ -34,6 +32,7 @@ app.listen(8081, () => {
 });
 
 
+//Connexió a la base de dades Railway
 const db = mysql.createConnection({
     host: "autorack.proxy.rlwy.net",
     user: "root",
@@ -41,6 +40,9 @@ const db = mysql.createConnection({
     database: "deploy_web_tfg",
     port: 51488,
 }); 
+
+
+
 
 
 /*
