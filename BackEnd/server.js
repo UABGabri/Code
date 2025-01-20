@@ -678,14 +678,14 @@ app.post('/addQuestion', async (req, res) => {
 
         const questionId = questionResult.insertId;
 
-        // Obtener els conceptes de la matèria
+        // Obtenir els conceptes de la matèria
         const conceptes = [...new Set(conceptes_materia.split(",").map((concept) => concept.trim()))];
 
         const conceptIds = [];
         for (const concept of conceptes) {
             let conceptId;
 
-            // Verificar si el concepto ja existeix
+            // Verificar si el concepte ja existeix
             const existingConcept = await dbQuery(
                 "SELECT id_concepte FROM conceptes WHERE nom_concepte = ?",
                 [concept]
@@ -701,14 +701,14 @@ app.post('/addQuestion', async (req, res) => {
                 );
 
                 if (existingConceptTema.length === 0) {
-                    // Relacionar concepto amb tema si no existeix
+                    // Relacionar concepte amb tema si no existeix
                     await dbQuery(
                         "INSERT INTO conceptes_temes (id_concepte, id_tema) VALUES (?, ?)",
                         [conceptId, id_tema]
                     );
                 }
             } else {
-                // Insertar nou  concepte i associar al tema
+                // Insertar nou concepte i associar al tema
                 const conceptInsert = await dbQuery(
                     "INSERT INTO conceptes (nom_concepte) VALUES (?)",
                     [concept]
@@ -741,6 +741,7 @@ app.post('/addQuestion', async (req, res) => {
 
 // Funció per afegir el concepte i la seva relació amb el tema
 app.put("/updateQuestion", async (req, res) => {
+
     const {
       id_pregunta,
       nom_tema,
@@ -756,7 +757,7 @@ app.put("/updateQuestion", async (req, res) => {
   
 
     const sqlSelectTopic = "SELECT id_tema FROM temes WHERE nom_tema = ? AND id_assignatura = ?";
-    // Pas 1: Recuperem l'ID del tema per posteriors execucions
+    // Recuperem l'ID del tema per posteriors execucions
     try {
       const temaResult = await queryDatabase(sqlSelectTopic, [nom_tema, Id_Assignatura]);
 
@@ -770,10 +771,10 @@ app.put("/updateQuestion", async (req, res) => {
             solucio_erronia2 = ?, solucio_erronia3 = ?, dificultat = ?, id_tema = ?
             WHERE id_pregunta = ?`;
 
-      // Pas 2: Actualitzem la pregunta
+      // Actualitzem la pregunta
       await queryDatabase(sqlUpdateQuestion, [pregunta, solucio_correcta, solucio_erronia1, solucio_erronia2, solucio_erronia3, dificultat, id_tema, id_pregunta]);
 
-      // Pas 3: Processar els conceptes. Aqui pot haver bifuració segons si existeix o no el concepte i el id del tema escollit.
+      // Processar els conceptes. Aqui pot haver bifuració segons si existeix o no el concepte i el id del tema escollit.
       const conceptesArray = conceptes.split(",").map((c) => c.trim());
       const conceptIds = [];
 
@@ -826,7 +827,7 @@ app.put("/updateQuestion", async (req, res) => {
 
           // Si ja hem processat tots els conceptes, passem a actualitzar les relacions de la pregunta
           if (conceptesProcessats === totalConceptes) {
-            // Pas 4: Actualitzar les relacions a `preguntes_conceptes`
+            //Actualitzar les relacions a `preguntes_conceptes`
 
             const sqlDeletePreguntesConceptes = "DELETE FROM preguntes_conceptes WHERE id_pregunta = ?";
             await queryDatabase(sqlDeletePreguntesConceptes, [id_pregunta]);
@@ -841,7 +842,7 @@ app.put("/updateQuestion", async (req, res) => {
 
               // Si hem insertat totes les relacions, retornem la resposta d'èxit
               if (insertsPendents === 0) {
-                res.json({ Status: "Sucess", missatge: "Pregunta actualitzada correctament." });
+                res.json({ Status: "Success", missatge: "Pregunta actualitzada correctament." });
               }
             }
           }
@@ -856,7 +857,7 @@ app.put("/updateQuestion", async (req, res) => {
     }
 });
 
-// Funció auxiliar per a realitzar les consultes de la base de dades amb Promeses
+// Middleware per a realitzar les consultes de la base de dades amb Promeses
 const queryDatabase = (sql, params) => {
   return new Promise((resolve, reject) => {
     db.query(sql, params, (err, result) => {
@@ -975,6 +976,8 @@ app.get('/recoverQuestionsAlumni', (req, res)=>{
     const id_assignatura = req.query.Id_Assignatura;
     const id_user = req.query.Id_User;
 
+    if(!id_assignatura || !id_user)
+        return res.json({ Status: "Failed" });
 
     const sql = `SELECT p.*, temes.nom_tema
         FROM preguntes p
@@ -1005,6 +1008,8 @@ app.put('/updateQuestionAccept', (req, res) =>{
     const id_pregunta = parseInt(req.body.id_pregunta);
     const estat = String(req.body.estat);
 
+    if(!id_pregunta || !estat)
+      return res.json({ Status: "Failed" });
    
 
     const sql = `UPDATE preguntes SET estat = ? WHERE id_pregunta = ?`
@@ -1472,36 +1477,36 @@ app.get('/recuperarPreguntesPerConceptes', (req, res) => {
 
 //Funció de recuperació dels temes de la assignatura i conceptes per poder crear tests
 app.get('/recoverElementsTest', (req, res) => {
-    const id_assignatura = req.query.idAssignatura;
+    const idAssignatura = parseInt(req.query.idAssignatura);
     
-    const idAssignatura = parseInt(id_assignatura, 10);
+    if(!idAssignatura)
+        return res.json({Status:"Failed"})
+
 
     const sql = `
        SELECT 
-    conceptes.id_concepte, 
-    conceptes.nom_concepte
-FROM 
-    temes
-INNER JOIN 
-    conceptes_temes ON temes.id_tema = conceptes_temes.id_tema
-INNER JOIN 
-    conceptes ON conceptes_temes.id_concepte = conceptes.id_concepte
-INNER JOIN 
-    preguntes_conceptes ON conceptes.id_concepte = preguntes_conceptes.id_concepte
-INNER JOIN 
-    preguntes ON preguntes_conceptes.id_pregunta = preguntes.id_pregunta
-WHERE 
-    temes.id_assignatura = ? AND
-    preguntes.estat = 'acceptada'
-GROUP BY 
-    conceptes.id_concepte, 
-    conceptes.nom_concepte
-ORDER BY 
-    conceptes.nom_concepte;
-
+        conceptes.id_concepte, 
+        conceptes.nom_concepte
+        FROM 
+            temes
+    INNER JOIN 
+        conceptes_temes ON temes.id_tema = conceptes_temes.id_tema
+    INNER JOIN 
+        conceptes ON conceptes_temes.id_concepte = conceptes.id_concepte
+    INNER JOIN 
+        preguntes_conceptes ON conceptes.id_concepte = preguntes_conceptes.id_concepte
+    INNER JOIN 
+        preguntes ON preguntes_conceptes.id_pregunta = preguntes.id_pregunta
+    WHERE 
+        temes.id_assignatura = ? AND
+        preguntes.estat = 'acceptada'
+    GROUP BY 
+        conceptes.id_concepte, 
+        conceptes.nom_concepte
+    ORDER BY 
+        conceptes.nom_concepte;
     `;
 
-    // Ejecutar la consulta en la base de datos
     db.query(sql, [idAssignatura], (error, result) => {
         if (error) {
             console.error("Error en la consulta:", error);

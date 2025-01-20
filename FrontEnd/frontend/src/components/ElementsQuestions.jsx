@@ -20,7 +20,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
   const [showModal, setShowModal] = useState(false);
   const [actionType, setActionType] = useState("");
   const [questionIdToAct, setQuestionIdToAct] = useState(null);
-  const [topics, setTopics] = useState({});
+  const [topics, setTopics] = useState([]);
 
   const navigate = useNavigate();
   const [numberQuestionsPendent, setNumberQuestionsPendent] = useState(0);
@@ -68,8 +68,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
           params: { Id_Assignatura },
         })
         .then((res) => {
-          console.log(res);
-          if (res.data.Status === "Empty") setQuestions(res.data.result);
+          if (res.data.Status === "Empty") setQuestions([]);
 
           if (res.data.Status === "Success") {
             setQuestions(res.data.result);
@@ -83,7 +82,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
               setTopics(res.data);
             });
         })
-        .catch((err) => console.error("Error a la sol·licitud:", err));
+        .catch((err) => alert(err));
     } else {
       axios
         .get("http://localhost:8081/recoverQuestionsAlumni", {
@@ -92,9 +91,9 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
         .then((res) => {
           setQuestions(res.data);
         })
-        .catch((err) => console.error("Error a la sol·licitud:", err));
+        .catch((err) => alert(err));
     }
-  }, [Id_Assignatura]);
+  }, [Id_Assignatura, questions]); //mirar les dependències
 
   const handleTopicChange = (e) => {
     setSelectedTopic(e.target.value);
@@ -195,16 +194,22 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
         Id_Assignatura,
       })
       .then((res) => {
-        if (res.data.Status === "Sucess") {
+        if (res.data.Status === "Success") {
           alert("Canvis efectuats");
-        }
 
-        axios
-          .get("http://localhost:8081/recoverQuestions", {
-            params: { Id_Assignatura },
-          })
-          .then((res) => setQuestions(res.data))
-          .catch((err) => console.error("Error a la sol·licitud:", err));
+          axios
+            .get("http://localhost:8081/recoverQuestions", {
+              params: { Id_Assignatura },
+            })
+            .then((res) => {
+              if (res.data.Status === "Empty") setQuestions([]);
+
+              if (res.data.Status === "Success") {
+                setQuestions(res.data.result);
+              }
+            })
+            .catch((err) => console.error("Error a la sol·licitud:", err));
+        }
       })
       .catch((err) => console.error("Error actualitzant la pregunta:", err));
   };
@@ -227,6 +232,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
 
   //Funció d'avaluació de les preguntes
   const handleStatusChange = (idPregunta, nouEstat) => {
+    console.log(idPregunta, nouEstat);
     axios
       .put("http://localhost:8081/updateQuestionAccept", {
         id_pregunta: idPregunta,
@@ -237,7 +243,13 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
           .get("http://localhost:8081/recoverQuestions", {
             params: { Id_Assignatura },
           })
-          .then((res) => setQuestions(res.data))
+          .then((res) => {
+            if (res.data.Status === "Empty") setQuestions([]);
+
+            if (res.data.Status === "Success") {
+              setQuestions(res.data.result);
+            }
+          })
           .catch((err) => console.error("Error a la sol·licitud:", err));
       })
       .catch((err) => console.error("Error actualitzant l'estat:", err));
@@ -289,16 +301,19 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
             <div key={question.id_pregunta} className={styles.questionCard}>
               <div className={styles.questionDetails}>
                 <p>
-                  <strong>Tema:</strong> {question.nom_tema}
+                  <strong>Tema:</strong> {question.nom_tema || "No té tema"}
                 </p>
                 <p>
-                  <strong>Dificultat:</strong> {question.dificultat}
+                  <strong>Dificultat:</strong>{" "}
+                  {question.dificultat || "No té dificultat"}
                 </p>
                 <p>
-                  <strong>Pregunta:</strong> {question.pregunta}
+                  <strong>Pregunta:</strong>{" "}
+                  {question.pregunta || "No té pregunta"}
                 </p>
                 <p>
-                  <strong>Resposta:</strong> {question.solucio_correcta}
+                  <strong>Resposta:</strong>{" "}
+                  {question.solucio_correcta || "No té resposta"}
                 </p>
               </div>
 
@@ -380,8 +395,8 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
           <div className={styles.modalContent}>
             <p>
               Estàs segur que vols{" "}
-              {actionType === "delete" ? "eliminar" : "acceptar"}
-              aquesta pregunta?
+              {actionType === "delete" ? "eliminar" : "acceptar"} aquesta
+              pregunta?
             </p>
             <div className={styles.modalButtons}>
               <button
@@ -451,6 +466,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                   placeholder="Conceptes separats per comes"
                   required
                   pattern="^[A-Za-zÀ-ÿ0-9\s,]+$"
+                  maxLength={30}
                   className={styles.editInput}
                 />
 
@@ -506,7 +522,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                   placeholder="Solució correcta"
                   required
                   pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
-                  maxLength={15}
+                  maxLength={30}
                   className={styles.selectInput}
                 />
 
@@ -525,7 +541,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                   className={styles.editInput}
                   pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
                   placeholder="Solució erronea"
-                  maxLength={15}
+                  maxLength={30}
                 />
 
                 <p>
@@ -543,7 +559,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                   className={styles.editInput}
                   pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
                   placeholder="Solució erronea"
-                  maxLength={15}
+                  maxLength={30}
                 />
 
                 <p>
@@ -561,12 +577,18 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                   className={styles.editInput}
                   pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
                   placeholder="Solució erronea"
-                  maxLength={15}
+                  maxLength={30}
                 />
 
                 <div>
-                  <button type="submit">Guardar</button>{" "}
-                  <button type="button" onClick={() => handleCancel()}>
+                  <button type="submit" className={styles.acceptButton}>
+                    Guardar
+                  </button>{" "}
+                  <button
+                    type="button"
+                    onClick={() => handleCancel()}
+                    className={styles.deleteButton}
+                  >
                     Cancel·lar
                   </button>
                 </div>

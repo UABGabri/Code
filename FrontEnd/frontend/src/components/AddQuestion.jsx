@@ -76,7 +76,7 @@ function AddQuestion() {
     }
   }, [Id_Assignatura]);
 
-  // Función para manejar la adición de opciones
+  // Funció afegir opcions erronies adicionals
   const handleAddOptions = () => {
     if (!extraOptionsVisible) {
       setExtraOptionsVisible(true);
@@ -180,7 +180,7 @@ function AddQuestion() {
                 placeholder="Insereix la teva pregunta"
                 required
                 pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
-                maxLength={200}
+                maxLength={100}
               />
             </div>
           </div>
@@ -199,6 +199,7 @@ function AddQuestion() {
                   }
                   placeholder="Solució correcta"
                   required
+                  maxLength={30}
                   pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
                   className={styles.selectInput}
                 />
@@ -216,6 +217,7 @@ function AddQuestion() {
                   onChange={(e) => updateField("erronea_1", e.target.value)}
                   required
                   pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
+                  maxLength={30}
                   className={styles.optionInput}
                   placeholder="Solució erronea"
                 />
@@ -241,6 +243,7 @@ function AddQuestion() {
                     value={values.erronea_2}
                     onChange={(e) => updateField("erronea_2", e.target.value)}
                     pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
+                    maxLength={30}
                     className={styles.optionInput}
                     placeholder="Solució erronea"
                   />
@@ -264,6 +267,7 @@ function AddQuestion() {
                     value={values.erronea_3}
                     onChange={(e) => updateField("erronea_3", e.target.value)}
                     pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
+                    maxLength={30}
                     className={styles.optionInput}
                     placeholder="Solució erronea"
                   />

@@ -376,23 +376,12 @@
   background-color: #f9f9f9;
 }
 
-.formRandom label {
-  text-align: center;
-  font-weight: bold;
-}
 
-.formRandom select {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 1rem;
-}
 
-.formRandom button {
+.buttonSubmit {
   grid-column: span 3;
   padding: 10px 20px;
-  background-color: #4CAF50;
+  background-color: green;
   color: white;
   border: none;
   border-radius: 5px;
@@ -402,7 +391,7 @@
   transition: background-color 0.3s ease;
 }
 
-.formRandom button:hover {
+.buttonSubmit:hover {
   background-color: darkgreen;
 }
 
@@ -414,22 +403,6 @@
 }
 
 
-.buttonIA{
-
-  padding: 10px 25px;
-  background-color: #4CAF50;
-  border: none;
-  color: white;
-  font-size: 1rem;
-  cursor: pointer;
-  border-radius: 6px;
-  transition: background-color 0.3s ease;
-  
-}
-
-.buttonIA:hover{
-  background-color: darkgreen;
-}
 
 /*FI SECCIO QUIZZ ALUMNE*/
 
