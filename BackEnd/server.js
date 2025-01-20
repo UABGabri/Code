@@ -10,8 +10,6 @@ import csvParser from 'csv-parser';
 import 'dotenv/config';
 
 
-
-
 //mysql://root:bjZVQpiVCOmCYLfWhXCPaaYrDxeAxltn@autorack.proxy.rlwy.net:51488/railway
 //domain: code-production-a812.up.railway.app
 
