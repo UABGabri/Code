@@ -9,7 +9,7 @@ import fs from 'fs';
 import csvParser from 'csv-parser';
 import 'dotenv/config';
 
-dotenv.config()
+
 
 
 //mysql://root:bjZVQpiVCOmCYLfWhXCPaaYrDxeAxltn@autorack.proxy.rlwy.net:51488/railway
