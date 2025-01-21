@@ -27,6 +27,7 @@ function CreateManualQuizz() {
   const [nomTest, setNomTest] = useState("");
   const [duracio, setDuracio] = useState("");
   const [clau, setClau] = useState("");
+  const [intents, setIntents] = useState("");
 
   useEffect(() => {
     axios
@@ -41,7 +42,7 @@ function CreateManualQuizz() {
 
         const id_assignatura = idAssignatura;
         axios
-          .get("http://localhost:8081/recoverTemasAssignatura", {
+          .get("http://localhost:8081/recoverTopicsSubject", {
             params: { Id_Assignatura: id_assignatura },
           })
           .then((response) => setTemesFilters(response.data))
@@ -85,7 +86,7 @@ function CreateManualQuizz() {
     const id_creador = idProfessor;
     const id_assignatura = idAssignatura;
 
-    console.log(nomTest, id_assignatura, id_creador, duracio, dataFinalitzacio);
+    if (tipus === "avaluatiu") console.log(clau, intents);
 
     axios
       .post("http://localhost:8081/createTest", {
@@ -96,6 +97,8 @@ function CreateManualQuizz() {
         tipus,
         data_finalitzacio: dataFinalitzacio,
         duracio,
+        clau,
+        intents,
       })
       .then((response) => {
         if (response.data.Status === "Failed") {
@@ -263,6 +266,36 @@ function CreateManualQuizz() {
                     placeholder="En minuts"
                   />
                 </label>
+                {tipus === "avaluatiu" && (
+                  <>
+                    <label className={styles.inputLabel}>
+                      Clau:
+                      <input
+                        type="text"
+                        value={clau}
+                        onChange={(e) => {
+                          setClau(e.target.value);
+                        }}
+                        className={styles.inputField}
+                        required
+                        maxLength={5}
+                      />
+                    </label>
+                    <label className={styles.inputLabel}>
+                      Intents:
+                      <input
+                        type="number"
+                        value={intents}
+                        onChange={(e) => {
+                          setIntents(e.target.value);
+                        }}
+                        className={styles.inputField}
+                        required
+                        maxLength={5}
+                      />
+                    </label>
+                  </>
+                )}
               </div>
 
               <div>
@@ -341,7 +374,7 @@ function CreateManualQuizz() {
         </div>
 
         <button
-          className={styles.createTestButtonn}
+          className={styles.colorButt}
           onClick={createQuizz}
           disabled={selectedQuestions.length < 1}
         >

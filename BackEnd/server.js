@@ -909,25 +909,6 @@ app.delete('/deleteQuestion', (req,res)=>{
 
 })
 
-//Funció de recuperació dels temes de la assignatura per afegir preguntes
-app.get('/recoverTemasAssignatura', (req, res)=>{ 
-
-    const id_assignatura = req.query.Id_Assignatura;
-
-    
-    const sql = 'SELECT * FROM temes WHERE id_assignatura = ?';
-
-    db.query(sql, [id_assignatura], (error, result) => {
-    
-        if (error) {
-            console.error("Error en la consulta:", error);
-            return res.json({ Status: "Failed" });
-          } else {
-            return res.json(result); 
-          }
-    })
-
-})
 
 
 //Funció de recuperació dels temes amb preguntes acceptades
@@ -939,11 +920,11 @@ app.get('/recoverTopicSubjectQuestions', (req, res) => {
     
     const sql = `
       SELECT t.*
-    FROM temes t
-    JOIN preguntes p ON t.id_tema = p.id_tema
-    WHERE t.id_assignatura = ?
-    AND p.estat = 'acceptada'
-    GROUP BY t.id_tema
+        FROM temes t
+        JOIN preguntes p ON t.id_tema = p.id_tema
+        WHERE t.id_assignatura = ?
+        AND p.estat = 'acceptada'
+        GROUP BY t.id_tema
     `;
   
     db.query(sql, [id_assignatura], (error, result) => {
@@ -1760,20 +1741,13 @@ app.get('/recoverPreguntesTema', (req, res) => {
 
 //Funció creació de test manual pel professor
 app.post('/createTest', async (req, res) => {
-    const { nom_test, id_creador, id_assignatura, idTema, tipus, data_finalitzacio, duracio } = req.body;
+    const { nom_test, id_creador, id_assignatura, idTema, tipus, data_finalitzacio, duracio, clau, intents } = req.body;
 
     // Validar data finalització
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/; // Formato YYYY-MM-DD
     if (!data_finalitzacio || !dateRegex.test(data_finalitzacio)) {
         return res.json({ Status: "Failed", Message: "Data finalització no vàlida. Utilitza el format YYYY-MM-DD." });
     }
-
-
-    const clau_acces = null;
-    if (tipus === 'avaluatiu') {
-        clau_acces = Math.random().toString(36).substr(2, 8);
-    }
- 
     
 
     const idCreador = parseInt(id_creador, 10);
@@ -1782,13 +1756,13 @@ app.post('/createTest', async (req, res) => {
 
     const sql = `
         INSERT INTO tests 
-        (nom_test,  data_final, clau_acces, id_creador, id_assignatura, id_tema, tipus, temps) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        (nom_test,  data_final, clau_acces, id_creador, id_assignatura, id_tema, tipus, temps, intents) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)
     `;
 
     db.query(
         sql,
-        [nom_test, data_finalitzacio, clau_acces, idCreador, idAssignatura, idTemaParsed, tipus, duracio],
+        [nom_test, data_finalitzacio, clau, idCreador, idAssignatura, idTemaParsed, tipus, duracio, intents],
         (error, result) => {
             if (error) {
                 console.error("Error en la consulta:", error);
@@ -1846,30 +1820,32 @@ app.post('/createQuizz', (req, res) => {
         });
 
      
-
         Promise.all(queries)
-            .then(allQuestions => {
-                const sqlInsertTestQuestions = `
-                    INSERT INTO test_preguntes (id_test, id_pregunta) VALUES ?
-                `;
-                const allQuestionsFlattened = allQuestions.flat();
+        .then(allQuestions => {
+            const allQuestionsFlattened = allQuestions.flat();
 
-                console.log(allQuestionsFlattened)
+            if (allQuestionsFlattened.length === 0) {
+             
+                return res.json({ Status: "Failed", Message: "No s'han trobat preguntes vàlides per al test." });
+            }
 
-                db.query(sqlInsertTestQuestions, [allQuestionsFlattened], (error) => {
-                    if (error) {
-                        console.error("Error al associar preguntes al test:", error);
-                        return res.json({ Status: "Error al processar les preguntes" });
-                    }else{
-                        return res.json({ Status: "Success", clau_acces, id_test: idTest });
-                    }
-                    
-                });
-            })
-            .catch(error => {
-                console.error("Error al processar les preguntes:", error);
-                res.json({ Status: "Error al processar preguntes" });
+            const sqlInsertTestQuestions = `
+                INSERT INTO test_preguntes (id_test, id_pregunta) VALUES ?
+            `;
+
+            db.query(sqlInsertTestQuestions, [allQuestionsFlattened], (error) => {
+                if (error) {
+                    console.error("Error al associar preguntes al test:", error);
+                    return res.json({ Status: "Error al processar les preguntes" });
+                }
+
+                res.json({ Status: "Success", clau_acces, id_test: idTest });
             });
+        })
+        .catch(error => {
+            console.error("Error al processar les preguntes:", error);
+            res.json({ Status: "Error al processar preguntes" });
+        });
     });
 });
 

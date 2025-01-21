@@ -21,11 +21,19 @@ function CreateQuizz() {
   const [nomTest, setNomTest] = useState("");
 
   useEffect(() => {
+    if (!id_assignatura) return;
+
     axios
       .get("http://localhost:8081/recoverTopicSubjectQuestions", {
         params: { Id_Assignatura: id_assignatura },
       })
-      .then((response) => setTemes(response.data))
+      .then((response) => {
+        if (Array.isArray(response.data)) {
+          setTemes(response.data);
+        } else {
+          setTemes([]);
+        }
+      })
       .catch((error) => console.error("Error al recuperar temes:", error));
   }, [id_assignatura]);
 
@@ -77,7 +85,8 @@ function CreateQuizz() {
             alert("Test creat correctament!");
           }
         } else {
-          alert("Error al crear el test.");
+          if (response.data.Status === "Failed")
+            alert("No s'ha trobat cap pregunta coincident. Test buit.");
         }
 
         setIsFinalModalOpen(false);
