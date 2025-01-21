@@ -26,6 +26,7 @@ function CustomTest() {
   const [duration, setDuration] = useState("");
   const [data, setData] = useState("");
   const [tipus, setTipus] = useState("");
+  const [intents, setIntents] = useState("");
   const [clau, setClau] = useState("");
 
   // Obtenir les preguntes del test seleccionat
@@ -44,7 +45,6 @@ function CustomTest() {
         setPreguntesTest(sortedPreguntes);
         fetchRemainingQuestions(sortedPreguntes);
 
-        //Elements per modificar tipus de test
         setTestName(sortedPreguntes[0].nom_test);
         setDuration(sortedPreguntes[0].temps / 60);
         const aux = sortedPreguntes[0].data_final;
@@ -56,7 +56,7 @@ function CustomTest() {
           setClau(sortedPreguntes[0].clau_acces);
         }
       })
-      .catch(() => console.log("Error fetching the test questions."));
+      .catch(() => console.log("Error obtenint les preguntes del test."));
   }, [idTest]);
 
   // Obtenir les preguntes restants del banc
@@ -95,7 +95,7 @@ function CustomTest() {
           posicio: q.posicio,
         })),
       })
-      .catch(() => alert("Error saving the order of the questions."));
+      .catch(() => alert("Error."));
   };
 
   // Afegir una pregunta al test
@@ -119,7 +119,7 @@ function CustomTest() {
           prev.filter((q) => q.id_pregunta !== pregunta.id_pregunta)
         )
       )
-      .catch(() => alert("Error adding the question to the test."));
+      .catch(() => alert("Error afegint pregunta."));
   };
 
   // Eliminar una pregunta del test
@@ -137,7 +137,7 @@ function CustomTest() {
         })),
       })
       .then(() => setBancPreguntes((prev) => [...prev, pregunta]))
-      .catch(() => alert("Error removing the question from the test."));
+      .catch(() => alert("Error treien la pregunta"));
   };
 
   // Eliminar el test
@@ -150,7 +150,7 @@ function CustomTest() {
         alert("Test deleted successfully.");
         navigate(-1);
       })
-      .catch(() => alert("Error deleting the test."));
+      .catch(() => alert("Error esborrant el test."));
   };
 
   //Funció d'aplicar canvis
@@ -165,7 +165,7 @@ function CustomTest() {
         userInput = prompt("Introdueix la clau pel nou test:");
 
         if (userInput === null) {
-          alert("No es va introduir cap clau.");
+          alert("No s'ha introduit cap clau.");
           cancelUser = true;
           break;
         }
@@ -174,6 +174,7 @@ function CustomTest() {
         if (validInput.test(userInput)) {
           alert(`La clau introduïda és: ${userInput}`);
           clauAux = userInput;
+
           break;
         } else {
           alert(
@@ -182,7 +183,8 @@ function CustomTest() {
         }
       }
     } else {
-      setClau(null);
+      setClau(" ");
+      setIntents(5);
     }
 
     if (cancelUser) {
@@ -199,6 +201,8 @@ function CustomTest() {
 
     const minutes = duration * 60;
 
+    console.log();
+
     axios
       .put("http://localhost:8081/updateTestCustom", {
         testName,
@@ -207,10 +211,11 @@ function CustomTest() {
         tipus,
         clauAux,
         idTest,
+        intents,
       })
       .then((res) => {
         console.log(res);
-        if (res.data.Status === "Sucess") {
+        if (res.data.Status === "Success") {
           alert("Canvis efectuats");
         } else {
           alert("Error en el servidor");
@@ -441,18 +446,36 @@ function CustomTest() {
                     </label>
                   </div>
 
-                  <label className={styles.inputLabel}>
-                    Tipus:
-                    <select
-                      value={tipus}
-                      onChange={(e) => setTipus(e.target.value)}
-                      className={styles.inputField}
-                      style={{ marginBottom: "50px" }}
-                    >
-                      <option value="practica">Pràctica</option>
-                      <option value="avaluatiu">Avaluatiu</option>
-                    </select>
-                  </label>
+                  <div style={{ marginRight: "20px" }}>
+                    {tipus === "avaluatiu" && (
+                      <label
+                        className={styles.inputLabel}
+                        style={{ marginRight: "20px" }}
+                      >
+                        Intents:
+                        <input
+                          type="number"
+                          value={intents}
+                          onChange={(e) => setIntents(e.target.value)}
+                          className={styles.inputField}
+                          min={1}
+                          required
+                        />
+                      </label>
+                    )}
+                    <label className={styles.inputLabel}>
+                      Tipus:
+                      <select
+                        value={tipus}
+                        onChange={(e) => setTipus(e.target.value)}
+                        className={styles.inputField}
+                        style={{ marginBottom: "50px" }}
+                      >
+                        <option value="practica">Pràctica</option>
+                        <option value="avaluatiu">Avaluatiu</option>
+                      </select>
+                    </label>
+                  </div>
 
                   <div style={{ gap: "20px", display: "flex" }}>
                     <button type="submit" className={styles.addButton}>

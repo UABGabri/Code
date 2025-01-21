@@ -1658,18 +1658,25 @@ app.post('/saveResults', (req, res) =>{
 app.put('/updateTestCustom', (req, res) =>{
 
 
-    const {testName, data, minutes, tipus, clauAux, idTest} = req.body;
+    const {testName, data, minutes, tipus, clauAux, idTest, intents} = req.body;
 
-    const sql = 'UPDATE tests SET nom_test = ?, data_final = ?, temps = ?, tipus = ?, clau_acces = ? WHERE id_test = ? ';
+    if (!testName || !data || !minutes || !tipus || !idTest) {
+        return res.json({ status: "Failed", message: "Manquen dades" });
+    }
+    
+
+    console.log(testName, data, minutes, tipus, clauAux, idTest, intents)
+
+    const sql = 'UPDATE tests SET nom_test = ?, data_final = ?, temps = ?, tipus = ?, clau_acces = ?, intents = ? WHERE id_test = ? ';
 
 
 
-    db.query(sql, [testName, data, minutes, tipus, clauAux, idTest], (error, result) => {
+    db.query(sql, [testName, data, minutes, tipus, clauAux, intents, idTest], (error, result) => {
         if (error) {
             console.error("Error a la consulta:", error);
             return res.json({ status: "Failed", error });
         }
-        return res.json({  Status: "Sucess" });
+        return res.json({  Status: "Success" });
     });
 
 })

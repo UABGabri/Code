@@ -111,6 +111,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
           idTest: test.id_test,
           idTema: id_tema,
           idAssignatura: id,
+          tipusTest: test.tipus,
         },
       });
     } else {

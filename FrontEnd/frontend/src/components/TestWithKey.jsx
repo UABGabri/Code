@@ -17,7 +17,9 @@ function TestWithKey() {
   const { idTest, Id_User } = location.state || {};
   const [avaluatiu, setAvaluatiu] = useState(false);
   const [Id_Subject, setIdSubject] = useState("");
-  const [time, setTime] = useState(0);
+  const [time, setTime] = useState(10);
+  const [resultsSent, setResultsSent] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   // La funció useEffect es llança dos cops pel mode dev -> resultats enviats dos cops -> cal aplicar funció de normalització
   useEffect(() => {
@@ -37,7 +39,7 @@ function TestWithKey() {
         console.log(response.data.Preguntes[0].tipus);
 
         setTime(parseInt(response.data.Preguntes[0].temps * 60));
-        //setTime(5);
+
         setPreguntes(preguntasConContenido);
         setRespostesBarrejades(
           preguntasConContenido.map((pregunta) => barrejarRespostes(pregunta))
@@ -59,6 +61,9 @@ function TestWithKey() {
         setTime((prevTime) => prevTime - 1);
       }, 1000);
       return () => clearInterval(interval);
+    } else {
+      clearInterval();
+      setShowResults(true);
     }
   }, [time]);
 
@@ -122,7 +127,8 @@ function TestWithKey() {
   }
 
   const enviarResultats = async (resultats) => {
-    console.log(idTest, resultats.percentatge, Id_User, Id_Subject);
+    if (resultsSent) return;
+    setResultsSent(true);
 
     try {
       await axios.post("http://localhost:8081/saveResults", {
@@ -134,6 +140,11 @@ function TestWithKey() {
     } catch (error) {
       console.error("Error al guardar resultats:", error);
     }
+  };
+
+  const handleDetails = () => {
+    console.log("detalls");
+    setShowModal(true);
   };
 
   if (showResults) {
@@ -172,7 +183,57 @@ function TestWithKey() {
                 >
                   Inici
                 </button>
+
+                <button onClick={handleDetails} className={styles.endButtons}>
+                  Detalls
+                </button>
               </>
+            )}
+
+            {showModal && (
+              <div className={styles.modalOverlay}>
+                <div className={styles.modalContent}>
+                  <h2>Detalls de les Respostes</h2>
+                  <ul className={styles.modalList}>
+                    {preguntes.map((pregunta, index) => {
+                      const respostaSeleccionada =
+                        selectedAnswers[index]?.split("-")[0] ||
+                        "No seleccionada";
+                      const correcta = pregunta.solucio_correcta;
+
+                      return (
+                        <li key={index} className={styles.modalListItem}>
+                          <p>
+                            <strong>Pregunta:</strong> {pregunta.pregunta}
+                          </p>
+                          <p>
+                            <strong>Resposta seleccionada:</strong>{" "}
+                            <span
+                              className={
+                                respostaSeleccionada === correcta
+                                  ? styles.correct
+                                  : styles.incorrect
+                              }
+                            >
+                              {respostaSeleccionada}
+                            </span>
+                          </p>
+                          <p>
+                            <strong>Resposta correcta:</strong>{" "}
+                            <span className={styles.correct}>{correcta}</span>
+                          </p>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  <button
+                    className={styles.closeModalButton}
+                    onClick={() => setShowModal(false)}
+                  >
+                    Tancar
+                  </button>
+                </div>
+              </div>
             )}
           </div>
         </div>
