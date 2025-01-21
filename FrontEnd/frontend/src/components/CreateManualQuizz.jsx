@@ -86,8 +86,6 @@ function CreateManualQuizz() {
     const id_creador = idProfessor;
     const id_assignatura = idAssignatura;
 
-    if (tipus === "avaluatiu") console.log(clau, intents);
-
     axios
       .post("http://localhost:8081/createTest", {
         nom_test: nomTest,

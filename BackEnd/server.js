@@ -1749,6 +1749,8 @@ app.post('/createTest', async (req, res) => {
         return res.json({ Status: "Failed", Message: "Data finalització no vàlida. Utilitza el format YYYY-MM-DD." });
     }
     
+    if(!nom_test || !id_creador || !id_assignatura || !idTema || !tipus || !data_finalitzacio || !duracio ||!clau || !intents)
+        return res.json({ Status: "Failed", message:"Manquen dades" });
 
     const idCreador = parseInt(id_creador, 10);
     const idAssignatura = parseInt(id_assignatura, 10);
@@ -1778,22 +1780,25 @@ app.post('/createTest', async (req, res) => {
 //Funció creació test automàtic
 app.post('/createQuizz', (req, res) => {
 
-    const { seleccions, nom_test, id_creador, id_assignatura, id_tema, tipus, data_finalitzacio, durationNormal } = req.body;
+    const { seleccions, nom_test, id_creador, id_assignatura, id_tema, tipus, data_finalitzacio, durationNormal, clau, intents } = req.body;
 
-    if (!nom_test || !nom_test.match(/^[a-zA-Z0-9]+$/)) {
-        return res.json({ Status: "Failed", Message: "Nom del test no vàlid." });
-    }
+
+    if(!nom_test || !id_creador || !id_assignatura || !id_tema || !tipus || !data_finalitzacio || !durationNormal ||!clau || !intents)
+        return res.json({ Status: "Failed", message:"Manquen dades" });
+
+
+    console.log( seleccions, nom_test, id_creador, id_assignatura, id_tema, tipus, data_finalitzacio, durationNormal, clau, intents)
 
     const duration = parseInt(durationNormal);
     const sqlInsertTestBase = `
         INSERT INTO tests 
-        (nom_test, data_final, clau_acces, id_creador, id_assignatura, id_tema, tipus, temps) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        (nom_test, data_final, clau_acces, id_creador, id_assignatura, id_tema, tipus, temps, intents) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     let clau_acces = tipus === 'avaluatiu' ? Math.random().toString(36).substr(2, 8) : null;
 
-    db.query(sqlInsertTestBase, [nom_test, data_finalitzacio, clau_acces, id_creador, id_assignatura, id_tema, tipus, duration], (error, result) => {
+    db.query(sqlInsertTestBase, [nom_test, data_finalitzacio, clau, id_creador, id_assignatura, id_tema, tipus, duration, intents], (error, result) => {
         if (error) {
             console.error("Error al crear el test:", error);
             return res.json({ Status: "Error al crear el test" });
@@ -1898,7 +1903,7 @@ app.get('/recoverTestsTopics', (req, res) =>{
     if(!idTema)
         return res.json({ status: "Failed" });
 
-    const sql = 'SELECT id_test, nom_test, tipus FROM tests WHERE id_tema = ?'
+    const sql = 'SELECT * FROM tests WHERE id_tema = ?'
 
     db.query(sql, [idTema], (error, result) => {
         if (error) {
@@ -1908,6 +1913,36 @@ app.get('/recoverTestsTopics', (req, res) =>{
             return res.json({ status: "Success", result });
         }
     });
+
+})
+
+app.get('/recoverTry', (req, res) =>{
+
+    const {Id_User, id_Test} = req.query
+
+    if(!Id_User || !id_Test)
+        return res.json({ Status: "Manquen dades" });
+
+    const sql = 'SELECT COUNT(*) FROM resultats WHERE id_alumne = ? AND id_test = ?'
+
+    db.query(sql, [Id_User, id_Test], (error, result) => {
+
+        if (error) {
+    
+            return res.json({ Status: "Consulta fallada" });
+        }
+        else{
+            const count = result[0]['COUNT(*)'];
+            if(count !== 0 )
+                return res.json({ Status: "Success", count });
+            else{
+                return res.json({ Status: "Failed" });
+            }
+        }
+       
+    });
+
+
 
 })
 

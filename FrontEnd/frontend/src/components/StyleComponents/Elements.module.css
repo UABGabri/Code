@@ -629,20 +629,29 @@ hr {
 
 .modalButton {
   padding: 8px 16px;
-  background-color: #007bff;
+  background-color: green;
   color: white;
   border: none;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .modalButtonCancel {
-  background-color: #ccc;
+  padding: 8px 16px;
+  background-color: red;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-.modalButton:hover, .modalButtonCancel:hover {
-  opacity: 0.8;
+.modalButton:hover {
+background-color: darkgreen;
 }
 
+.modalButtonCancel:hover {
+  background-color: darkred;
+}
 
 
 

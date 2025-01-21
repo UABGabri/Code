@@ -114,16 +114,16 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
         },
       });
     } else {
-      // Mostrar modal en cas de no ser professor.
+      // Mostrar modal en cas de no ser professor. Casos de pràctica i avaluatius
       if (test.tipus === "avaluatiu") {
         setSelectedTest(test);
         setShowModal(true);
       } else {
         setSelectedTest(test);
 
-        if (selectedTest && selectedTest.id_test) {
+        if (test && test.id_test) {
           navigate("/realitzartest", {
-            state: { idTest: selectedTest.id_test, Id_User },
+            state: { idTest: test.id_test, Id_User },
           });
         } else {
           alert("El test seleccionat és invàlid o manca 'id_test'");
@@ -151,6 +151,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
 
   //Funció de validació de la clau d'accés
   const handleAccessKeySubmit = () => {
+    const id_Test = selectedTest.id_test;
     axios
       .post("http://localhost:8081/validateTestAccess", {
         id_test: selectedTest.id_test,
@@ -158,10 +159,24 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
       })
       .then((response) => {
         if (response.data.status === "Success") {
-          setShowModal(false);
-          navigate("/realitzartest", {
-            state: { idTest: selectedTest.id_test, Id_User },
-          });
+          axios
+            .get("http://localhost:8081/recoverTry", {
+              params: { Id_User, id_Test },
+            })
+            .then((response) => {
+              console.log(response);
+              if (response.data.Status === "Success") {
+                if (response.data.count >= selectedTest.intents) {
+                  alert("Has superat el número d'intents");
+                }
+                setShowModal(false);
+              } else {
+                setShowModal(false);
+                navigate("/realitzartest", {
+                  state: { idTest: selectedTest.id_test, Id_User },
+                });
+              }
+            });
         } else {
           alert("La clau d'accés és incorrecta. Torna-ho a intentar.");
         }
@@ -209,6 +224,22 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
 
               {openTema[tema.id_tema] && (
                 <div className={styles.temaContent}>
+                  <div className={styles.tests}>
+                    <h3 className={styles.temaSubtitle}>
+                      <strong>Continguts</strong>
+                    </h3>
+                    <hr />
+
+                    {Role_User === "professor" && (
+                      <button
+                        className={styles.buttonAddTest}
+                        onClick={() => {}}
+                      >
+                        <FaPlus />
+                      </button>
+                    )}
+                  </div>
+
                   <div className={styles.tests}>
                     <h3 className={styles.temaSubtitle}>
                       <strong>Proves Pràctiques</strong>

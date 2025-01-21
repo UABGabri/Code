@@ -19,6 +19,8 @@ function CreateQuizz() {
   const [isFinalModal, setIsFinalModalOpen] = useState(false);
   const { id_assignatura, id_professor, id_tema, tipus } = location.state || {};
   const [nomTest, setNomTest] = useState("");
+  const [clau, setClau] = useState("");
+  const [intents, setIntents] = useState("");
 
   useEffect(() => {
     if (!id_assignatura) return;
@@ -74,13 +76,13 @@ function CreateQuizz() {
         tipus,
         data_finalitzacio: dataFinalitzacio,
         durationNormal,
+        clau,
+        intents,
       })
       .then((response) => {
-        const clau = response.data.clau_acces;
-
         if (response.data.Status === "Success") {
           if (tipus === "avaluatiu") {
-            alert("Test creat correctament amb clau: " + clau);
+            alert("Test creat correctament");
           } else {
             alert("Test creat correctament!");
           }
@@ -260,6 +262,37 @@ function CreateQuizz() {
                     }}
                   />
                 </label>
+
+                {tipus === "avaluatiu" && (
+                  <>
+                    <label className={styles.inputLabel}>
+                      Clau:
+                      <input
+                        type="text"
+                        value={clau}
+                        onChange={(e) => {
+                          setClau(e.target.value);
+                        }}
+                        className={styles.inputField}
+                        required
+                        maxLength={5}
+                      />
+                    </label>
+                    <label className={styles.inputLabel}>
+                      Intents:
+                      <input
+                        type="number"
+                        value={intents}
+                        onChange={(e) => {
+                          setIntents(e.target.value);
+                        }}
+                        className={styles.inputField}
+                        required
+                        maxLength={5}
+                      />
+                    </label>
+                  </>
+                )}
               </div>
 
               <div className={styles.modalButtons}>
