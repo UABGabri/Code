@@ -18,7 +18,7 @@ function TestIALayout() {
   useEffect(() => {
     const Id_Assignatura = parseInt(idAssignatura);
     axios
-      .get("http://localhost:8081/recoverTemasAssignatura", {
+      .get("http://localhost:8081/recoverTopicsSubject", {
         params: { Id_Assignatura },
       })
       .then((response) => {
