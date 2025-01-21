@@ -1939,12 +1939,10 @@ app.get('/recoverTry', (req, res) =>{
             return res.json({ Status: "Consulta fallada" });
         }
         else{
-            const count = result[0]['COUNT(*)'];
-            if(count !== 0 )
-                return res.json({ Status: "Success", count });
-            else{
-                return res.json({ Status: "Failed" });
-            }
+             const count = result[0]['COUNT(*)'];
+      
+            return res.json({ Status: "Success", count });
+            
         }
        
     });

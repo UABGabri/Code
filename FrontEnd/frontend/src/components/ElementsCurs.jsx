@@ -159,6 +159,8 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
       return;
     }
 
+    console.log(id_Test);
+
     axios
       .post("http://localhost:8081/validateTestAccess", {
         id_test: id_Test,
