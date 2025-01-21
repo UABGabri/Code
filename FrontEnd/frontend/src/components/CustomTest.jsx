@@ -184,7 +184,7 @@ function CustomTest() {
       }
     } else {
       setClau(" ");
-      setIntents(5);
+      setIntents(10);
     }
 
     if (cancelUser) {
@@ -217,6 +217,7 @@ function CustomTest() {
         console.log(res);
         if (res.data.Status === "Success") {
           alert("Canvis efectuats");
+          setShowInfoTest(false);
         } else {
           alert("Error en el servidor");
         }
@@ -463,18 +464,6 @@ function CustomTest() {
                         />
                       </label>
                     )}
-                    <label className={styles.inputLabel}>
-                      Tipus:
-                      <select
-                        value={tipus}
-                        onChange={(e) => setTipus(e.target.value)}
-                        className={styles.inputField}
-                        style={{ marginBottom: "50px" }}
-                      >
-                        <option value="practica">Pràctica</option>
-                        <option value="avaluatiu">Avaluatiu</option>
-                      </select>
-                    </label>
                   </div>
 
                   <div style={{ gap: "20px", display: "flex" }}>

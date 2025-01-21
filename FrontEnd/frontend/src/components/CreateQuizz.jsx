@@ -288,7 +288,7 @@ function CreateQuizz() {
                         }}
                         className={styles.inputField}
                         required
-                        maxLength={5}
+                        min={1}
                       />
                     </label>
                   </>

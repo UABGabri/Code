@@ -14,7 +14,6 @@ function TestLayout() {
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [loading, setLoading] = useState(true);
   const [showResults, setShowResults] = useState(false);
-  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     axios
@@ -88,14 +87,6 @@ function TestLayout() {
     return { correctes, incorrectes, percentatge };
   };
 
-  const handleDetails = () => {
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-  };
-
   if (loading) {
     return <p>Carregant preguntes...</p>;
   }
@@ -112,9 +103,6 @@ function TestLayout() {
           <p>Incorrectes: {incorrectes}</p>
           <p>Nota: {percentatge}%</p>
           <div>
-            <button className={styles.endButtons} onClick={handleDetails}>
-              Detalls
-            </button>
             <button
               className={styles.endButtons}
               onClick={() => window.location.reload()}
@@ -126,48 +114,6 @@ function TestLayout() {
             Tornar a la pàgina principal
           </button>
         </div>
-
-        {showModal && (
-          <div className={styles.modalOverlay}>
-            <div className={styles.modalContent}>
-              <h2>Detalls de les Respostes</h2>
-              <ul className={styles.modalList}>
-                {preguntes.map((pregunta, index) => {
-                  const respostaSeleccionada =
-                    selectedAnswers[index]?.split("-")[0] || "No seleccionada";
-                  const correcta = pregunta.solucio_correcta;
-
-                  return (
-                    <li key={index} className={styles.modalListItem}>
-                      <p>
-                        <strong>Pregunta:</strong> {pregunta.pregunta}
-                      </p>
-                      <p>
-                        <strong>Resposta seleccionada:</strong>{" "}
-                        <span
-                          className={
-                            respostaSeleccionada === correcta
-                              ? styles.correct
-                              : styles.incorrect
-                          }
-                        >
-                          {respostaSeleccionada}
-                        </span>
-                      </p>
-                      <p>
-                        <strong>Resposta correcta:</strong>{" "}
-                        <span className={styles.correct}>{correcta}</span>
-                      </p>
-                    </li>
-                  );
-                })}
-              </ul>
-              <button className={styles.closeModalButton} onClick={closeModal}>
-                Tancar
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     );
   }

@@ -61,7 +61,7 @@ function AddQuestion() {
 
   const recoverTemasAssignatura = () => {
     axios
-      .get("http://localhost:8081/recoverTemasAssignatura", {
+      .get("http://localhost:8081/recoverTopicsSubject", {
         params: { Id_Assignatura },
       })
       .then((res) => {

@@ -152,10 +152,16 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
 
   //Funció de validació de la clau d'accés
   const handleAccessKeySubmit = () => {
-    const id_Test = selectedTest.id_test;
+    const id_Test = selectedTest?.id_test;
+
+    if (!id_Test) {
+      alert("Test no vàlid o manca 'id_test'.");
+      return;
+    }
+
     axios
       .post("http://localhost:8081/validateTestAccess", {
-        id_test: selectedTest.id_test,
+        id_test: id_Test,
         access_key: accessKey,
       })
       .then((response) => {
@@ -165,18 +171,22 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
               params: { Id_User, id_Test },
             })
             .then((response) => {
-              console.log(response);
               if (response.data.Status === "Success") {
                 if (response.data.count >= selectedTest.intents) {
                   alert("Has superat el número d'intents");
+                  setShowModal(false);
+                  return;
                 }
-                setShowModal(false);
-              } else {
-                setShowModal(false);
                 navigate("/realitzartest", {
-                  state: { idTest: selectedTest.id_test, Id_User },
+                  state: { idTest: id_Test, Id_User },
                 });
+              } else {
+                alert("Error accedint al test.");
               }
+            })
+            .catch((error) => {
+              console.error("Error recuperant intents:", error);
+              alert("Error accedint al test.");
             });
         } else {
           alert("La clau d'accés és incorrecta. Torna-ho a intentar.");
