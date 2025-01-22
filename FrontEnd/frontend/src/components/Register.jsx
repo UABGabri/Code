@@ -65,6 +65,7 @@ function Register() {
       return;
     }
 
+    console.log(apiUrl);
     // Registrar l'usuari al servidor
     axios
       .post(`${apiUrl}/register`, values, {
