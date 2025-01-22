@@ -95,20 +95,17 @@ function Register() {
       <div className={styles.white}>
         <div>
           <h2>Registre</h2>
-          {error && <div className="alert alert-danger">{error}</div>}
+          {error && <div>{error}</div>}
 
-          <form className="form-label-1" onSubmit={handleConfirmPassword}>
+          <form onSubmit={handleConfirmPassword}>
             <div>
-              <label htmlFor="username" className="form-label">
-                Nom de usuari
-              </label>
+              <label htmlFor="username">Nom de usuari</label>
               <input
                 type="text"
                 name="username"
                 onChange={(e) =>
                   setValues({ ...values, username: e.target.value })
                 }
-                className="form-control"
                 id="username"
                 placeholder="Introdueix el teu nom de usuari"
                 required
@@ -119,14 +116,11 @@ function Register() {
             </div>
 
             <div>
-              <label htmlFor="niu" className="form-label-2">
-                NIU
-              </label>
+              <label htmlFor="niu">NIU</label>
               <input
                 type="text"
                 name="niu"
                 onChange={(e) => setValues({ ...values, niu: e.target.value })}
-                className="form-control"
                 id="niu"
                 placeholder="Introdueix el teu NIU"
                 required
@@ -137,16 +131,13 @@ function Register() {
             </div>
 
             <div>
-              <label htmlFor="gmail" className="form-label">
-                Correu electrònic
-              </label>
+              <label htmlFor="gmail">Correu electrònic</label>
               <input
                 type="email"
                 name="gmail"
                 onChange={(e) =>
                   setValues({ ...values, gmail: e.target.value })
                 }
-                className="form-control"
                 id="gmail"
                 placeholder="Introdueix el teu correu"
                 required
@@ -156,9 +147,7 @@ function Register() {
             </div>
 
             <div>
-              <label htmlFor="password" className="form-label">
-                Contrasenya
-              </label>
+              <label htmlFor="password">Contrasenya</label>
               <input
                 type="password"
                 name="password"
@@ -166,7 +155,6 @@ function Register() {
                   setValues({ ...values, password: e.target.value });
                   setIsPasswordValid(validatePassword(e.target.value));
                 }}
-                className="form-control"
                 id="password"
                 placeholder="Introdueix la teva contrasenya"
                 required
@@ -177,14 +165,11 @@ function Register() {
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="form-label">
-                Confirmar contrasenya
-              </label>
+              <label htmlFor="confirmPassword">Confirmar contrasenya</label>
               <input
                 type="password"
                 name="confirmPassword"
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="form-control"
                 id="confirmPassword"
                 minLength={8}
                 maxLength={10}

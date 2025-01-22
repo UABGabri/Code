@@ -51,19 +51,16 @@ function Login() {
         <h1 className={styles.logos}>UAB</h1>
       </div>
       <div className={styles.white}>
-        <div className="container">
+        <div>
           <div className={styles.logincontainer}>
             <h2>Iniciar sessió</h2>
             {error && <div className="alert alert-danger">{error}</div>}
 
             <form onSubmit={handleSubmit}>
-              <div className="mb-3">
-                <label htmlFor="username" className="form-label">
-                  NIU de usuari
-                </label>
+              <div>
+                <label htmlFor="username">NIU de usuari</label>
                 <input
                   type="text"
-                  className="form-control"
                   id="username"
                   onChange={(e) =>
                     setValues({ ...values, niu: e.target.value })
@@ -74,13 +71,10 @@ function Login() {
                   title="El NIU ha de ser un número de 7 dígits"
                 />
               </div>
-              <div className="mb-3">
-                <label htmlFor="password" className="form-label">
-                  Contrasenya
-                </label>
+              <div>
+                <label htmlFor="password">Contrasenya</label>
                 <input
                   type="password"
-                  className="form-control"
                   id="password"
                   onChange={(e) =>
                     setValues({ ...values, password: e.target.value })
