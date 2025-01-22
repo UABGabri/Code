@@ -20,12 +20,12 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-    origin: 'https://sparkling-torte-716cbe.netlify.app', //origen https://sparkling-torte-716cbe.netlify.app  http://localhost:5173
+    origin: 'http://localhost:5173', //origen https://sparkling-torte-716cbe.netlify.app  http://localhost:5173
     methods: ['GET', 'POST', 'PUT', 'DELETE'],// Metodes permesos
     credentials: true // Credencials necessaris
 }));
 
-
+/*
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', 'https://sparkling-torte-716cbe.netlify.app');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
@@ -41,21 +41,21 @@ const db = mysql.createConnection({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     port: process.env.DB_PORT,
-}); 
+}); */
 
 
 app.use(cookieParser());  //Cookies
 
 
 
-/*
+
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "Ga21012002",
     database: "web_examen_tfg"
 });
-*/
+
 
 
 db.connect((err) => {

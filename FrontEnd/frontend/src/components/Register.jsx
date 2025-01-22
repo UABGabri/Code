@@ -110,6 +110,7 @@ function Register() {
                 placeholder="Introdueix el teu nom de usuari"
                 required
                 maxLength={15}
+                className={styles.inputField}
                 pattern="^[A-Za-zÀ-ÿ\s]+$"
                 title="El nom només ha de tenir lletres"
               />
@@ -124,6 +125,7 @@ function Register() {
                 id="niu"
                 placeholder="Introdueix el teu NIU"
                 required
+                className={styles.inputField}
                 maxLength={7}
                 pattern="^\d{7}$"
                 title="El NIU ha de ser un número de 7 dígits"
@@ -141,6 +143,7 @@ function Register() {
                 id="gmail"
                 placeholder="Introdueix el teu correu"
                 required
+                className={styles.inputField}
                 maxLength={30}
                 title="Introdueix un correu vàlid"
               />
@@ -158,6 +161,7 @@ function Register() {
                 id="password"
                 placeholder="Introdueix la teva contrasenya"
                 required
+                className={styles.inputField}
                 minLength={8}
                 maxLength={10}
                 title="La contrasenya ha de tenir entre 8 i 10 caràcters"
@@ -174,6 +178,7 @@ function Register() {
                 minLength={8}
                 maxLength={10}
                 required
+                className={styles.inputField}
                 placeholder="Confirma la contrasenya"
               />
             </div>

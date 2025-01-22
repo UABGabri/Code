@@ -49,6 +49,21 @@
     .buttonSecondHeader:hover{
         transform: scale(1.2); 
     }
+
+
+
+    .deleteButton {
+        background-color: red;
+        color: white;
+        border: none;
+        transition: background-color 0.3s ease;
+      }
+
+      .deleteButton:hover {
+        background-color: darkred;
+      }
+
+
     .mainMenu {
         position: fixed; 
         top: 110px; 
@@ -76,6 +91,21 @@
     
     }
 
+    .addButton{
+        padding: 10px 20px;
+        background-color: green;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      
+      
+      .addButton:hover{
+        background-color: darkgreen;
+      }
 
 
 

@@ -66,6 +66,7 @@ function Login() {
                   }
                   maxLength={7}
                   required
+                  className={styles.inputField}
                   pattern="^\d{7}$"
                   title="El NIU ha de ser un número de 7 dígits"
                 />
@@ -75,6 +76,7 @@ function Login() {
                 <input
                   type="password"
                   id="password"
+                  className={styles.inputField}
                   onChange={(e) =>
                     setValues({ ...values, password: e.target.value })
                   }

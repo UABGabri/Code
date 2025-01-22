@@ -135,8 +135,18 @@ function AssignaturaLayout() {
           <div className={styles.modalContent}>
             <p>Estàs segur de deixar aquesta assignatura?</p>
             <div className={styles.modalButtons}>
-              <button onClick={handleConfirmDropOut}>Acceptar</button>
-              <button onClick={() => setLeaveSubject(false)}>Cancel·lar</button>
+              <button
+                onClick={handleConfirmDropOut}
+                className={styles.addButton}
+              >
+                Acceptar
+              </button>
+              <button
+                onClick={() => setLeaveSubject(false)}
+                className={styles.deleteButton}
+              >
+                Cancel·lar
+              </button>
             </div>
           </div>
         </div>
