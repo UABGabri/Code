@@ -7,6 +7,8 @@ import axios from "axios";
 import { useLocation } from "react-router-dom";
 import { FaPlus, FaMinus } from "react-icons/fa";
 
+const apiUrl = import.meta.env.VITE_API_URL2;
+
 function AddQuestion() {
   const location = useLocation();
   const { Id_User, Id_Assignatura, Role_User } = location.state;
@@ -44,8 +46,7 @@ function AddQuestion() {
     e.preventDefault();
 
     try {
-      const res = await axios.post("http://localhost:8081/addQuestion", values);
-      console.log("Resposta del servidor:", res.data);
+      const res = await axios.post(`${apiUrl}/addQuestion`, values);
 
       if (res.data.Status === "Failed") {
         setFormErrors(res.data.Message || "No s'ha pogut afegir la pregunta.");
@@ -61,7 +62,7 @@ function AddQuestion() {
 
   const recoverTemasAssignatura = () => {
     axios
-      .get("http://localhost:8081/recoverTopicsSubject", {
+      .get(`${apiUrl}/recoverTopicsSubject`, {
         params: { Id_Assignatura },
       })
       .then((res) => {

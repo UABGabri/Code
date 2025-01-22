@@ -3,6 +3,8 @@ import styles from "./StyleComponents/DashboardStyle.module.css";
 import PropTypes from "prop-types";
 import axios from "axios";
 
+const apiUrl = import.meta.env.VITE_API_URL2;
+
 function AddSubjectModal({ id_User, onClose }) {
   const [subject_Name, setSubject_Name] = useState("");
   const [id_Subject, setIdSubject] = useState("");
@@ -21,7 +23,7 @@ function AddSubjectModal({ id_User, onClose }) {
     };
 
     axios
-      .post("http://localhost:8081/registerSubject", values)
+      .post(`${apiUrl}/registerSubject`, values)
       .then((res) => {
         if (res.data.Status === "Failed") {
           alert(res.data.Messages);

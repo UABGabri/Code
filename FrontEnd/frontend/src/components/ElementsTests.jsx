@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import styles from "./StyleComponents/Elements.module.css";
 
+const apiUrl = import.meta.env.VITE_API_URL2;
+
 function ElementsTests({ idAssignatura }) {
   const navigate = useNavigate();
   const [conceptes, setConceptes] = useState([]);
@@ -15,7 +17,7 @@ function ElementsTests({ idAssignatura }) {
   useEffect(() => {
     if (idAssignatura) {
       axios
-        .get("http://localhost:8081/recoverElementsTest", {
+        .get(`${apiUrl}/recoverElementsTest`, {
           params: { idAssignatura },
         })
         .then((res) => {

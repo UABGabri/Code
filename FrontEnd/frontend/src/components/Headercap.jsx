@@ -5,6 +5,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import axios from "axios";
 
+const apiUrl = import.meta.env.VITE_API_URL2;
+
 function Headercap({}) {
   const [dropdown, setDropdown] = useState(false);
   const location = useLocation(); // Per obtenir la ruta actual
@@ -18,7 +20,7 @@ function Headercap({}) {
   // Funció per fer logout
   const handleDelete = () => {
     axios
-      .get("http://localhost:8081/logout")
+      .get(`${apiUrl}/logout`)
       .then((res) => {
         navigate("/login");
       })

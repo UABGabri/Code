@@ -10,6 +10,8 @@ import ElementsTests from "./ElementsTests";
 import { FaSignOutAlt } from "react-icons/fa";
 import axios from "axios";
 
+const apiUrl = import.meta.env.VITE_API_URL2;
+
 function AssignaturaLayout() {
   const { id } = useParams(); //id de la ASSIGNATURA
   const location = useLocation();
@@ -23,7 +25,7 @@ function AssignaturaLayout() {
     console.log(id);
 
     axios
-      .delete("http://localhost:8081/leaveSubject", {
+      .delete(`${apiUrl}/leaveSubject`, {
         params: { Id_Assignatura: id, id: id_User, role_User },
       })
       .then(() => {
@@ -46,7 +48,11 @@ function AssignaturaLayout() {
         );
       case "PARTICIPANTS":
         return (
-          <ElementsParticipants Id_Assignatura={id} Role_User={role_User} />
+          <ElementsParticipants
+            Id_User={id_User}
+            Id_Assignatura={id}
+            Role_User={role_User}
+          />
         );
       case "PREGUNTES":
         return (

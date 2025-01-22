@@ -3,6 +3,8 @@ import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./StyleComponents/TestLayout.module.css";
 
+const apiUrl = import.meta.env.VITE_API_URL2;
+
 function TestLayout() {
   const location = useLocation();
   const { conceptesSeleccionats } = location.state.parametersTest;
@@ -17,7 +19,7 @@ function TestLayout() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8081/recoverQuestionsConcepts", {
+      .get(`${apiUrl}/recoverQuestionsConcepts`, {
         params: { conceptesSeleccionats },
       })
       .then((response) => {

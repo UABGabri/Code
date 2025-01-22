@@ -12,6 +12,8 @@ import {
   FaArrowRight,
 } from "react-icons/fa";
 
+const apiUrl = import.meta.env.VITE_API_URL2;
+
 function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
   const [questions, setQuestions] = useState([]);
   const [editingQuestion, setEditingQuestion] = useState(null);
@@ -33,7 +35,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
   //Funció de recuperació del número de preguntes en estat pendent de l'usuari per evitar més de tres preguntes sent alumne
   useEffect(() => {
     axios
-      .get("http://localhost:8081/pendentQuestions", { params: { Id_User } })
+      .get(`${apiUrl}/pendentQuestions`, { params: { Id_User } })
       .then((res) => {
         if (res.data.Status === "Sucess") {
           setNumberQuestionsPendent(parseInt(res.data.count));
@@ -64,7 +66,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
   useEffect(() => {
     if (Role_User === "professor") {
       axios
-        .get("http://localhost:8081/recoverQuestions", {
+        .get(`${apiUrl}/recoverQuestions`, {
           params: { Id_Assignatura },
         })
         .then((res) => {
@@ -75,7 +77,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
           }
 
           axios
-            .get("http://localhost:8081/recoverTopicsSubject", {
+            .get(`${apiUrl}/recoverTopicsSubject`, {
               params: { Id_Assignatura },
             })
             .then((res) => {
@@ -85,7 +87,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
         .catch((err) => alert(err));
     } else {
       axios
-        .get("http://localhost:8081/recoverQuestionsAlumni", {
+        .get(`${apiUrl}/recoverQuestionsAlumni`, {
           params: { Id_Assignatura, Id_User },
         })
         .then((res) => {
@@ -181,7 +183,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
   //Funció de update de la edició -> falta repassar el id dels conceptes perquè funcioni del tot i del tema (que canvii)
   const handleSave = () => {
     axios
-      .put("http://localhost:8081/updateQuestion", {
+      .put(`${apiUrl}/updateQuestion`, {
         id_pregunta: selectedEditingQuestion.id_pregunta,
         nom_tema: selectedEditingQuestion.nom_tema,
         pregunta: selectedEditingQuestion.pregunta,
@@ -198,7 +200,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
           alert("Canvis efectuats");
 
           axios
-            .get("http://localhost:8081/recoverQuestions", {
+            .get(`${apiUrl}/recoverQuestions`, {
               params: { Id_Assignatura },
             })
             .then((res) => {
@@ -217,7 +219,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
   //Funció d'avaluació eliminació de les preguntes
   const handleDelete = (idPregunta) => {
     axios
-      .delete("http://localhost:8081/deleteQuestion", {
+      .delete(`${apiUrl}/deleteQuestion`, {
         params: { idPregunta },
       })
       .then(() => {
@@ -234,13 +236,13 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
   const handleStatusChange = (idPregunta, nouEstat) => {
     console.log(idPregunta, nouEstat);
     axios
-      .put("http://localhost:8081/updateQuestionAccept", {
+      .put(`${apiUrl}/updateQuestionAccept`, {
         id_pregunta: idPregunta,
         estat: nouEstat,
       })
       .then(() => {
         axios
-          .get("http://localhost:8081/recoverQuestions", {
+          .get(`${apiUrl}/recoverQuestions`, {
             params: { Id_Assignatura },
           })
           .then((res) => {

@@ -7,6 +7,8 @@ import Headercap from "./Headercap";
 import { BiArrowBack } from "react-icons/bi";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 
+const apiUrl = import.meta.env.VITE_API_URL2;
+
 function CreateManualQuizz() {
   const location = useLocation();
   const idTema = location.state?.id_tema;
@@ -31,7 +33,7 @@ function CreateManualQuizz() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8081/recoverPreguntes", {
+      .get(`${apiUrl}/recoverPreguntes`, {
         params: { idAssignatura },
       })
       .then((response) => {
@@ -42,7 +44,7 @@ function CreateManualQuizz() {
 
         const id_assignatura = idAssignatura;
         axios
-          .get("http://localhost:8081/recoverTopicsSubject", {
+          .get(`${apiUrl}/recoverTopicsSubject`, {
             params: { Id_Assignatura: id_assignatura },
           })
           .then((response) => setTemesFilters(response.data))
@@ -87,7 +89,7 @@ function CreateManualQuizz() {
     const id_assignatura = idAssignatura;
 
     axios
-      .post("http://localhost:8081/createTest", {
+      .post(`${apiUrl}/createTest`, {
         nom_test: nomTest,
         id_creador,
         id_assignatura,
@@ -120,7 +122,7 @@ function CreateManualQuizz() {
         );
 
         axios
-          .post("http://localhost:8081/insertQuestionsTest", {
+          .post(`${apiUrl}/insertQuestionsTest`, {
             id_test: idTest,
             questions: orderedQuestions,
           })

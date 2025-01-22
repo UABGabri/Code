@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { FaChevronDown, FaChevronUp, FaPlus } from "react-icons/fa";
 
+const apiUrl = import.meta.env.VITE_API_URL2;
+
 function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
   const [temes, setTemes] = useState([]);
   const [testsAvaluatius, setTestsAvaluatius] = useState({});
@@ -19,7 +21,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
   //Funció de recuperació dels temes de la assignatura.
   useEffect(() => {
     axios
-      .get("http://localhost:8081/recoverTopicsSubject", {
+      .get(`${apiUrl}/recoverTopicsSubject`, {
         params: { Id_Assignatura },
       })
       .then((response) => {
@@ -36,7 +38,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
   useEffect(() => {
     temes.forEach((tema) => {
       axios
-        .get("http://localhost:8081/recoverTestsTopics", {
+        .get(`${apiUrl}/recoverTestsTopics`, {
           params: { id_tema: tema.id_tema },
         })
         .then((response) => {
@@ -74,7 +76,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
     }
 
     axios
-      .post("http://localhost:8081/createTopic", {
+      .post(`${apiUrl}/createTopic`, {
         Id_Assignatura,
         name: newTemaName,
       })
@@ -136,7 +138,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
   //Funció d'eliminació d'un tema.
   const handleDeleteTheme = (id_tema) => {
     axios
-      .delete("http://localhost:8081/deleteTopic", {
+      .delete(`${apiUrl}/deleteTopic`, {
         params: { id_tema, Id_Assignatura },
       })
       .then((response) => {
@@ -162,14 +164,14 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
     console.log(id_Test);
 
     axios
-      .post("http://localhost:8081/validateTestAccess", {
+      .post(`${apiUrl}/validateTestAccess`, {
         id_test: id_Test,
         access_key: accessKey,
       })
       .then((response) => {
         if (response.data.status === "Success") {
           axios
-            .get("http://localhost:8081/recoverTry", {
+            .get(`${apiUrl}/recoverTry`, {
               params: { Id_User, id_Test },
             })
             .then((response) => {

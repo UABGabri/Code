@@ -4,6 +4,8 @@ import Headercap from "./Headercap";
 import styles from "./StyleComponents/Profile.module.css";
 import { useNavigate } from "react-router-dom";
 
+const apiUrl = import.meta.env.VITE_API_URL2;
+
 function Profile() {
   const [values, setValues] = useState({
     niu: "",
@@ -19,7 +21,7 @@ function Profile() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8081/user", { withCredentials: true })
+      .get(`${apiUrl}/user`, { withCredentials: true })
       .then((res) => {
         if (res.data.Status === "Success") setValues(res.data.user);
       })
@@ -44,7 +46,7 @@ function Profile() {
       return;
     } else {
       axios
-        .put("http://localhost:8081/updateUser", values, {
+        .put(`${apiUrl}/updateUser`, values, {
           withCredentials: true,
         })
         .then((res) => {
@@ -67,7 +69,7 @@ function Profile() {
 
   const handleConfirmDropOut = () => {
     axios
-      .delete("http://localhost:8081/deleteUser", {
+      .delete(`${apiUrl}/deleteUser`, {
         params: { values },
         withCredentials: true,
       })

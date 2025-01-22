@@ -7,6 +7,8 @@ import axios from "axios";
 import { FaTrash } from "react-icons/fa";
 import { FaInfo } from "react-icons/fa6";
 
+const apiUrl = import.meta.env.VITE_API_URL2;
+
 function CustomTest() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -32,7 +34,7 @@ function CustomTest() {
   // Obtenir les preguntes del test seleccionat
   useEffect(() => {
     axios
-      .get("http://localhost:8081/recoverSelectedTestWithKeyQuestions", {
+      .get(`${apiUrl}/recoverSelectedTestWithKeyQuestions`, {
         params: { idTest },
       })
       .then((response) => {
@@ -62,7 +64,7 @@ function CustomTest() {
   // Obtenir les preguntes restants del banc
   const fetchRemainingQuestions = (preguntesTest) => {
     axios
-      .get("http://localhost:8081/recoverPreguntesTema", {
+      .get(`${apiUrl}/recoverPreguntesTema`, {
         params: { idAssignatura },
       })
       .then((response) => {
@@ -88,7 +90,7 @@ function CustomTest() {
     preguntaClone.forEach((q, index) => (q.posicio = index + 1));
     setPreguntesTest(preguntaClone);
     axios
-      .post("http://localhost:8081/updateTestQuestions", {
+      .post(`${apiUrl}/updateTestQuestions`, {
         idTest,
         questions: preguntaClone.map((q) => ({
           id_pregunta: q.id_pregunta,
@@ -107,7 +109,7 @@ function CustomTest() {
     ];
     setPreguntesTest(updatedTestPreguntes);
     axios
-      .post("http://localhost:8081/updateTestQuestions", {
+      .post(`${apiUrl}/updateTestQuestions`, {
         idTest,
         questions: updatedTestPreguntes.map((q) => ({
           id_pregunta: q.id_pregunta,
@@ -129,7 +131,7 @@ function CustomTest() {
       .map((q, index) => ({ ...q, posicio: index + 1 }));
     setPreguntesTest(updatedTestPreguntes);
     axios
-      .post("http://localhost:8081/updateTestQuestions", {
+      .post(`${apiUrl}/updateTestQuestions`, {
         idTest,
         questions: updatedTestPreguntes.map((q) => ({
           id_pregunta: q.id_pregunta,
@@ -143,7 +145,7 @@ function CustomTest() {
   // Eliminar el test
   const eliminarTest = () => {
     axios
-      .delete("http://localhost:8081/deleteTest", {
+      .delete(`${apiUrl}/deleteTest`, {
         params: { idTest },
       })
       .then(() => {
@@ -204,7 +206,7 @@ function CustomTest() {
     console.log();
 
     axios
-      .put("http://localhost:8081/updateTestCustom", {
+      .put(`${apiUrl}/updateTestCustom`, {
         testName,
         data,
         minutes,

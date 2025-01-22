@@ -4,7 +4,9 @@ import axios from "axios";
 import styles from "./StyleComponents/Elements.module.css";
 import { FaArrowLeft, FaArrowRight, FaInfo, FaTrash } from "react-icons/fa6";
 
-function ElementsParticipants({ Id_Assignatura, Role_User }) {
+const apiUrl = import.meta.env.VITE_API_URL2;
+
+function ElementsParticipants({ Id_User, Id_Assignatura, Role_User }) {
   const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [infoModal, setInfoModal] = useState(false);
@@ -19,12 +21,19 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
   //Funció de recuperació dels participants
   useEffect(() => {
     axios
-      .get("http://localhost:8081/recoverAtendees", {
+      .get(`${apiUrl}/recoverAtendees`, {
         params: { Id_Assignatura },
       })
       .then((res) => {
         if (res.data.Status === "Success") {
-          setUsers(res.data.result);
+          console.log(Id_User);
+          const filteredUsers = res.data.result.filter(
+            (user) => user.niu !== Id_User
+          );
+
+          console.log(filteredUsers);
+
+          setUsers(filteredUsers);
         } else {
           alert(res.data.message);
         }
@@ -56,15 +65,13 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
 
   //Funció d'eliminació dels participants
   const handleEliminateParticipant = () => {
-    console.log("Alo", userToDelete);
-
     const niu = userToDelete.niu;
     const role = userToDelete.role;
 
     const endpoint =
       role === "professor"
-        ? "http://localhost:8081/eliminateTeacher"
-        : "http://localhost:8081/eliminateStudent";
+        ? `${apiUrl}/eliminateTeacher`
+        : `${apiUrl}/eliminateStudent`;
 
     axios
       .delete(endpoint, {
@@ -103,13 +110,9 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
     formData.append("Id_Assignatura", idAssignatura);
 
     try {
-      const response = await axios.post(
-        "http://localhost:8081/import-csv",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
+      const response = await axios.post(`${apiUrl}/import-csv`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       if (response.data.status === "Success") {
         alert("Importació completada correctament!");
         setUsers(response.data.participants);
@@ -126,7 +129,7 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
     if (!newNiu) return alert("Has d'introduir un NIU!");
 
     axios
-      .get("http://localhost:8081/checkUserExists", {
+      .get(`${apiUrl}/checkUserExists`, {
         params: { niu: newNiu },
       })
       .then((res) => {
@@ -135,8 +138,8 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
 
           const checkEndpoint =
             role === "professor"
-              ? "http://localhost:8081/checkProfessorInSubject"
-              : "http://localhost:8081/checkStudentInSubject";
+              ? `${apiUrl}/checkProfessorInSubject`
+              : `${apiUrl}/checkStudentInSubject`;
 
           axios
             .get(checkEndpoint, {
@@ -151,10 +154,9 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
               } else {
                 const endpoint =
                   role === "professor"
-                    ? "http://localhost:8081/addProfessorToSubject"
-                    : "http://localhost:8081/addStudentToSubject";
+                    ? `${apiUrl}/addProfessorToSubject`
+                    : `${apiUrl}/addStudentToSubject`;
 
-                console.log(newNiu, Id_Assignatura);
                 axios
                   .post(endpoint, {
                     niu: newNiu,
@@ -444,6 +446,7 @@ function ElementsParticipants({ Id_Assignatura, Role_User }) {
 }
 
 ElementsParticipants.propTypes = {
+  Id_User: PropTypes.number.isRequired,
   Id_Assignatura: PropTypes.string.isRequired,
   Role_User: PropTypes.string.isRequired,
 };

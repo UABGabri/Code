@@ -3,6 +3,8 @@ import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./StyleComponents/TestLayout.module.css";
 
+const apiUrl = import.meta.env.VITE_API_URL2;
+
 function TestIALayout() {
   const location = useLocation();
   const { idAssignatura } = location.state || {};
@@ -18,7 +20,7 @@ function TestIALayout() {
   useEffect(() => {
     const Id_Assignatura = parseInt(idAssignatura);
     axios
-      .get("http://localhost:8081/recoverTopicsSubject", {
+      .get(`${apiUrl}/recoverTopicsSubject`, {
         params: { Id_Assignatura },
       })
       .then((response) => {
@@ -62,7 +64,7 @@ function TestIALayout() {
       seleccionarTemaPerProbabilitat(currentProbabilities);
 
     axios
-      .get("http://localhost:8081/recoverPreguntaRandom", {
+      .get(`${apiUrl}/recoverPreguntaRandom`, {
         params: { temaSeleccionat },
       })
       .then((response) => {
@@ -98,7 +100,7 @@ function TestIALayout() {
       novesProbabilitats[tema] = Math.max(novesProbabilitats[tema] - 0.05, 0.1);
     } else {
       // Incrementar la probabilitat del tema seleccionat si falla
-      novesProbabilitats[tema] = Math.min(novesProbabilitats[tema] + 0.05, 1);
+      novesProbabilitats[tema] = Math.min(novesProbabilitats[tema] + 0.05, 0.7);
     }
 
     // Normalitzar les probabilitats perquè la suma sigui 1

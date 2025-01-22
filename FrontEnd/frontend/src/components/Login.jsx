@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "./StyleComponents/Homepage.module.css";
 
+const apiUrl = import.meta.env.VITE_API_URL2;
+
 function Login() {
   const [values, setValues] = useState({
     niu: "",
@@ -29,7 +31,7 @@ function Login() {
       return;
     } else {
       axios
-        .post(`http://localhost:8081/login`, values) //Sol·licitud POST al servidor amb els valors de l'usuari.
+        .post(`${apiUrl}/login`, values) //Sol·licitud POST al servidor amb els valors de l'usuari.
         .then((res) => {
           if (res.data.Status === "Success") {
             navigate("/modules");

@@ -7,6 +7,8 @@ import Headercap from "./Headercap";
 import axios from "axios";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 
+const apiUrl = import.meta.env.VITE_API_URL2;
+
 function Dashboard({ id_User, role_User }) {
   const [assignatures, setAssignatures] = useState([]);
   const [addModal, setAddModal] = useState(false);
@@ -22,7 +24,7 @@ function Dashboard({ id_User, role_User }) {
   //Funció auxiliar per la obtenció de tota la informació de les assignatures relacionades amb un usuari.
   const fetchAssignatures = async () => {
     try {
-      const res = await axios.post("http://localhost:8081/recoverSubjects", {
+      const res = await axios.post(`${apiUrl}/recoverSubjects`, {
         idUser: id_User,
         roleUser: role_User,
       });
@@ -82,7 +84,7 @@ function Dashboard({ id_User, role_User }) {
     if (!accessId || !accessPassword) return alert("Manquen dades");
 
     try {
-      const res = await axios.post("http://localhost:8081/accessSubject", {
+      const res = await axios.post(`${apiUrl}/accessSubject`, {
         id_User,
         id_Subject: accessId,
         accessPassword,
@@ -115,7 +117,7 @@ function Dashboard({ id_User, role_User }) {
     }
 
     try {
-      const res = await axios.delete("http://localhost:8081/deleteSubject", {
+      const res = await axios.delete(`${apiUrl}/deleteSubject`, {
         params: { id_subject: deleteId, password: accessPassword },
       });
 

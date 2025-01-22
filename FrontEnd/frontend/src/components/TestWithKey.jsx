@@ -3,6 +3,8 @@ import styles from "./StyleComponents/TestLayout.module.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
+const apiUrl = import.meta.env.VITE_API_URL2;
+
 //Creació layout del Test amb clau
 function TestWithKey() {
   const location = useLocation();
@@ -24,7 +26,7 @@ function TestWithKey() {
   // La funció useEffect es llança dos cops pel mode dev -> resultats enviats dos cops -> cal aplicar funció de normalització
   useEffect(() => {
     axios
-      .get("http://localhost:8081/recoverSelectedTestWithKeyQuestions", {
+      .get(`${apiUrl}/recoverSelectedTestWithKeyQuestions`, {
         params: { idTest },
       })
       .then((response) => {
@@ -131,7 +133,7 @@ function TestWithKey() {
     setResultsSent(true);
 
     try {
-      await axios.post("http://localhost:8081/saveResults", {
+      await axios.post(`${apiUrl}/saveResults`, {
         idTest,
         nota: resultats.percentatge,
         Id_User,

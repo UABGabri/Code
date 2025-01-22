@@ -1790,11 +1790,10 @@ app.post('/createQuizz', (req, res) => {
     const { seleccions, nom_test, id_creador, id_assignatura, id_tema, tipus, data_finalitzacio, durationNormal, clau, intents } = req.body;
 
 
-    if(!nom_test || !id_creador || !id_assignatura || !id_tema || !tipus || !data_finalitzacio || !durationNormal ||!clau || !intents)
+    if(!nom_test || !id_creador || !id_assignatura || !id_tema || !tipus || !data_finalitzacio || !durationNormal )
+    
         return res.json({ Status: "Failed", message:"Manquen dades" });
 
-
-    console.log( seleccions, nom_test, id_creador, id_assignatura, id_tema, tipus, data_finalitzacio, durationNormal, clau, intents)
 
     const duration = parseInt(durationNormal);
     const sqlInsertTestBase = `

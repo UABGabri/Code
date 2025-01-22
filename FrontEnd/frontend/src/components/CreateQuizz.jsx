@@ -6,6 +6,8 @@ import styles from "./StyleComponents/CreateQuizzLayout.module.css";
 import { BiArrowBack } from "react-icons/bi";
 import { FaPlus, FaTrash } from "react-icons/fa6";
 
+const apiUrl = import.meta.env.VITE_API_URL2;
+
 function CreateQuizz() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -19,14 +21,14 @@ function CreateQuizz() {
   const [isFinalModal, setIsFinalModalOpen] = useState(false);
   const { id_assignatura, id_professor, id_tema, tipus } = location.state || {};
   const [nomTest, setNomTest] = useState("");
-  const [clau, setClau] = useState("");
-  const [intents, setIntents] = useState("");
+  const [clau, setClau] = useState("null");
+  const [intents, setIntents] = useState(10);
 
   useEffect(() => {
     if (!id_assignatura) return;
 
     axios
-      .get("http://localhost:8081/recoverTopicSubjectQuestions", {
+      .get(`${apiUrl}/recoverTopicSubjectQuestions`, {
         params: { Id_Assignatura: id_assignatura },
       })
       .then((response) => {
@@ -67,7 +69,7 @@ function CreateQuizz() {
     const durationNormal = parseInt(duracio) * 60;
 
     axios
-      .post("http://localhost:8081/createQuizz", {
+      .post(`${apiUrl}/createQuizz`, {
         seleccions,
         nom_test: nomTest,
         id_creador: id_professor,
@@ -80,6 +82,8 @@ function CreateQuizz() {
         intents,
       })
       .then((response) => {
+        console.log(response);
+
         if (response.data.Status === "Success") {
           if (tipus === "avaluatiu") {
             alert("Test creat correctament");
