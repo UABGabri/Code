@@ -9,8 +9,6 @@ import fs from 'fs';
 import csvParser from 'csv-parser';
 import 'dotenv/config';
 
-
-
 const salt = 10;
 const saltRounds = 10;
 const upload = multer({ dest: "uploads/" });
@@ -20,20 +18,20 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-    origin: 'http://localhost:5173', //origen https://sparkling-torte-716cbe.netlify.app
+    origin: 'origen https://sparkling-torte-716cbe.netlify.app', //origen https://sparkling-torte-716cbe.netlify.app  http://localhost:5173
     methods: ['GET', 'POST', 'PUT', 'DELETE'],// Metodes permesos
     credentials: true // Credencials necessaris
 }));
 
 
-/*
+
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', 'https://sparkling-torte-716cbe.netlify.app');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.header('Access-Control-Allow-Credentials', 'true');
     next();
-});*/
+});
 
 
 app.use(cookieParser());  //Cookies
@@ -43,15 +41,17 @@ app.use(cookieParser());  //Cookies
 
 //Connexió a la base de dades Railway
 
-/*
+
 const db = mysql.createConnection({
     host: process.env.DB_HOST || '127.0.0.1',
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     port: process.env.DB_PORT,
-}); */
+}); 
 
+
+/*
 
 const db = mysql.createConnection({
     host: "localhost",
@@ -59,6 +59,8 @@ const db = mysql.createConnection({
     password: "Ga21012002",
     database: "web_examen_tfg"
 });
+
+*/
 
 db.connect((err) => {
     if (err) console.error("Error connecting to database:", err.message);
