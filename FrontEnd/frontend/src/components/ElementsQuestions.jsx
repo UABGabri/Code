@@ -12,7 +12,7 @@ import {
   FaArrowRight,
 } from "react-icons/fa";
 
-const apiUrl = import.meta.env.VITE_API_URL2;
+const apiUrl = import.meta.env.VITE_API_URL;
 
 function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
   const [questions, setQuestions] = useState([]);

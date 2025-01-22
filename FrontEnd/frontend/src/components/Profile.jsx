@@ -4,7 +4,7 @@ import Headercap from "./Headercap";
 import styles from "./StyleComponents/Profile.module.css";
 import { useNavigate } from "react-router-dom";
 
-const apiUrl = import.meta.env.VITE_API_URL2;
+const apiUrl = import.meta.env.VITE_API_URL;
 
 function Profile() {
   const [values, setValues] = useState({

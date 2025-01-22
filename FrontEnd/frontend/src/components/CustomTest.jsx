@@ -7,7 +7,7 @@ import axios from "axios";
 import { FaTrash } from "react-icons/fa";
 import { FaInfo } from "react-icons/fa6";
 
-const apiUrl = import.meta.env.VITE_API_URL2;
+const apiUrl = import.meta.env.VITE_API_URL;
 
 function CustomTest() {
   const navigate = useNavigate();

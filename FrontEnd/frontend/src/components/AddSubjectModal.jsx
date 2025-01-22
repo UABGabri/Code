@@ -3,7 +3,7 @@ import styles from "./StyleComponents/DashboardStyle.module.css";
 import PropTypes from "prop-types";
 import axios from "axios";
 
-const apiUrl = import.meta.env.VITE_API_URL2;
+const apiUrl = import.meta.env.VITE_API_URL;
 
 function AddSubjectModal({ id_User, onClose }) {
   const [subject_Name, setSubject_Name] = useState("");

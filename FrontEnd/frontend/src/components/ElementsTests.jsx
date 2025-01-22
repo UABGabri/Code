@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import styles from "./StyleComponents/Elements.module.css";
 
-const apiUrl = import.meta.env.VITE_API_URL2;
+const apiUrl = import.meta.env.VITE_API_URL;
 
 function ElementsTests({ idAssignatura }) {
   const navigate = useNavigate();

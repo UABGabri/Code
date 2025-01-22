@@ -10,7 +10,7 @@ import ElementsTests from "./ElementsTests";
 import { FaSignOutAlt } from "react-icons/fa";
 import axios from "axios";
 
-const apiUrl = import.meta.env.VITE_API_URL2;
+const apiUrl = import.meta.env.VITE_API_URL;
 
 function AssignaturaLayout() {
   const { id } = useParams(); //id de la ASSIGNATURA

@@ -4,7 +4,7 @@ import axios from "axios";
 import styles from "./StyleComponents/Elements.module.css";
 import { FaArrowLeft, FaArrowRight, FaInfo, FaTrash } from "react-icons/fa6";
 
-const apiUrl = import.meta.env.VITE_API_URL2;
+const apiUrl = import.meta.env.VITE_API_URL;
 
 function ElementsParticipants({ Id_User, Id_Assignatura, Role_User }) {
   const [users, setUsers] = useState([]);

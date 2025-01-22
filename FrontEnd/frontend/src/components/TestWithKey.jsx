@@ -3,7 +3,7 @@ import styles from "./StyleComponents/TestLayout.module.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
-const apiUrl = import.meta.env.VITE_API_URL2;
+const apiUrl = import.meta.env.VITE_API_URL;
 
 //Creació layout del Test amb clau
 function TestWithKey() {
