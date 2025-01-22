@@ -18,7 +18,7 @@ function AddQuestion() {
   const [selectedTema, setSelectedTema] = useState();
   const [values, setValues] = useState({
     conceptes_materia: "",
-    dificultat: "Avaluació",
+    dificultat: "Fàcil",
     pregunta: "",
     solucio_correcta: "",
     estat: "pendent",

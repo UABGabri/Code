@@ -380,7 +380,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
               placeholder="Nom del tema"
               className={styles.temaInput}
               required
-              maxLength={12}
+              maxLength={20}
               pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
               title="El nom del tema ha de contenir elements vàlids."
             />
