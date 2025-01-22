@@ -145,7 +145,6 @@ function TestWithKey() {
   };
 
   const handleDetails = () => {
-    console.log("detalls");
     setShowModal(true);
   };
 
@@ -172,23 +171,32 @@ function TestWithKey() {
               </button>
             ) : (
               <>
-                <button
-                  onClick={() => window.location.reload()}
-                  className={styles.endButtons}
-                >
-                  Reiniciar
-                </button>
+                <div className={styles.buttonsTestKey}>
+                  <div>
+                    <button
+                      onClick={() => window.location.reload()}
+                      className={styles.endButtons}
+                    >
+                      Reiniciar
+                    </button>
 
-                <button
-                  onClick={() => history(-1)}
-                  className={styles.endButtons}
-                >
-                  Inici
-                </button>
+                    <button
+                      onClick={() => history(-1)}
+                      className={styles.endButtons}
+                    >
+                      Inici
+                    </button>
+                  </div>
 
-                <button onClick={handleDetails} className={styles.endButtons}>
-                  Detalls
-                </button>
+                  <div>
+                    <button
+                      onClick={handleDetails}
+                      className={styles.endButtons}
+                    >
+                      Detalls
+                    </button>
+                  </div>
+                </div>
               </>
             )}
 

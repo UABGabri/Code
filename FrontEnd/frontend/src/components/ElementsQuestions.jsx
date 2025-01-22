@@ -421,8 +421,8 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
       {/*Edició de les preguntes*/}
       {editedQuestion && (
         <>
-          <div className={styles.editionMode}>
-            <div className={styles.editionContent}>
+          <div className={styles.updateContent}>
+            <div className={styles.updateQuestionForm}>
               <h1>Editar Pregunta</h1>
 
               <form

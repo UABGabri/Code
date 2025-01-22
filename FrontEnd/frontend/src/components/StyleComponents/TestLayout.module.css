@@ -243,3 +243,8 @@
   background-color: #b02a37;
 }
 
+
+.buttonsTestKey{
+  display: flex;
+  flex-direction: column;
+}
