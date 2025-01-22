@@ -7,7 +7,7 @@ import Headercap from "./Headercap";
 import axios from "axios";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 
-const apiUrl = import.meta.env.VITE_API_URL2;
+const apiUrl = import.meta.env.VITE_API_URL;
 
 function Dashboard({ id_User, role_User }) {
   const [assignatures, setAssignatures] = useState([]);

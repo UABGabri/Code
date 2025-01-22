@@ -3,7 +3,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import Dashboard from "./Dashboard";
 
-const apiUrl = import.meta.env.VITE_API_URL2;
+const apiUrl = import.meta.env.VITE_API_URL;
 
 function Modulespage() {
   const [role, setRole] = useState("");

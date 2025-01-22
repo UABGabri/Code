@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "./StyleComponents/Homepage.module.css";
 
-const apiUrl = import.meta.env.VITE_API_URL2;
+const apiUrl = import.meta.env.VITE_API_URL;
 
 function Login() {
   const [values, setValues] = useState({
