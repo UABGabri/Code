@@ -24,7 +24,6 @@ function Login() {
   // Gestiona l'enviament del formulari mitjançant una sol·licitud POST.
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(values);
 
     if (values.niu === "" || values.password === "") {
       setError("Sisplau, emplena tots els camps.");
