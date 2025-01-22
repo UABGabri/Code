@@ -37,7 +37,6 @@ function AddSubjectModal({ id_User, onClose }) {
         setErrorMessage("Error al realitzar la sol·licitud.");
       });
 
-    window.location.reload();
     onClose(); // Tancar el modal un cop enviat el formulari
   };
 

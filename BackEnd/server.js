@@ -26,7 +26,6 @@ app.use(cors({
 }));
 
 
-
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', 'https://sparkling-torte-716cbe.netlify.app');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
@@ -34,14 +33,6 @@ app.use((req, res, next) => {
     res.header('Access-Control-Allow-Credentials', 'true');
     next();
 });
-
-
-app.use(cookieParser());  //Cookies
-
-//Funció d'escolta del servidor 
-
-
-//Connexió a la base de dades Railway
 
 
 const db = mysql.createConnection({
@@ -53,16 +44,19 @@ const db = mysql.createConnection({
 }); 
 
 
-/*
+app.use(cookieParser());  //Cookies
 
+
+
+/*
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "Ga21012002",
     database: "web_examen_tfg"
 });
-
 */
+
 
 db.connect((err) => {
     if (err) console.error("Error connecting to database:", err.message);

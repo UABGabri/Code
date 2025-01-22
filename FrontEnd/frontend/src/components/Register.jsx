@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "./StyleComponents/Homepage.module.css";
 
-const apiUrl = import.meta.env.VITE_API_URL2;
+const apiUrl = import.meta.env.VITE_API_URL;
 
 function Register() {
   // Emmagatzemem les dades del formulari
@@ -67,7 +67,7 @@ function Register() {
 
     // Registrar l'usuari al servidor
     axios
-      .post(`${apiUrl}register`, values, {
+      .post(`${apiUrl}/register`, values, {
         withCredentials: true,
       })
       .then((res) => {
