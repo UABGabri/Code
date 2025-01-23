@@ -14,6 +14,8 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
   const [newTemaName, setNewTemaName] = useState("");
   const [selectedTest, setSelectedTest] = useState(null);
   const [accessKey, setAccessKey] = useState("");
+  const [contingutModal, setContingutModal] = useState("");
+  const [linkContingut, setLinkContingut] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [openTema, setOpenTema] = useState({});
   const navigate = useNavigate();
@@ -257,10 +259,37 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                     {Role_User === "professor" && (
                       <button
                         className={styles.buttonAddTest}
-                        onClick={() => {}}
+                        onClick={() => setContingutModal(true)}
                       >
                         <FaPlus />
                       </button>
+                    )}
+
+                    {contingutModal && (
+                      <div className={styles.modal}>
+                        <div className={styles.modalContent}>
+                          <form
+                            onSubmit={(e) => {
+                              e.preventDefault();
+                              handleCreateTema();
+                            }}
+                            className={styles.temaCrear}
+                          >
+                            <label>Afegeix Link</label>
+                            <input
+                              type="text"
+                              value={linkContingut}
+                              onChange={(e) => setLinkContingut(e.target.value)}
+                              className={styles.temaInput}
+                              required
+                              maxLength={20}
+                            />
+                            <button type="submit" className={styles.temaButton}>
+                              Afegir Link
+                            </button>
+                          </form>
+                        </div>
+                      </div>
                     )}
                   </div>
 
