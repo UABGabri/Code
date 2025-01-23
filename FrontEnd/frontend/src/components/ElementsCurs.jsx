@@ -245,6 +245,15 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                     </h3>
                     <hr />
 
+                    <ol>
+                      <a
+                        href="https://www.cambridgeenglish.org/es/exams-and-tests/first/exam-format/"
+                        target="_blank"
+                      >
+                        Examen de prova any anterior
+                      </a>
+                    </ol>
+
                     {Role_User === "professor" && (
                       <button
                         className={styles.buttonAddTest}

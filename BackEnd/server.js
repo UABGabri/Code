@@ -48,7 +48,6 @@ app.use(cookieParser());  //Cookies
 
 
 
-
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -88,16 +87,16 @@ app.post('/register', (req, res) => {
 
 
         if (result.length > 0) {
-            return res.status(400).json({ error: "El NIU ja existeix" });
+            return res.json({ error: "El NIU ja existeix" });
         }
  
         const checkEmailSql = "SELECT * FROM usuaris WHERE email = ?";
         db.query(checkEmailSql, [gmail], (err, result) => {
-            if (err) return res.status(400).json({ Error: err.message });
+            if (err) return res.json({ Error: err.message });
 
           
             if (result.length > 0) {
-                return res.status(400).json({ error: "El correu electrònic ja està registrat" });
+                return res.json({ error: "El correu electrònic ja està registrat" });
             }
 
        
@@ -105,7 +104,7 @@ app.post('/register', (req, res) => {
 
     
             bcryptjs.hash(password.toString(), salt, (err, hash) => {
-                if (err) return res.status(400).json({ Error: "Error hashing password" });
+                if (err) return res.json({ error: "Error hashing password" });
 
                 const values = [niu, username, hash, role, gmail];
 
@@ -2167,12 +2166,23 @@ app.post("/import-csv", upload.single("file"), async (req, res) => {
                     // Resposta final amb usuaris 
 
                     db.query(
-                        `SELECT usuaris.*, 'alumne' AS role 
-                         FROM usuaris 
-                         JOIN alumnes_assignatures 
-                         ON usuaris.niu = alumnes_assignatures.id_alumne 
-                         WHERE alumnes_assignatures.id_assignatura = ?`,
-                        [subjectId],
+                        `SELECT usuaris.*, 
+                            'alumne' AS role 
+                        FROM usuaris
+                        JOIN alumnes_assignatures 
+                        ON usuaris.niu = alumnes_assignatures.id_alumne 
+                        WHERE alumnes_assignatures.id_assignatura = ?
+
+                        UNION
+
+                        SELECT usuaris.*, 
+                            'professor' AS role 
+                        FROM usuaris
+                        JOIN professors_assignatures 
+                        ON usuaris.niu = professors_assignatures.id_professor
+                        WHERE professors_assignatures.id_assignatura = ?;
+                        `,
+                        [subjectId, subjectId],
                         (err, result) => {
                             if (err) {
                                 console.error("Error en la consulta SELECT:", err);

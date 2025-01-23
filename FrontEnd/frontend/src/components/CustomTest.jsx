@@ -156,7 +156,7 @@ function CustomTest() {
   };
 
   //Funció d'aplicar canvis
-  const aplicarCanvis = () => {
+  const aplicarCanvis = async () => {
     let clauAux;
     let cancelUser = false;
 
@@ -176,7 +176,6 @@ function CustomTest() {
         if (validInput.test(userInput)) {
           alert(`La clau introduïda és: ${userInput}`);
           clauAux = userInput;
-
           break;
         } else {
           alert(
@@ -203,10 +202,8 @@ function CustomTest() {
 
     const minutes = duration * 60;
 
-    console.log();
-
-    axios
-      .put(`${apiUrl}/updateTestCustom`, {
+    try {
+      const res = await axios.put(`${apiUrl}/updateTestCustom`, {
         testName,
         data,
         minutes,
@@ -214,17 +211,18 @@ function CustomTest() {
         clauAux,
         idTest,
         intents,
-      })
-      .then((res) => {
-        console.log(res);
-        if (res.data.Status === "Success") {
-          alert("Canvis efectuats");
-          setShowInfoTest(false);
-        } else {
-          alert("Error en el servidor");
-        }
-      })
-      .catch(() => alert("Error amb la sol·licitud"));
+      });
+
+      if (res.data.Status === "Success") {
+        alert("Canvis efectuats");
+        setShowInfoTest(false);
+      } else {
+        alert("Error en el servidor");
+      }
+    } catch (error) {
+      console.error("Error amb la sol·licitud:", error);
+      alert("Error amb la sol·licitud");
+    }
   };
 
   const handleSubmit = (e) => {

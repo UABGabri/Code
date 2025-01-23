@@ -259,7 +259,7 @@ function CreateManualQuizz() {
                       const inputValue = e.target.value;
 
                       if (/^\d{0,3}$/.test(inputValue)) {
-                        setDuracio(inputValue);
+                        setDuracio(inputValue * 60);
                       }
                     }}
                     className={styles.inputField}

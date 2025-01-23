@@ -95,7 +95,7 @@ function Register() {
       <div className={styles.white}>
         <div>
           <h2>Registre</h2>
-          {error && <div>{error}</div>}
+          {error && <div className="alert alert-danger">{error}</div>}
 
           <form onSubmit={handleConfirmPassword}>
             <div>

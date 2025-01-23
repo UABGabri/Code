@@ -403,13 +403,14 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
             <div className={styles.modalButtons}>
               <button
                 onClick={handleConfirmAction}
-                className={styles.confirmButton}
+                className={styles.addQuestionButton}
+                style={{ marginRight: "10px" }}
               >
                 Confirmar
               </button>
               <button
                 onClick={() => setShowModal(false)}
-                className={styles.cancelButton}
+                className={styles.deleteButton}
               >
                 Cancel·lar
               </button>
@@ -418,24 +419,24 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
         </div>
       )}
 
-      {/*Edició de les preguntes*/}
       {editedQuestion && (
-        <>
-          <div className={styles.updateContent}>
-            <div className={styles.updateQuestionForm}>
-              <h1>Editar Pregunta</h1>
+        <div className={styles.updateContent}>
+          <form
+            className={styles.updateQuestionForm}
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSave();
+            }}
+          >
+            <h1 className={styles.updateTitle}>Editar Pregunta</h1>
 
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleSave();
-                }}
-              >
+            <div className={styles.UpdateFormGroup}>
+              <div>
                 <p>
-                  <strong>Tema:</strong>{" "}
+                  <strong>Tema:</strong>
                 </p>
                 <select
-                  className={styles.filterInput}
+                  className={styles.updateSelectInput}
                   value={selectedEditingQuestion.nom_tema}
                   onChange={(e) =>
                     setSelectedEditingQuestion({
@@ -443,7 +444,6 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                       nom_tema: e.target.value,
                     })
                   }
-                  placeholder="Selecciona un tema"
                   required
                 >
                   {topics.map((tema) => (
@@ -452,12 +452,15 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                     </option>
                   ))}
                 </select>
+              </div>
 
+              <div>
                 <p>
                   <strong>Conceptes:</strong>
                 </p>
                 <input
                   type="text"
+                  className={styles.updateSelectInput}
                   value={selectedEditingQuestion.conceptes}
                   onChange={(e) =>
                     setSelectedEditingQuestion({
@@ -469,13 +472,15 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                   required
                   pattern="^[A-Za-zÀ-ÿ0-9\s,]+$"
                   maxLength={30}
-                  className={styles.editInput}
                 />
+              </div>
 
+              <div>
                 <p>
-                  <strong>Dificultat:</strong>{" "}
+                  <strong>Dificultat:</strong>
                 </p>
                 <select
+                  className={styles.updateSelectInput}
                   value={selectedEditingQuestion.dificultat}
                   onChange={(e) =>
                     setSelectedEditingQuestion({
@@ -489,50 +494,58 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                   <option>Mitjà</option>
                   <option>Difícil</option>
                 </select>
+              </div>
+            </div>
 
+            <div className={styles.updateQuestionArea}>
+              <p>
+                <strong>Pregunta:</strong>
+              </p>
+              <textarea
+                className={styles.updateSelectInput}
+                value={selectedEditingQuestion.pregunta}
+                onChange={(e) =>
+                  setSelectedEditingQuestion({
+                    ...selectedEditingQuestion,
+                    pregunta: e.target.value,
+                  })
+                }
+                placeholder="Insereix la teva pregunta"
+                required
+                rows={5}
+                maxLength={200}
+              />
+            </div>
+
+            <div>
+              <p>
+                <strong>Resposta Correcta:</strong>
+              </p>
+              <input
+                type="text"
+                className={styles.updateSelectInput}
+                value={selectedEditingQuestion.solucio_correcta}
+                onChange={(e) =>
+                  setSelectedEditingQuestion({
+                    ...selectedEditingQuestion,
+                    solucio_correcta: e.target.value,
+                  })
+                }
+                placeholder="Solució correcta"
+                required
+                pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
+                maxLength={30}
+              />
+            </div>
+
+            <div className={styles.UpdateFormGroup}>
+              <div>
                 <p>
-                  <strong>Pregunta:</strong>{" "}
+                  <strong>Resposta Incorrecta 1:</strong>
                 </p>
                 <input
                   type="text"
-                  value={selectedEditingQuestion.pregunta}
-                  onChange={(e) =>
-                    setSelectedEditingQuestion({
-                      ...selectedEditingQuestion,
-                      pregunta: e.target.value,
-                    })
-                  }
-                  className={styles.editInput}
-                  placeholder="Insereix la teva pregunta"
-                  required
-                  pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
-                  maxLength={200}
-                />
-
-                <p>
-                  <strong>Resposta Correcta:</strong>{" "}
-                </p>
-                <input
-                  type="text"
-                  value={selectedEditingQuestion.solucio_correcta}
-                  onChange={(e) =>
-                    setSelectedEditingQuestion({
-                      ...selectedEditingQuestion,
-                      solucio_correcta: e.target.value,
-                    })
-                  }
-                  placeholder="Solució correcta"
-                  required
-                  pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
-                  maxLength={30}
-                  className={styles.selectInput}
-                />
-
-                <p>
-                  <strong>Resposta Incorrecta:</strong>
-                </p>
-                <input
-                  type="text"
+                  className={styles.updateSelectInput}
                   value={selectedEditingQuestion.solucio_erronia1}
                   onChange={(e) =>
                     setSelectedEditingQuestion({
@@ -540,17 +553,18 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                       solucio_erronia1: e.target.value,
                     })
                   }
-                  className={styles.editInput}
-                  pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
-                  placeholder="Solució erronea"
+                  placeholder="Solució errònia"
                   maxLength={30}
                 />
+              </div>
 
+              <div>
                 <p>
                   <strong>Resposta Incorrecta 2:</strong>
                 </p>
                 <input
                   type="text"
+                  className={styles.updateSelectInput}
                   value={selectedEditingQuestion.solucio_erronia2}
                   onChange={(e) =>
                     setSelectedEditingQuestion({
@@ -558,17 +572,18 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                       solucio_erronia2: e.target.value,
                     })
                   }
-                  className={styles.editInput}
-                  pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
-                  placeholder="Solució erronea"
+                  placeholder="Solució errònia"
                   maxLength={30}
                 />
+              </div>
 
+              <div>
                 <p>
-                  <strong>Resposta Incorrecta 3:</strong>{" "}
+                  <strong>Resposta Incorrecta 3:</strong>
                 </p>
                 <input
                   type="text"
+                  className={styles.updateSelectInput}
                   value={selectedEditingQuestion.solucio_erronia3}
                   onChange={(e) =>
                     setSelectedEditingQuestion({
@@ -576,28 +591,26 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                       solucio_erronia3: e.target.value,
                     })
                   }
-                  className={styles.editInput}
-                  pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
-                  placeholder="Solució erronea"
+                  placeholder="Solució errònia"
                   maxLength={30}
                 />
-
-                <div>
-                  <button type="submit" className={styles.acceptButton}>
-                    Guardar
-                  </button>{" "}
-                  <button
-                    type="button"
-                    onClick={() => handleCancel()}
-                    className={styles.deleteButton}
-                  >
-                    Cancel·lar
-                  </button>
-                </div>
-              </form>
+              </div>
             </div>
-          </div>
-        </>
+
+            <div className={styles.updateButtons}>
+              <button type="submit" className={styles.acceptButton}>
+                Guardar
+              </button>
+              <button
+                type="button"
+                onClick={() => handleCancel()}
+                className={styles.deleteButton}
+              >
+                Cancel·lar
+              </button>
+            </div>
+          </form>
+        </div>
       )}
     </div>
   );

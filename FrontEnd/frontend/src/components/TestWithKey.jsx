@@ -40,7 +40,7 @@ function TestWithKey() {
 
         console.log(response.data.Preguntes[0].tipus);
 
-        setTime(parseInt(response.data.Preguntes[0].temps * 60));
+        setTime(parseInt(response.data.Preguntes[0].temps));
 
         setPreguntes(preguntasConContenido);
         setRespostesBarrejades(

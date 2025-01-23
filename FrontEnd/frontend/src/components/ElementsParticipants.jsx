@@ -26,12 +26,9 @@ function ElementsParticipants({ Id_User, Id_Assignatura, Role_User }) {
       })
       .then((res) => {
         if (res.data.Status === "Success") {
-          console.log(Id_User);
           const filteredUsers = res.data.result.filter(
             (user) => user.niu !== Id_User
           );
-
-          console.log(filteredUsers);
 
           setUsers(filteredUsers);
         } else {
@@ -79,7 +76,11 @@ function ElementsParticipants({ Id_User, Id_Assignatura, Role_User }) {
       })
       .then((res) => {
         if (res.data.Status === "Success") {
-          setUsers(res.data.result);
+          const filteredUsers = res.data.result.filter(
+            (user) => user.niu !== Id_User
+          );
+
+          setUsers(filteredUsers);
         } else {
           alert("Error al actualitzar la llista de participants.");
         }
@@ -163,8 +164,13 @@ function ElementsParticipants({ Id_User, Id_Assignatura, Role_User }) {
                     Id_Assignatura,
                   })
                   .then((addRes) => {
-                    console.log("Hello", addRes);
-                    setUsers(addRes.data.result);
+                    const filteredUsers = addRes.data.result.filter(
+                      (user) => user.niu !== Id_User
+                    );
+
+                    console.log(filteredUsers);
+
+                    setUsers(filteredUsers);
                     setShowModal(false);
                     setNewNiu("");
                     alert("Participant afegit correctament!");
