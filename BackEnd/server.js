@@ -20,12 +20,12 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-    origin: 'http://localhost:5173', //origen https://sparkling-torte-716cbe.netlify.app  http://localhost:5173
+    origin: 'https://sparkling-torte-716cbe.netlify.app', //origen https://sparkling-torte-716cbe.netlify.app  http://localhost:5173
     methods: ['GET', 'POST', 'PUT', 'DELETE'],// Metodes permesos
     credentials: true // Credencials necessaris
 }));
 
-/*
+
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', 'https://sparkling-torte-716cbe.netlify.app');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
@@ -41,20 +41,20 @@ const db = mysql.createConnection({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     port: process.env.DB_PORT,
-}); */
+}); 
 
 
 app.use(cookieParser());  //Cookies
 
 
-
+/*
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "Ga21012002",
     database: "web_examen_tfg"
 });
-
+*/
 
 
 db.connect((err) => {
@@ -754,7 +754,6 @@ app.post('/addQuestion', async (req, res) => {
 });
 
 
-
 // Funció per afegir el concepte i la seva relació amb el tema
 app.put("/updateQuestion", async (req, res) => {
 
@@ -884,7 +883,7 @@ const queryDatabase = (sql, params) => {
 };
 
 
-
+//Funció esborrar pregunta
 app.delete('/deleteQuestion', (req,res)=>{
 
     const id_Pregunta = req.query.idPregunta;
@@ -969,7 +968,7 @@ app.get('/recoverQuestions', (req, res)=>{
     })
 })
 
-
+//Funció recuperació preguntes d'alumne
 app.get('/recoverQuestionsAlumni', (req, res)=>{ 
 
     const id_assignatura = req.query.Id_Assignatura;
@@ -1073,7 +1072,7 @@ UNION
 });
 
 
-
+//Funció existència usuari a BD
 app.get("/checkUserExists", async (req, res) => {
 
     const id_niu = parseInt(req.query.niu, 10); 
@@ -1100,7 +1099,7 @@ app.get("/checkUserExists", async (req, res) => {
 });
 
 
-
+//Funció existència professor assignatura
 app.get("/checkProfessorInSubject", (req, res) => {
 
     const { niu, Id_Assignatura } = req.query;
@@ -1126,6 +1125,7 @@ app.get("/checkProfessorInSubject", (req, res) => {
     });
 });
 
+//Funció existència assignatura
 app.get("/checkStudentInSubject", (req, res) => {
     const { niu, Id_Assignatura } = req.query;
 
@@ -1144,7 +1144,7 @@ app.get("/checkStudentInSubject", (req, res) => {
 });
 
 
-
+//Funció afegir professor
 app.post("/addProfessorToSubject", async (req, res) => {
     const { niu, Id_Assignatura } = req.body;
 
@@ -1197,7 +1197,7 @@ app.post("/addProfessorToSubject", async (req, res) => {
 });
 
 
-
+//Funció afegir estudiant
 app.post("/addStudentToSubject", async (req, res) => {
     const { niu, Id_Assignatura } = req.body;
 
@@ -1251,6 +1251,7 @@ app.post("/addStudentToSubject", async (req, res) => {
 });
 
 
+//Funció esborrar usuari
 app.delete('/deleteUser', (req, res) =>{
 
     const id_user = req.query.values.niu;
@@ -1275,7 +1276,7 @@ app.delete('/deleteUser', (req, res) =>{
 })
 
 
-
+//Funció abandonar assignatura
 app.delete('/leaveSubject', (req,res) =>{
 
     const id_participant = req.query.id;
@@ -1305,7 +1306,7 @@ app.delete('/leaveSubject', (req,res) =>{
 })
 
 
-
+//Funció eliminació alumne
 app.delete('/eliminateStudent', (req, res) => {
     const id_participant = req.query.id;
     const id_assignatura = req.query.Id_Assignatura;
@@ -1357,6 +1358,7 @@ app.delete('/eliminateStudent', (req, res) => {
     });
 });
 
+//Funció eliminació professor
 app.delete('/eliminateTeacher', (req, res) => {
 
     const id_participant = req.query.id;
@@ -1407,7 +1409,7 @@ app.delete('/eliminateTeacher', (req, res) => {
     });
 });
 
-
+//Funció recuperació preguntes conceptes
 app.get('/recoverQuestionsConcepts', (req, res) => {
     const { conceptesSeleccionats } = req.query; 
 
@@ -1483,8 +1485,6 @@ app.get('/recoverElementsTest', (req, res) => {
 });
 
 
-
-
 //Funció de creació de test professors
 app.post('/generarTest', (req, res) => {
     const { idAssignatura, idTema, idCreador, nombreTest } = req.body;
@@ -1540,7 +1540,6 @@ app.post('/generarTest', (req, res) => {
   });
   
 
-
 //Funció de recuperació de les preguntes segons els paràmetres definits per l'usuari
 app.get('/recoverRandomTestQuestions', async (req, res) => { 
    
@@ -1565,7 +1564,6 @@ app.get('/recoverRandomTestQuestions', async (req, res) => {
 
 
 //Funció de recuperació de les preguntes dels tests (utilitzats en tests avaluatius)
-
 app.get('/recoverSelectedTestWithKeyQuestions', (req, res) => {
 
     const idTest = parseInt(req.query.idTest);
@@ -1628,7 +1626,7 @@ app.get('/recoverSelectedTestWithKeyQuestions', (req, res) => {
 
 });
 
-//Funció 
+//Funció  guardat resultats
 app.post('/saveResults', (req, res) =>{
 
     const id_Test = parseInt(req.body.idTest);
@@ -1636,7 +1634,7 @@ app.post('/saveResults', (req, res) =>{
     const id_User = req.body.Id_User;
     const id_Subject = parseInt(req.body.Id_Subject);
 
-    //console.log(id_User, id_Test, grade)
+ 
 
     const sql = `INSERT INTO resultats (id_alumne, id_test, nota, id_assignatura) VALUES (?,?,?, ?)`;
 
@@ -1651,7 +1649,6 @@ app.post('/saveResults', (req, res) =>{
 })
 
 //Funció actualització del test
-
 app.put('/updateTestCustom', (req, res) =>{
 
 
@@ -1861,7 +1858,7 @@ app.post('/createQuizz', (req, res) => {
 
 
 
-
+//Funció insert preguntes al test
 app.post('/insertQuestionsTest', (req, res) => {
 
     const idTest = req.body.id_test;
@@ -1876,7 +1873,7 @@ app.post('/insertQuestionsTest', (req, res) => {
         return new Promise((resolve, reject) => {
             db.query(sql, value, (error, result) => {
                 if (error) {
-                    console.error("Error al insertar la pregunta:", value, error);
+                    console.error("Error al insert pregunta:", value, error);
                     return reject(error);
                 }
                 resolve(result);
@@ -1890,7 +1887,7 @@ app.post('/insertQuestionsTest', (req, res) => {
             return res.json({ status: "Success", results });
         })
         .catch((error) => {
-            console.error("Error durante el proceso de inserción:", error);
+            console.error("Error durant el procés d'insert:", error);
             return res.json({ status: "Failed", message: "Database error" });
         });
     
@@ -1919,6 +1916,7 @@ app.get('/recoverTestsTopics', (req, res) =>{
 
 })
 
+//Funció retorna número d'intents
 app.get('/recoverTry', (req, res) =>{
 
     const {Id_User, id_Test} = req.query
@@ -2068,7 +2066,7 @@ app.get("/recoverPreguntaRandom", (req, res) => {
 });
 
 
-
+//Funció pujada fitxers amb usuaris nous
 app.post("/import-csv", upload.single("file"), async (req, res) => {
 
     const filePath = req.file.path;
