@@ -120,6 +120,7 @@ function AddQuestion() {
                 setSelectedTema(e.target.value);
                 updateField("id_tema", e.target.value);
               }}
+              style={{ maxWidth: "200px" }}
               placeholder="Selecciona un tema"
               className={styles.selectInput}
               required
@@ -201,6 +202,7 @@ function AddQuestion() {
                   placeholder="Solució correcta"
                   required
                   maxLength={30}
+                  style={{ maxWidth: "200px" }}
                   pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
                   className={styles.selectInput}
                 />
@@ -219,20 +221,10 @@ function AddQuestion() {
                   required
                   pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
                   maxLength={30}
-                  className={styles.optionInput}
+                  className={styles.selectInput}
                   placeholder="Solució erronea"
                 />
               </div>
-
-              {addButtonOption && (
-                <button
-                  type="button"
-                  onClick={handleAddOptions}
-                  className={styles.addOptionButton}
-                >
-                  <FaPlus />
-                </button>
-              )}
 
               {extraOptionsVisible && (
                 <div className={styles.formGroup}>
@@ -245,7 +237,7 @@ function AddQuestion() {
                     onChange={(e) => updateField("erronea_2", e.target.value)}
                     pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
                     maxLength={30}
-                    className={styles.optionInput}
+                    className={styles.selectInput}
                     placeholder="Solució erronea"
                   />
                   <button
@@ -269,7 +261,7 @@ function AddQuestion() {
                     onChange={(e) => updateField("erronea_3", e.target.value)}
                     pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
                     maxLength={30}
-                    className={styles.optionInput}
+                    className={styles.selectInput}
                     placeholder="Solució erronea"
                   />
                   <button
@@ -280,6 +272,16 @@ function AddQuestion() {
                     <FaMinus />
                   </button>
                 </div>
+              )}
+
+              {addButtonOption && (
+                <button
+                  type="button"
+                  onClick={handleAddOptions}
+                  className={styles.addOptionButton}
+                >
+                  <FaPlus />
+                </button>
               )}
             </div>
           </div>
