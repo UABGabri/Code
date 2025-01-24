@@ -365,7 +365,7 @@ app.post('/accessSubject', async (req, res) =>{
 
     console.log(id_User, id_Subject, accessPassword, userRole)
 
-    console.log(id_User, id_Subject, accessPassword, userRole)
+
 
     if (!id_User || !id_Subject || !accessPassword || !userRole) {
         return res.json({ Status: "Failed", Messages: "Falten dades obligatòries." });
@@ -409,8 +409,12 @@ app.post('/accessSubject', async (req, res) =>{
                return res.json({ Status: "Failed", Messages: "L'usuari ja està inscrit en aquesta assignatura." });
            }
    
+
            const insertQuery = userRole === "professor" ? sqlInsertProfessor : sqlInsertStudent;
    
+           
+
+         
            await new Promise((resolve, reject) => {
                db.query(insertQuery, [id_User, id_Subject], (err) => {
                    if (err) reject("Error en afegir l'usuari a l'assignatura.");
