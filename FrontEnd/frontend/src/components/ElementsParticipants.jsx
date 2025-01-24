@@ -253,6 +253,7 @@ function ElementsParticipants({ Id_User, Id_Assignatura, Role_User }) {
               type="text"
               placeholder="Filtrar per nom"
               value={filter}
+              maxLength={20}
               onChange={(e) => setFilter(e.target.value)}
               className={styles.filterInput}
             />
@@ -413,8 +414,11 @@ function ElementsParticipants({ Id_User, Id_Assignatura, Role_User }) {
                 type="text"
                 id="niu"
                 value={newNiu}
-                onChange={(e) => setNewNiu(e.target.value)}
+                onChange={(e) => {
+                  e.preventDefault(), setNewNiu(e.target.value);
+                }}
                 className={styles.inputField}
+                maxLength={7}
               />
               <div className={styles.modalActions}>
                 <button
