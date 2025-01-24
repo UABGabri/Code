@@ -50,6 +50,7 @@ function Profile() {
           withCredentials: true,
         })
         .then((res) => {
+          console.log(res);
           if (res.data.Status === "Failed") alert("Aquest email ja existeix");
           if (res.data.Status === "Success") alert("Canvis efectuats");
         })

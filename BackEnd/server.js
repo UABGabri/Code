@@ -20,13 +20,13 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-    origin: 'https://sparkling-torte-716cbe.netlify.app', //origen https://sparkling-torte-716cbe.netlify.app  http://localhost:5173
+    origin: 'http://localhost:5173', //origen https://sparkling-torte-716cbe.netlify.app  http://localhost:5173
     methods: ['GET', 'POST', 'PUT', 'DELETE'],// Metodes permesos
     credentials: true // Credencials necessaris
 }));
 
 
-
+/*
 const db = mysql.createConnection({
     host: process.env.DB_HOST || '127.0.0.1',
     user: process.env.DB_USER,
@@ -34,19 +34,19 @@ const db = mysql.createConnection({
     database: process.env.DB_NAME,
     port: process.env.DB_PORT,
 }); 
-
+*/
 
 app.use(cookieParser());  //Cookies
 
 
-/*
+
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "Ga21012002",
     database: "web_examen_tfg"
 });
-*/
+
 
 
 db.connect((err) => {
@@ -253,13 +253,17 @@ app.put('/updateUser', (req, res) => {
         }
 
 
-        const sqlCheck = 'SELECT FROM usuaris WHERE niu = ? AND email = ?';
+        console.log(typeof(email))
+
+        const sqlCheck = 'SELECT * FROM usuaris WHERE email = ?';
 
 
-        db.query(sql, [niu, email], (err, result) => {
-            if (err) return res.json({ Error: "Error buscant l'usuari" });
+        db.query(sqlCheck, [email], (err, result) => {
+            if (err) return res.json({ Status: "Failed", Error: "Error buscant l'usuari" });
             
-            if (result.affectedRows > 0) {
+            console.log(result.length)
+
+            if (result.length === 1) {
                 return res.json({ Status: "Failed", Message: "Email duplicat" });
             } else {
                 
