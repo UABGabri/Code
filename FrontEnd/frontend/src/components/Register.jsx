@@ -74,7 +74,7 @@ function Register() {
         if (res.data.error) {
           setError(res.data.error);
         } else {
-          handleLogin();
+          alert("Registrat amb èxit");
         }
       })
       .catch((err) => {
