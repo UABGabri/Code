@@ -216,6 +216,24 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
     }));
   };
 
+  const handleAddLink = async (id_tema) => {
+    if (!linkContingut || !id_tema) alert("Contingut buit");
+
+    axios
+      .post(`${apiUrl}/addLink`, {
+        linkContingut,
+        id_tema,
+      })
+      .then((response) => {
+        if (response.data.Status === "Success")
+          alert("Link afegit correctament");
+        else {
+          alert("Error afegint Links");
+        }
+      })
+      .catch();
+  };
+
   return (
     <div className={styles.elementsCursContainer}>
       <h1 className={styles.elementsCursHeader}>
@@ -271,21 +289,31 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                           <form
                             onSubmit={(e) => {
                               e.preventDefault();
-                              handleCreateTema();
+
+                              handleAddLink(tema.id_tema);
                             }}
                             className={styles.temaCrear}
                           >
-                            <label>Afegeix Link</label>
+                            <h3>
+                              <strong>Afegeix Link</strong>
+                            </h3>
                             <input
                               type="text"
                               value={linkContingut}
                               onChange={(e) => setLinkContingut(e.target.value)}
-                              className={styles.temaInput}
                               required
                               maxLength={20}
                             />
                             <button type="submit" className={styles.temaButton}>
                               Afegir Link
+                            </button>
+
+                            <button
+                              type="button"
+                              className={styles.modalButtonCancel}
+                              onClick={() => setContingutModal(false)}
+                            >
+                              Tancar
                             </button>
                           </form>
                         </div>

@@ -1104,8 +1104,6 @@ app.get("/checkProfessorInSubject", (req, res) => {
 
     const { niu, Id_Assignatura } = req.query;
 
-    
-
     if(!niu || !Id_Assignatura)
         return res.json({Status:"Failed"})
 
@@ -1119,9 +1117,13 @@ app.get("/checkProfessorInSubject", (req, res) => {
 
         const exists = result[0].count > 0;
 
-        
-        if(exists > 0)
+        console.log(exists)
+
+        if(exists === true)
             return res.json({ Status:"Success" });
+        else    
+         return res.json({ Status:"Found" });
+    
     });
 });
 
@@ -1136,10 +1138,17 @@ app.get("/checkStudentInSubject", (req, res) => {
     db.query(sql, [niu, Id_Assignatura], (error, result) => {
         if (error) {
             console.error("Error en la consulta:", error);
-            return res.status(500).json({ exists: false, error: "Database query failed" });
+            return res.json({ Status: "Failed", error: "Database query failed" });
         }
+
         const exists = result[0].count > 0;
-        res.json({ exists });
+
+        console.log(exists)
+
+        if(exists === true)
+            return res.json({ Status:"Success" });
+        else    
+         return res.json({ Status:"Found" });
     });
 });
 
@@ -2163,8 +2172,7 @@ app.post("/import-csv", upload.single("file"), async (req, res) => {
 
                     // Resposta final amb usuaris 
 
-                    db.query(
-                        `SELECT usuaris.*, 
+                    const sqlReturn = `SELECT usuaris.*, 
                             'alumne' AS role 
                         FROM usuaris
                         JOIN alumnes_assignatures 
@@ -2179,7 +2187,9 @@ app.post("/import-csv", upload.single("file"), async (req, res) => {
                         JOIN professors_assignatures 
                         ON usuaris.niu = professors_assignatures.id_professor
                         WHERE professors_assignatures.id_assignatura = ?;
-                        `,
+                        `
+                    db.query(
+                        sqlReturn,
                         [subjectId, subjectId],
                         (err, result) => {
                             if (err) {
@@ -2215,7 +2225,24 @@ app.post("/import-csv", upload.single("file"), async (req, res) => {
 });
 
   
-  
+app.post("/addLink", (req, res) =>{
+
+    const {linkContingut,id_tema} = req.body;
+
+    const sqlInsert = "INSERT INTO continguts (id_tema, link) VALUES (?, ?)"
+
+    db.query(sqlInsert,[id_tema, linkContingut],(err, result) => {
+
+        if(err){
+            return res.json({Status:"Failed"})
+        }else{
+            return res.json({Status:"Success"})
+        }
+
+    })
+
+
+})
   
 
 

@@ -61,7 +61,7 @@ function ElementsParticipants({ Id_User, Id_Assignatura, Role_User }) {
   };
 
   //Funció d'eliminació dels participants
-  const handleEliminateParticipant = () => {
+  const handleEliminateParticipant = async () => {
     const niu = userToDelete.niu;
     const role = userToDelete.role;
 
@@ -116,7 +116,13 @@ function ElementsParticipants({ Id_User, Id_Assignatura, Role_User }) {
       });
       if (response.data.status === "Success") {
         alert("Importació completada correctament!");
-        setUsers(response.data.participants);
+
+        console.log(response.data.participants);
+        const filteredUsers = response.data.participants.filter(
+          (user) => user.niu !== Id_User
+        );
+
+        setUsers(filteredUsers);
       } else {
         alert("Error a la importació: " + response.data.message);
       }
@@ -126,7 +132,7 @@ function ElementsParticipants({ Id_User, Id_Assignatura, Role_User }) {
   };
 
   //Funció afegir participant individual
-  const handleAddParticipant = () => {
+  const handleAddParticipant = async () => {
     if (!newNiu) return alert("Has d'introduir un NIU!");
 
     axios
@@ -147,7 +153,7 @@ function ElementsParticipants({ Id_User, Id_Assignatura, Role_User }) {
               params: { niu: newNiu, Id_Assignatura },
             })
             .then((checkRes) => {
-              console.log(checkRes);
+              console.log("Gaga");
               if (checkRes.data.Status === "Success") {
                 alert(
                   "Aquest participant ja està registrat en aquesta assignatura!"
@@ -213,7 +219,6 @@ function ElementsParticipants({ Id_User, Id_Assignatura, Role_User }) {
       return user.username.toLowerCase().includes(filter.toLowerCase());
     }
 
-    // Filter by both name and role
     return (
       user.username.toLowerCase().includes(filter.toLowerCase()) &&
       user.role.toLowerCase() === filterRole.toLowerCase()
