@@ -251,21 +251,42 @@ app.put('/updateUser', (req, res) => {
         if (!username || !email || !password) {
             return res.json({ Error: "Tots els camps són obligatoris" });
         }
-     
-        bcryptjs.hash(password.toString(), salt, (err, hash) => {
-            if (err) return res.json({ Error: "Error encriptant la contrasenya" });
 
-            const sql = 'UPDATE usuaris SET username = ?, email = ?, password = ? WHERE niu = ?';
-            db.query(sql, [username, email, hash, niu], (err, result) => {
-                if (err) return res.json({ Error: "Error actualitzant l'usuari" });
+
+        const sqlCheck = 'SELECT FROM usuaris WHERE niu = ? AND email = ?';
+
+
+        db.query(sql, [niu, email], (err, result) => {
+            if (err) return res.json({ Error: "Error buscant l'usuari" });
+            
+            if (result.affectedRows > 0) {
+                return res.json({ Status: "Failed", Message: "Email duplicat" });
+            } else {
                 
-                if (result.affectedRows > 0) {
-                    return res.json({ Status: "Success", Message: "Dades actualitzades correctament" });
-                } else {
-                    return res.json({ Error: "Usuari no trobat" });
-                }
-            });
+
+
+                bcryptjs.hash(password.toString(), salt, (err, hash) => {
+                    if (err) return res.json({ Error: "Error encriptant la contrasenya" });
+        
+                    const sql = 'UPDATE usuaris SET username = ?, email = ?, password = ? WHERE niu = ?';
+                    db.query(sql, [username, email, hash, niu], (err, result) => {
+                        if (err) return res.json({ Error: "Error actualitzant l'usuari" });
+                        
+                        if (result.affectedRows > 0) {
+                            return res.json({ Status: "Success", Message: "Dades actualitzades correctament" });
+                        } else {
+                            return res.json({ Error: "Usuari no trobat" });
+                        }
+                    });
+                });
+
+
+                
+            }
         });
+
+     
+    
     });
 });
 
