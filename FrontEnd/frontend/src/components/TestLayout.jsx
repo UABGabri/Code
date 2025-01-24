@@ -8,6 +8,7 @@ const apiUrl = import.meta.env.VITE_API_URL;
 function TestLayout() {
   const location = useLocation();
   const { conceptesSeleccionats } = location.state.parametersTest;
+  const { idAssignatura } = location.state.idAssignatura;
 
   const history = useNavigate();
   const [preguntes, setPreguntes] = useState([]);
@@ -20,7 +21,7 @@ function TestLayout() {
   useEffect(() => {
     axios
       .get(`${apiUrl}/recoverQuestionsConcepts`, {
-        params: { conceptesSeleccionats },
+        params: { conceptesSeleccionats, idAssignatura },
       })
       .then((response) => {
         if (response.data.Status === "Success") {

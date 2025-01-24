@@ -61,9 +61,9 @@ function Login() {
                 <input
                   type="text"
                   id="username"
-                  onChange={(e) =>
-                    setValues({ ...values, niu: e.target.value })
-                  }
+                  onChange={(e) => {
+                    setValues({ ...values, niu: e.target.value });
+                  }}
                   maxLength={7}
                   required
                   className={styles.inputField}
@@ -77,9 +77,9 @@ function Login() {
                   type="password"
                   id="password"
                   className={styles.inputField}
-                  onChange={(e) =>
-                    setValues({ ...values, password: e.target.value })
-                  }
+                  onChange={(e) => {
+                    setValues({ ...values, password: e.target.value });
+                  }}
                   maxLength={10}
                   title="La contrasenya ha de tenir entre 8 i 10 caràcters"
                 />

@@ -52,7 +52,8 @@ function ElementsTests({ idAssignatura }) {
       conceptesSeleccionats: conceptesSeleccionatsIds,
     };
 
-    navigate("/testlayout", { state: { parametersTest } });
+    console.log(parametersTest, idAssignatura);
+    navigate("/testlayout", { state: { parametersTest, idAssignatura } });
   };
 
   // Generar tests amb IA
