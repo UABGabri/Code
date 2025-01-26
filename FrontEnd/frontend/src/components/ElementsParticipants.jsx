@@ -17,6 +17,8 @@ function ElementsParticipants({ Id_User, Id_Assignatura, Role_User }) {
   const itemsPerPage = 7;
   const [filter, setFilter] = useState("");
   const [filterRole, setFilterRole] = useState("Tots");
+  const [GradeHistory, setOpenGradeHistory] = useState(false);
+  const [grades, setGrades] = useState([]);
 
   //Funció de recuperació dels participants
   useEffect(() => {
@@ -239,6 +241,19 @@ function ElementsParticipants({ Id_User, Id_Assignatura, Role_User }) {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
 
+  const handleShowGrades = async (Id_User) => {
+    axios
+      .get(`${apiUrl}/recoverUserMarks`, {
+        params: { Id_User },
+      })
+      .then((res) => {
+        if (res.data.Status === "Success") {
+          setGrades(res.data.result);
+          console.log(res);
+        }
+      });
+  };
+
   return (
     <div>
       <div className={styles.participantContainer}>
@@ -324,13 +339,64 @@ function ElementsParticipants({ Id_User, Id_Assignatura, Role_User }) {
                       <strong>Rol: </strong> {userInfo.role}
                     </p>
 
-                    {Role_User === "professor" && (
-                      <p>
-                        <strong>
-                          Nota Global Assignatura:{" "}
-                          {(userInfo.notes / 10 || 0.0).toFixed(2)}{" "}
-                        </strong>
-                      </p>
+                    {Role_User === "professor" &&
+                      userInfo.role === "alumne" && (
+                        <p
+                          onClick={() => {
+                            handleShowGrades(userInfo.niu),
+                              setOpenGradeHistory(true);
+                          }}
+                        >
+                          <strong>
+                            Nota Global Assignatura:{" "}
+                            {(userInfo.notes / 10 || 0.0).toFixed(2)}{" "}
+                          </strong>
+                        </p>
+                      )}
+                    {GradeHistory && (
+                      <div className={styles.modalInformation}>
+                        <div>
+                          <div className={styles.modalGrades}>
+                            <h2>Historial de Notes</h2>
+                            <hr></hr>
+                            <div className={styles.modalGrades}>
+                              <div className={styles.modalGradesContent}>
+                                <h3>Tema</h3>
+                                <h3>Test</h3>
+                                <h3>Nota Final</h3>
+                                <h3>Data</h3>
+
+                                {grades.length > 0 ? (
+                                  grades.map((grade, index) => (
+                                    <div
+                                      key={index}
+                                      className={styles.gradeRow}
+                                    >
+                                      <p>{grade.nom_tema}</p>
+                                      <p>{grade.nom_test}</p>
+                                      <p>{grade.nota}</p>
+                                      <p>
+                                        {new Date(
+                                          grade.realitzacio
+                                        ).toLocaleDateString()}
+                                      </p>
+                                    </div>
+                                  ))
+                                ) : (
+                                  <h3>Sense notes</h3>
+                                )}
+                              </div>
+                            </div>
+
+                            <button
+                              onClick={() => setOpenGradeHistory(false)}
+                              className={styles.cancelButtonModal}
+                            >
+                              Tancar
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>
