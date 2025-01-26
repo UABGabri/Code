@@ -8,16 +8,26 @@ import multer from "multer";
 import fs from 'fs';
 import csvParser from 'csv-parser';
 import 'dotenv/config';
+import nodemailer from 'nodemailer'
+
 
 const salt = 10;
 const saltRounds = 10;
 const upload = multer({ dest: "uploads/" });
-
 const app = express();
 
-//http://localhost:8081
+
 
 app.use(express.json());
+
+
+const transporter = nodemailer.createTransport({
+    service: "Gmail",
+    auth: {
+      user: process.env.EMAIL_USER, // Configura esto con tu correo
+      pass: process.env.EMAIL_PASS, // Configura esto con tu contraseña o app password
+    },
+  });
 
 app.use(cors({
     origin: 'http://localhost:5173', //origen https://sparkling-torte-716cbe.netlify.app  http://localhost:5173
@@ -69,8 +79,21 @@ app.post('/register', (req, res) => {
 
     // Verificar que tots els camps són correctes
     if (!niu || !username || !password || !role || !gmail) {
-        return res.status(400).json({ error: "Tots els camps es requereixen" });
+        return res.json({ error: "Tots els camps es requereixen" });
     }
+
+
+
+     transporter.sendMail({
+        from: '"UAB Registre" 21gabifranco@gmail.com', // Remitente
+        to: gmail, 
+        subject: "Confirma el teu registre",
+        html: `
+          <h1>Benvingut/da a UAB Web Generador Examens de Prova</h1>
+          <p>Hola, ${username}!</p>
+          <p>Gràcies per registrar-te. Per accedir, introdueix el teu ${niu} i la teva contrasenya. ${password} </p>
+        `,
+      });
 
     // Verificar si el NIU ja  existeix
     const checkNiuSql = "SELECT * FROM usuaris WHERE niu = ?";
