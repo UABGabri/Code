@@ -1976,7 +1976,19 @@ app.get('/recoverTestsTopics', (req, res) =>{
     if(!idTema)
         return res.json({ status: "Failed" });
 
-    const sql = 'SELECT * FROM tests WHERE id_tema = ?'
+    
+    const sql = `SELECT 
+                    tests.*, 
+                    ROUND(AVG(resultats.nota), 2) AS puntuacio_promig
+                FROM 
+                    tests
+                JOIN 
+                    resultats ON tests.id_test = resultats.id_test
+                WHERE 
+                    tests.id_tema = ?
+                GROUP BY 
+                    tests.id_test;
+                `
 
     db.query(sql, [idTema], (error, result) => {
         if (error) {

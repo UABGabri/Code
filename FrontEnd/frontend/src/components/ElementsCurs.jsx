@@ -387,6 +387,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                               }
                             >
                               {test.nom_test}
+                              <p>Puntuació Mitja: {test.puntuacio_promig}%</p>
                             </li>
                           ))}
                         </ol>
