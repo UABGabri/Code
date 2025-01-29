@@ -47,7 +47,7 @@ function Register() {
   };
 
   // Enviar dades de registre al servidor
-  const handleConfirmPassword = (event) => {
+  const handleRegister = (event) => {
     event.preventDefault();
 
     if (!isValidEmail) {
@@ -75,7 +75,7 @@ function Register() {
           setError(res.data.error);
         } else {
           alert("Registrat amb èxit");
-          //navigate("/login");
+          navigate("/login");
         }
       })
       .catch((err) => {
@@ -98,7 +98,7 @@ function Register() {
           <h2>Registre</h2>
           {error && <div className="alert alert-danger">{error}</div>}
 
-          <form onSubmit={handleConfirmPassword}>
+          <form onSubmit={handleRegister}>
             <div>
               <label htmlFor="username">Nom de usuari</label>
               <input

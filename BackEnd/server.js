@@ -17,26 +17,37 @@ const upload = multer({ dest: "uploads/" });
 const app = express();
 
 
-
 app.use(express.json());
 
 
 const transporter = nodemailer.createTransport({
     service: "Gmail",
     auth: {
-      user: process.env.EMAIL_USER, // Configura esto con tu correo
-      pass: process.env.EMAIL_PASS, // Configura esto con tu contraseña o app password
+      user: process.env.EMAIL_USER, // Configura amb el teu correu
+      pass: process.env.EMAIL_PASS, // Configura amb la password
     },
   });
 
 app.use(cors({
-    origin: 'http://localhost:5173', //origen https://sparkling-torte-716cbe.netlify.app  http://localhost:5173
+    origin: 'https://sparkling-torte-716cbe.netlify.app', //origen https://sparkling-torte-716cbe.netlify.app  http://localhost:5173
     methods: ['GET', 'POST', 'PUT', 'DELETE'],// Metodes permesos
     credentials: true // Credencials necessaris
 }));
 
 
+app.use(cookieParser());  //Cookies
+
 /*
+const db = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "Ga21012002",
+    database: "web_examen_tfg"
+});
+*/
+
+
+
 const db = mysql.createConnection({
     host: process.env.DB_HOST || '127.0.0.1',
     user: process.env.DB_USER,
@@ -44,19 +55,6 @@ const db = mysql.createConnection({
     database: process.env.DB_NAME,
     port: process.env.DB_PORT,
 }); 
-*/
-
-
-app.use(cookieParser());  //Cookies
-
-
-
-const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "Ga21012002",
-    database: "web_examen_tfg"
-});
 
 
 
@@ -85,13 +83,13 @@ app.post('/register', (req, res) => {
 
 
      transporter.sendMail({
-        from: '"UAB Registre" 21gabifranco@gmail.com', // Remitente
+        from: '"UAB Registre" 21gabifranco@gmail.com', 
         to: gmail, 
         subject: "Confirma el teu registre",
         html: `
           <h1>Benvingut/da a UAB Web Generador Examens de Prova</h1>
           <p>Hola, ${username}!</p>
-          <p>Gràcies per registrar-te. Per accedir, introdueix el teu ${niu} i la teva contrasenya. ${password} </p>
+          <p>Gràcies per registrar-te. Per accedir, introdueix el teu NIU: ${niu} i la teva contrasenya. ${password} </p>
         `,
       });
 
@@ -2000,17 +1998,16 @@ app.get('/recoverTestsTopics', (req, res) =>{
         return res.json({ status: "Failed" });
 
     
-    const sql = `SELECT 
-                    tests.*, 
-                    ROUND(AVG(resultats.nota), 2) AS puntuacio_promig
+    const sql = `SELECT tests.*, 
+                    COALESCE(ROUND(AVG(resultats.nota), 2), 0) AS puntuacio_promig
                 FROM 
                     tests
-                JOIN 
+                LEFT JOIN 
                     resultats ON tests.id_test = resultats.id_test
                 WHERE 
                     tests.id_tema = ?
                 GROUP BY 
-                    tests.id_test;
+                    tests.id_test, tests.nom_test;
                 `
 
     db.query(sql, [idTema], (error, result) => {

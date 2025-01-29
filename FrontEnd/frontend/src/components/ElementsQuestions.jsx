@@ -7,7 +7,6 @@ import {
   FaCheck,
   FaTimes,
   FaEdit,
-  FaSave,
   FaArrowLeft,
   FaArrowRight,
 } from "react-icons/fa";

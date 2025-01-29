@@ -44,6 +44,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
           params: { id_tema: tema.id_tema },
         })
         .then((response) => {
+          console.log(response);
           if (response.data.status === "Success") {
             const testsAvaluatius = response.data.result.filter(
               (test) => test.tipus === "avaluatiu"

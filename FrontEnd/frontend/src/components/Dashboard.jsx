@@ -44,6 +44,7 @@ function Dashboard({ id_User, role_User }) {
   useEffect(() => {
     if (id_User && role_User) {
       fetchAssignatures().then((data) => {
+        console.log(data);
         setAssignatures(data);
       });
 
