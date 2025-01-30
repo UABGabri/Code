@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 function Profile() {
+  axios.defaults.withCredentials = true;
+
   const [values, setValues] = useState({
     niu: "",
     username: "",
@@ -19,6 +21,7 @@ function Profile() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  //Funció recuperació dels valors inicials de l'usuari
   useEffect(() => {
     axios
       .get(`${apiUrl}/user`, { withCredentials: true })
@@ -38,26 +41,33 @@ function Profile() {
     }));
   };
 
+  //Funció actualització perfil
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (values.password !== confirmPassword) {
-      alert("Si us plau, introdueix contrasenyes coincidents.");
-      return;
-    } else {
-      axios
-        .put(`${apiUrl}/updateUser`, values, {
-          withCredentials: true,
-        })
-        .then((res) => {
-          console.log(res);
-          if (res.data.Status === "Failed") alert("Aquest email ja existeix");
-          if (res.data.Status === "Success") alert("Canvis efectuats");
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+    if (values.password !== "") {
+      if (values.password !== confirmPassword) {
+        alert("Si us plau, introdueix contrasenyes coincidents.");
+        return;
+      }
     }
+
+    const updatedValues = { ...values };
+
+    // Elimina la contrasenya si no s'ha canviat
+    if (!updatedValues.password.trim()) {
+      delete updatedValues.password;
+    }
+
+    axios
+      .put(`${apiUrl}/updateUser`, updatedValues, { withCredentials: true })
+      .then((res) => {
+        if (res.data.Status === "Failed") alert("Aquest email ja existeix");
+        if (res.data.Status === "Success") alert("Canvis efectuats");
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   };
 
   const openModal = () => {
@@ -68,6 +78,7 @@ function Profile() {
     setIsModalOpen(false);
   };
 
+  //Funció eliminació del compte
   const handleConfirmDropOut = () => {
     axios
       .delete(`${apiUrl}/deleteUser`, {
@@ -141,7 +152,6 @@ function Profile() {
               type="password"
               name="password"
               onChange={handleInputChange}
-              required
               id="password"
               minLength={8}
               maxLength={10}
@@ -160,7 +170,6 @@ function Profile() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               className={styles.inputProfile}
               id="confirmPassword"
-              required
               minLength={8}
               maxLength={10}
               placeholder="Confirma la contrasenya"

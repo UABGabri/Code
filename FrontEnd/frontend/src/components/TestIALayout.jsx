@@ -30,8 +30,6 @@ function TestIALayout() {
           return acc;
         }, {});
 
-        //console.log(initialProbabilities);
-
         setProbabilities(initialProbabilities);
         fetchNextQuestion(initialProbabilities); // Carregar pregunta inicial
       })

@@ -24,7 +24,7 @@ function Headercap({}) {
       .then((res) => {
         navigate("/login");
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.error(err));
   };
 
   // Funció per tornar a la pàgina anterior

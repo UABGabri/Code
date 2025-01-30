@@ -52,7 +52,6 @@ function ElementsTests({ idAssignatura }) {
       conceptesSeleccionats: conceptesSeleccionatsIds,
     };
 
-    console.log(parametersTest, idAssignatura);
     navigate("/testlayout", { state: { parametersTest, idAssignatura } });
   };
 

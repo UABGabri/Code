@@ -81,7 +81,8 @@ function Login() {
                     setValues({ ...values, password: e.target.value });
                   }}
                   maxLength={10}
-                  title="La contrasenya ha de tenir entre 8 i 10 caràcters"
+                  minLength={8}
+                  title="La contrasenya ha de tenir entre 8 i 10 caràcters. Només números i lletres."
                 />
               </div>
 

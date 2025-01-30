@@ -119,7 +119,6 @@ function ElementsParticipants({ Id_User, Id_Assignatura, Role_User }) {
       if (response.data.status === "Success") {
         alert("Importació completada correctament!");
 
-        console.log(response.data.participants);
         const filteredUsers = response.data.participants.filter(
           (user) => user.niu !== Id_User
         );
@@ -155,7 +154,6 @@ function ElementsParticipants({ Id_User, Id_Assignatura, Role_User }) {
               params: { niu: newNiu, Id_Assignatura },
             })
             .then((checkRes) => {
-              console.log("Gaga");
               if (checkRes.data.Status === "Success") {
                 alert(
                   "Aquest participant ja està registrat en aquesta assignatura!"
@@ -175,8 +173,6 @@ function ElementsParticipants({ Id_User, Id_Assignatura, Role_User }) {
                     const filteredUsers = addRes.data.result.filter(
                       (user) => user.niu !== Id_User
                     );
-
-                    console.log(filteredUsers);
 
                     setUsers(filteredUsers);
                     setShowModal(false);
@@ -249,7 +245,6 @@ function ElementsParticipants({ Id_User, Id_Assignatura, Role_User }) {
       .then((res) => {
         if (res.data.Status === "Success") {
           setGrades(res.data.result);
-          console.log(res);
         }
       });
   };
@@ -328,9 +323,12 @@ function ElementsParticipants({ Id_User, Id_Assignatura, Role_User }) {
                     <p>
                       <strong>Nom:</strong> {userInfo.username}
                     </p>
-                    <p>
-                      <strong>NIU:</strong> {userInfo.niu}
-                    </p>
+                    {Role_User === "professor" && (
+                      <p>
+                        <strong>NIU:</strong> {userInfo.niu}
+                      </p>
+                    )}
+
                     <p>
                       <strong>Email:</strong>{" "}
                       <a href={`mailto:${userInfo.email}`}>{userInfo.email}</a>

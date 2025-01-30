@@ -29,7 +29,7 @@ const transporter = nodemailer.createTransport({
   });
 
 app.use(cors({
-    origin: 'https://sparkling-torte-716cbe.netlify.app', //origen https://sparkling-torte-716cbe.netlify.app  http://localhost:5173
+    origin: ' http://localhost:5173', //origen https://sparkling-torte-716cbe.netlify.app  http://localhost:5173
     methods: ['GET', 'POST', 'PUT', 'DELETE'],// Metodes permesos
     credentials: true // Credencials necessaris
 }));
@@ -83,7 +83,7 @@ app.post('/register', (req, res) => {
 
 
      transporter.sendMail({
-        from: '"UAB Registre" 21gabifranco@gmail.com', 
+        from: '"UAB Registre"', 
         to: gmail, 
         subject: "Confirma el teu registre",
         html: `
@@ -256,6 +256,7 @@ app.get('/user', (req, res) => {
 
 //Funció que serveix per actualització del perfil a la base de dades
 app.put('/updateUser', (req, res) => { 
+    
     const token = req.cookies.token;
 
     if (!token) {
@@ -270,49 +271,51 @@ app.put('/updateUser', (req, res) => {
         const niu = decoded.niu;
         const { username, email, password } = req.body;
 
-        if (!username || !email || !password) {
-            return res.json({ Error: "Tots els camps són obligatoris" });
+        if (!username || !email) {
+            return res.json({ Error: "El nom i el correu són obligatoris" });
         }
 
-
-        console.log(typeof(email))
-
-        const sqlCheck = 'SELECT * FROM usuaris WHERE email = ?';
+        const sqlCheck = 'SELECT * FROM usuaris WHERE email = ? AND niu != ?';
 
 
-        db.query(sqlCheck, [email], (err, result) => {
+        db.query(sqlCheck, [email, niu], (err, result) => {
             if (err) return res.json({ Status: "Failed", Error: "Error buscant l'usuari" });
-            
-            console.log(result.length)
 
-            if (result.length === 1) {
+            if (result.length > 0) {
                 return res.json({ Status: "Failed", Message: "Email duplicat" });
             } else {
                 
-
-
-                bcryptjs.hash(password.toString(), salt, (err, hash) => {
-                    if (err) return res.json({ Error: "Error encriptant la contrasenya" });
-        
-                    const sql = 'UPDATE usuaris SET username = ?, email = ?, password = ? WHERE niu = ?';
-                    db.query(sql, [username, email, hash, niu], (err, result) => {
+                if (!password) {
+                    const sql = 'UPDATE usuaris SET username = ?, email = ? WHERE niu = ?';
+                    db.query(sql, [username, email, niu], (err, result) => {
                         if (err) return res.json({ Error: "Error actualitzant l'usuari" });
-                        
+    
                         if (result.affectedRows > 0) {
                             return res.json({ Status: "Success", Message: "Dades actualitzades correctament" });
                         } else {
                             return res.json({ Error: "Usuari no trobat" });
                         }
                     });
-                });
-
-
-                
+                } else {
+                    // Si la contrasenya NO està buida, la xifrem abans d'actualitzar
+                 
+                        bcryptjs.hash(password.toString(), salt, (err, hash) => {
+                            if (err) return res.json({ Error: "Error encriptant la contrasenya" });
+    
+                            const sql = 'UPDATE usuaris SET username = ?, email = ?, password = ? WHERE niu = ?';
+                            db.query(sql, [username, email, hash, niu], (err, result) => {
+                                if (err) return res.json({ Error: "Error actualitzant l'usuari" });
+    
+                                if (result.affectedRows > 0) {
+                                    return res.json({ Status: "Success", Message: "Dades actualitzades correctament" });
+                                } else {
+                                    return res.json({ Error: "Usuari no trobat" });
+                                }
+                            });
+                        });
+                }
             }
         });
-
-     
-    
     });
 });
 
@@ -2339,7 +2342,22 @@ app.post("/addLink", (req, res) =>{
 
 
 })
-  
+
+app.get("/recoverLinks", (req, res) =>{
+
+    const Id_Assignatura = req.query.Id_Assignatura;
+
+    const sql = 'SELECT * FROM continguts JOIN temes ON temes.id_tema = continguts.id_tema WHERE temes.id_assignatura = ?'
+
+    db.query(sql,[Id_Assignatura],(err, result) => {
+
+    if(err){
+            return res.json({Status:"Failed"})
+        }else{
+            return res.json({Status:"Success", result})
+        }
+    })
+})
 
 
 

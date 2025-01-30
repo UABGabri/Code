@@ -22,8 +22,6 @@ function AssignaturaLayout() {
 
   //Funció per abandonar una assignatura
   const handleConfirmDropOut = () => {
-    console.log(id);
-
     axios
       .delete(`${apiUrl}/leaveSubject`, {
         params: { Id_Assignatura: id, id: id_User, role_User },

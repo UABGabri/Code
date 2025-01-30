@@ -110,7 +110,7 @@ function Register() {
                 id="username"
                 placeholder="Introdueix el teu nom de usuari"
                 required
-                maxLength={15}
+                maxLength={30}
                 className={styles.inputField}
                 pattern="^[A-Za-zÀ-ÿ\s]+$"
                 title="El nom només ha de tenir lletres"
@@ -165,7 +165,8 @@ function Register() {
                 className={styles.inputField}
                 minLength={8}
                 maxLength={10}
-                title="La contrasenya ha de tenir entre 8 i 10 caràcters"
+                pattern="^[A-Za-z0-9]+$"
+                title="La contrasenya ha de tenir entre 8 i 10 caràcters. Només números i lletres."
               />
             </div>
 
@@ -179,6 +180,7 @@ function Register() {
                 minLength={8}
                 maxLength={10}
                 required
+                pattern="^[A-Za-z0-9]+$"
                 className={styles.inputField}
                 placeholder="Confirma la contrasenya"
               />

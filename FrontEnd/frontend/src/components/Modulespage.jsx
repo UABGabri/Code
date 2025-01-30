@@ -12,7 +12,6 @@ function Modulespage() {
   const [niu, setNiu] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  // Configura axios perquè inclogui les cookies en totes les sol·licituds
   axios.defaults.withCredentials = true;
 
   // Recupera informació de l'usuari quan es carrega el component

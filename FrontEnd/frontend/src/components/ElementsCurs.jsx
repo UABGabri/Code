@@ -18,6 +18,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
   const [linkContingut, setLinkContingut] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [openTema, setOpenTema] = useState({});
+  const [continguts, setContinguts] = useState({});
   const navigate = useNavigate();
 
   //Funció de recuperació dels temes de la assignatura.
@@ -34,6 +35,14 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
       .catch(() => {
         alert("Error al recuperar els temes.");
       });
+
+    axios
+      .get(`${apiUrl}/recoverLinks`, {
+        params: { Id_Assignatura },
+      })
+      .then((response) => {
+        setContinguts(response.data.result);
+      });
   }, [Id_Assignatura]);
 
   //Funció de recuperació de tots els tests de cada tema.
@@ -44,7 +53,6 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
           params: { id_tema: tema.id_tema },
         })
         .then((response) => {
-          console.log(response);
           if (response.data.status === "Success") {
             const testsAvaluatius = response.data.result.filter(
               (test) => test.tipus === "avaluatiu"
@@ -164,8 +172,6 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
       return;
     }
 
-    console.log(id_Test);
-
     axios
       .post(`${apiUrl}/validateTestAccess`, {
         id_test: id_Test,
@@ -266,14 +272,19 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                     </h3>
                     <hr />
 
-                    <ol>
-                      <a
-                        href="https://www.cambridgeenglish.org/es/exams-and-tests/first/exam-format/"
-                        target="_blank"
-                      >
-                        Examen de prova any anterior
-                      </a>
-                    </ol>
+                    {continguts
+                      .filter((contingut) => contingut.id_tema === tema.id_tema)
+                      .map((contingut) => (
+                        <ol key={contingut.id_contingut}>
+                          <a
+                            href={contingut.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {contingut.link}
+                          </a>
+                        </ol>
+                      ))}
 
                     {Role_User === "professor" && (
                       <button
@@ -303,7 +314,7 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                               value={linkContingut}
                               onChange={(e) => setLinkContingut(e.target.value)}
                               required
-                              maxLength={20}
+                              maxLength={100}
                             />
                             <button type="submit" className={styles.temaButton}>
                               Afegir Link
@@ -388,7 +399,9 @@ function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
                               }
                             >
                               {test.nom_test}
-                              <p>Puntuació Mitja: {test.puntuacio_promig}%</p>
+                              {Role_User === "professor" && (
+                                <p>Mitja Aprovats: {test.puntuacio_promig}%</p>
+                              )}
                             </li>
                           ))}
                         </ol>

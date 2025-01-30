@@ -82,8 +82,6 @@ function CreateQuizz() {
         intents,
       })
       .then((response) => {
-        console.log(response);
-
         if (response.data.Status === "Success") {
           if (tipus === "avaluatiu") {
             alert("Test creat correctament");

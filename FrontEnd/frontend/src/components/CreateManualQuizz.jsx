@@ -40,8 +40,6 @@ function CreateManualQuizz() {
         setPreguntes(response.data);
         setFilteredPreguntes(response.data);
 
-        console.log(response);
-
         const id_assignatura = idAssignatura;
         axios
           .get(`${apiUrl}/recoverTopicsSubject`, {

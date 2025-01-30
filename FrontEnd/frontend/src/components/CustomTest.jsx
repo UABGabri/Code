@@ -42,7 +42,6 @@ function CustomTest() {
         const sortedPreguntes = response.data.Preguntes.sort(
           (a, b) => a.posicio - b.posicio
         );
-        console.log(response);
 
         setPreguntesTest(sortedPreguntes);
         fetchRemainingQuestions(sortedPreguntes);
@@ -58,7 +57,7 @@ function CustomTest() {
           setClau(sortedPreguntes[0].clau_acces);
         }
       })
-      .catch(() => console.log("Error obtenint les preguntes del test."));
+      .catch(() => console.error("Error obtenint les preguntes del test."));
   }, [idTest]);
 
   // Obtenir les preguntes restants del banc

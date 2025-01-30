@@ -233,7 +233,6 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
 
   //Funció d'avaluació de les preguntes
   const handleStatusChange = (idPregunta, nouEstat) => {
-    console.log(idPregunta, nouEstat);
     axios
       .put(`${apiUrl}/updateQuestionAccept`, {
         id_pregunta: idPregunta,

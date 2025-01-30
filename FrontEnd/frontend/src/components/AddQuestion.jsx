@@ -66,7 +66,6 @@ function AddQuestion() {
         params: { Id_Assignatura },
       })
       .then((res) => {
-        console.log("Resposta servidor:", res.data);
         setTemes(res.data);
       });
   };

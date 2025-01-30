@@ -10,6 +10,8 @@ import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 function Dashboard({ id_User, role_User }) {
+  axios.defaults.withCredentials = true;
+
   const [assignatures, setAssignatures] = useState([]);
   const [addModal, setAddModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
@@ -44,11 +46,8 @@ function Dashboard({ id_User, role_User }) {
   useEffect(() => {
     if (id_User && role_User) {
       fetchAssignatures().then((data) => {
-        console.log(data);
         setAssignatures(data);
       });
-
-      console.log(assignatures);
     } else {
       console.error("id_User or role_User no està definit");
     }
@@ -92,7 +91,6 @@ function Dashboard({ id_User, role_User }) {
         userRole: role_User,
       });
 
-      console.log(res);
       if (res.data.success) {
         alert(res.data.Messages);
       } else {
@@ -285,13 +283,14 @@ function Dashboard({ id_User, role_User }) {
               </div>
 
               <div className={styles.formGroup}>
-                <label htmlFor="password">Password de l'assignatura:</label>
+                <label htmlFor="password">Contrasenya de l'assignatura:</label>
                 <input
                   type="password"
                   id="password"
                   value={accessPassword}
                   required
                   maxLength={10}
+                  pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
                   onChange={(e) => setAccessPassword(e.target.value)}
                   className={styles.inputField}
                 />
@@ -346,13 +345,16 @@ function Dashboard({ id_User, role_User }) {
                   </div>
 
                   <div className={styles.formGroup}>
-                    <label htmlFor="password">Password de l'assignatura:</label>
+                    <label htmlFor="password">
+                      Contrasenya de l'assignatura:
+                    </label>
                     <input
                       type="password"
                       id="password"
                       value={accessPassword}
                       required
                       maxLength={10}
+                      pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
                       onChange={(e) => setAccessPassword(e.target.value)}
                       className={styles.inputField}
                     />
