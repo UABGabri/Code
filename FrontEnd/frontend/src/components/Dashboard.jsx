@@ -355,6 +355,7 @@ function Dashboard({ id_User, role_User }) {
                       required
                       maxLength={10}
                       pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
+                      title="Només caràcters alfabètics i numèrics."
                       onChange={(e) => setAccessPassword(e.target.value)}
                       className={styles.inputField}
                     />

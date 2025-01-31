@@ -67,6 +67,7 @@ function AddSubjectModal({ id_User, onClose }) {
               placeholder="Ex: Matemàtiques"
               required
               maxLength={15}
+              title="Només caràcters alfabètics."
               pattern="^[A-Za-zÀ-ÿ\s]+$"
             />
           </div>
@@ -80,6 +81,7 @@ function AddSubjectModal({ id_User, onClose }) {
               required
               maxLength={10}
               pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
+              title="Només caràcters alfabètics i numèrics."
             />
           </div>
 

@@ -233,6 +233,7 @@ function CreateQuizz() {
 
                       setNomTest(inputValue);
                     }}
+                    title="Utilitza només caràcters numèrics o alfabètics."
                     placeholder="Nom del test"
                   />
                 </label>
@@ -257,6 +258,7 @@ function CreateQuizz() {
                     required
                     maxLength={3}
                     placeholder="En minuts"
+                    title="Utilitza només caràcters numèrics. Màxim 3."
                     pattern="\d{1,3}"
                     onChange={(e) => {
                       const inputValue = e.target.value;
