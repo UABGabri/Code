@@ -243,6 +243,7 @@ function CreateManualQuizz() {
                   <input
                     type="date"
                     value={dataFinalitzacio}
+                    min={new Date().toISOString().split("T")[0]}
                     onChange={(e) => setDataFinalitzacio(e.target.value)}
                     className={styles.inputField}
                   />
@@ -271,6 +272,8 @@ function CreateManualQuizz() {
                       <input
                         type="text"
                         value={clau}
+                        pattern="[a-zA-Z0-9]+"
+                        title="Només caràcters alfabètics i/o numèrics."
                         onChange={(e) => {
                           setClau(e.target.value);
                         }}
@@ -285,7 +288,13 @@ function CreateManualQuizz() {
                         type="number"
                         value={intents}
                         onChange={(e) => {
-                          setIntents(e.target.value);
+                          const value = Number(e.target.value);
+
+                          if (value < 1 || isNaN(value)) {
+                            setIntents(1);
+                          } else {
+                            setIntents(value);
+                          }
                         }}
                         className={styles.inputField}
                         required

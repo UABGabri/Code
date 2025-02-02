@@ -301,6 +301,10 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
             <div key={question.id_pregunta} className={styles.questionCard}>
               <div className={styles.questionDetails}>
                 <p>
+                  <strong>Autor:</strong> {question.id_creador || "No té tema"}
+                </p>
+
+                <p>
                   <strong>Tema:</strong> {question.nom_tema || "No té tema"}
                 </p>
                 <p>
@@ -310,10 +314,6 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                 <p>
                   <strong>Pregunta:</strong>{" "}
                   {question.pregunta || "No té pregunta"}
-                </p>
-                <p>
-                  <strong>Resposta:</strong>{" "}
-                  {question.solucio_correcta || "No té resposta"}
                 </p>
               </div>
 

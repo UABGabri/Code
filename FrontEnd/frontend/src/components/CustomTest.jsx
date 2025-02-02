@@ -38,7 +38,6 @@ function CustomTest() {
         params: { idTest },
       })
       .then((response) => {
-        console.log(response);
         const sortedPreguntes = response.data.Preguntes.sort(
           (a, b) => a.posicio - b.posicio
         );
@@ -46,14 +45,16 @@ function CustomTest() {
         setPreguntesTest(sortedPreguntes);
         fetchRemainingQuestions(sortedPreguntes);
 
+        setIntents(sortedPreguntes[0].intents);
         setTestName(sortedPreguntes[0].nom_test);
         setDuration(sortedPreguntes[0].temps / 60);
         const aux = sortedPreguntes[0].data_final;
         const formattedDate = new Date(aux).toISOString().split("T")[0];
         setData(formattedDate);
-        setTipus(sortedPreguntes[0].tipus);
+        const tipusTest = sortedPreguntes[0].tipus;
+        setTipus(tipusTest);
 
-        if (tipus === "avaluatiu") {
+        if (tipusTest === "avaluatiu") {
           setClau(sortedPreguntes[0].clau_acces);
         }
       })
@@ -156,7 +157,7 @@ function CustomTest() {
 
   //Funció d'aplicar canvis
   const aplicarCanvis = async () => {
-    let clauAux;
+    let clauAux = null;
     let cancelUser = false;
 
     if (tipus === "avaluatiu") {
@@ -184,7 +185,7 @@ function CustomTest() {
       }
     } else {
       setClau(" ");
-      setIntents(10);
+      setIntents(5);
     }
 
     if (cancelUser) {
@@ -199,7 +200,7 @@ function CustomTest() {
       }
     }
 
-    const minutes = duration * 60;
+    const minutes = Number(duration) * 60;
 
     try {
       const res = await axios.put(`${apiUrl}/updateTestCustom`, {
@@ -417,8 +418,10 @@ function CustomTest() {
                         className={styles.inputField}
                         value={testName}
                         onChange={(e) => setTestName(e.target.value)}
-                        maxLength="10"
+                        maxLength={20}
+                        pattern="[a-zA-Z0-9]+"
                         required
+                        title="Només es pot introduir valors alfabètics o numèrics."
                       />
                     </label>
 
@@ -429,6 +432,7 @@ function CustomTest() {
                         value={data}
                         onChange={(e) => setData(e.target.value)}
                         className={styles.inputField}
+                        min={new Date().toISOString().split("T")[0]}
                         required
                       />
                     </label>
@@ -441,6 +445,8 @@ function CustomTest() {
                         onChange={(e) => setDuration(e.target.value)}
                         className={styles.inputField}
                         placeholder="En minuts"
+                        pattern="\d{1,3}"
+                        title="Només es pot introduir un valor numèric de fins a tres xifres."
                         required
                       />
                     </label>
@@ -450,14 +456,14 @@ function CustomTest() {
                     {tipus === "avaluatiu" && (
                       <label
                         className={styles.inputLabel}
-                        style={{ marginRight: "20px" }}
+                        style={{ marginRight: "20px", marginBottom: "10px" }}
                       >
                         Intents:
                         <input
                           type="number"
                           value={intents}
-                          onChange={(e) => setIntents(e.target.value)}
                           className={styles.inputField}
+                          onChange={(e) => setIntents(e.target.value || 0)}
                           min={1}
                           required
                         />

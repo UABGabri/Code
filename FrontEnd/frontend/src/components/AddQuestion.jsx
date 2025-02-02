@@ -144,6 +144,7 @@ function AddQuestion() {
               value={values.conceptes_materia}
               onChange={(e) => updateField("conceptes_materia", e.target.value)}
               placeholder="Conceptes separats per comes"
+              title="Només elements de caràcter numèric o alfabètic."
               required
               pattern="^[A-Za-zÀ-ÿ0-9\s,]+$"
               className={styles.selectInput}
@@ -180,6 +181,7 @@ function AddQuestion() {
                 className={styles.textarea}
                 placeholder="Insereix la teva pregunta"
                 required
+                title="Només elements de caràcter numèric o alfabètic."
                 pattern="^[A-Za-zÀ-ÿ0-9\s]+$"
                 maxLength={100}
               />

@@ -472,33 +472,41 @@ function ElementsParticipants({ Id_User, Id_Assignatura, Role_User }) {
         <div className={styles.modalBackdropParticipant}>
           <div className={styles.modalContentParticipant}>
             <div>
-              <h2>Afegir Participant</h2>
-              <label htmlFor="niu">NIU de l'usuari:</label>
-              <input
-                type="text"
-                id="niu"
-                value={newNiu}
-                onChange={(e) => {
-                  e.preventDefault(), setNewNiu(e.target.value);
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleAddParticipant(); // Crida la funció quan es prem "Afegir"
                 }}
-                className={styles.inputField}
-                maxLength={7}
-              />
-              <div className={styles.modalActions}>
-                <button
-                  onClick={handleAddParticipant}
-                  className={styles.addParticipantButton}
-                >
-                  Afegir
-                </button>
-                <button
-                  style={{ backgroundColor: "red", color: "white" }}
-                  onClick={() => setShowModal(false)}
-                  className={styles.cancelButtonModal}
-                >
-                  Cancel·lar
-                </button>
-              </div>
+              >
+                <h2>Afegir Participant</h2>
+
+                <label htmlFor="niu">NIU de l'usuari:</label>
+                <input
+                  type="text"
+                  id="niu"
+                  value={newNiu}
+                  onChange={(e) => setNewNiu(e.target.value)}
+                  maxLength={7}
+                  pattern="^\d{7}$"
+                  title="Només es poden introduir fins a 7 xifres."
+                  className={styles.inputField}
+                  required
+                />
+
+                <div className={styles.modalActions}>
+                  <button type="submit" className={styles.addParticipantButton}>
+                    Afegir
+                  </button>
+                  <button
+                    type="button"
+                    style={{ backgroundColor: "red", color: "white" }}
+                    onClick={() => setShowModal(false)}
+                    className={styles.cancelButtonModal}
+                  >
+                    Cancel·lar
+                  </button>
+                </div>
+              </form>
 
               <hr></hr>
               <div>

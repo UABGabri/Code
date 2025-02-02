@@ -1681,6 +1681,7 @@ app.get('/recoverSelectedTestWithKeyQuestions', (req, res) => {
                 t.data_final,
                 t.temps,
                 t.clau_acces,
+                t.intents,
                 GROUP_CONCAT(c.nom_concepte ORDER BY c.nom_concepte SEPARATOR ', ') AS conceptes
             FROM 
                 test_preguntes pt
@@ -1759,7 +1760,6 @@ app.put('/updateTestCustom', (req, res) =>{
     console.log(testName, data, minutes, tipus, clauAux, idTest, intents)
 
     const sql = 'UPDATE tests SET nom_test = ?, data_final = ?, temps = ?, tipus = ?, clau_acces = ?, intents = ? WHERE id_test = ? ';
-
 
 
     db.query(sql, [testName, data, minutes, tipus, clauAux, intents, idTest], (error, result) => {
