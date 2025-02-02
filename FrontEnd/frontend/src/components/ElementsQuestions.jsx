@@ -307,10 +307,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                 <p>
                   <strong>Tema:</strong> {question.nom_tema || "No té tema"}
                 </p>
-                <p>
-                  <strong>Dificultat:</strong>{" "}
-                  {question.dificultat || "No té dificultat"}
-                </p>
+
                 <p>
                   <strong>Pregunta:</strong>{" "}
                   {question.pregunta || "No té pregunta"}
