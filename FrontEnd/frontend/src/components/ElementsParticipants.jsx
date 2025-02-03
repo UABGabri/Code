@@ -7,6 +7,7 @@ import { FaArrowLeft, FaArrowRight, FaInfo, FaTrash } from "react-icons/fa6";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 function ElementsParticipants({ Id_User, Id_Assignatura, Role_User }) {
+  axios.defaults.withCredentials = true;
   const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [infoModal, setInfoModal] = useState(false);

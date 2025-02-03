@@ -6,6 +6,7 @@ import axios from "axios";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 function AddSubjectModal({ id_User, onClose }) {
+  axios.defaults.withCredentials = true;
   const [subject_Name, setSubject_Name] = useState("");
   const [id_Subject, setIdSubject] = useState("");
   const [passwordSubject, setPasswordSubject] = useState("");

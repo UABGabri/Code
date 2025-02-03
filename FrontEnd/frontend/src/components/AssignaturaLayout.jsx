@@ -13,6 +13,7 @@ import axios from "axios";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 function AssignaturaLayout() {
+  axios.defaults.withCredentials = true;
   const { id } = useParams(); //id de la ASSIGNATURA
   const location = useLocation();
   const { name, id_User, role_User } = location.state;

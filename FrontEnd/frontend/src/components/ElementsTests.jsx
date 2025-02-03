@@ -8,6 +8,7 @@ import styles from "./StyleComponents/Elements.module.css";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 function ElementsTests({ idAssignatura }) {
+  axios.defaults.withCredentials = true;
   const navigate = useNavigate();
   const [conceptes, setConceptes] = useState([]);
   const [conceptesSeleccionats, setConceptesSeleccionats] = useState([]);

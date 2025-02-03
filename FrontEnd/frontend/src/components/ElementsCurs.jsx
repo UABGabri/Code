@@ -8,6 +8,7 @@ import { FaChevronDown, FaChevronUp, FaPlus } from "react-icons/fa";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 function ElementsCurs({ Id_Assignatura, Id_User, Role_User }) {
+  axios.defaults.withCredentials = true;
   const [temes, setTemes] = useState([]);
   const [testsAvaluatius, setTestsAvaluatius] = useState({});
   const [testsPractica, setTestsPractica] = useState({});

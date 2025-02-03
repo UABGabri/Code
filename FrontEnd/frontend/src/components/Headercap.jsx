@@ -8,6 +8,7 @@ import axios from "axios";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 function Headercap({}) {
+  axios.defaults.withCredentials = true;
   const [dropdown, setDropdown] = useState(false);
   const location = useLocation(); // Per obtenir la ruta actual
   const navigate = useNavigate();

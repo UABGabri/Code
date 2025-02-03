@@ -9,6 +9,7 @@ import { FaPlus, FaTrash } from "react-icons/fa6";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 function CreateQuizz() {
+  axios.defaults.withCredentials = true;
   const navigate = useNavigate();
   const location = useLocation();
   const [temes, setTemes] = useState([]);
@@ -150,38 +151,43 @@ function CreateQuizz() {
                 <ul className={styles.selectedTopics}>
                   {seleccions.length > 0 ? (
                     seleccions.map((seleccio, index) => (
-                      <li key={`${seleccio.id}-${index}`}>
-                        {seleccio.nom_tema} - Preguntes:
-                        <input
-                          type="number"
-                          min="1"
-                          max="15"
-                          value={seleccio.preguntes}
-                          onChange={(e) =>
-                            setSeleccions((prev) =>
-                              prev.map((sel, idx) =>
-                                idx === index
-                                  ? {
-                                      ...sel,
-                                      preguntes: parseInt(e.target.value),
-                                    }
-                                  : sel
-                              )
-                            )
-                          }
-                          className={styles.selectedTopic}
-                        />
-                        <span> Dificultat: {seleccio.dificultat}</span>
-                        <button
-                          onClick={() =>
-                            setSeleccions((prev) =>
-                              prev.filter((_, idx) => idx !== index)
-                            )
-                          }
-                        >
-                          <FaTrash />
-                        </button>
-                      </li>
+                      <>
+                        <div>
+                          <li key={`${seleccio.id}-${index}`}>
+                            {seleccio.nom_tema} - Preguntes:
+                            <input
+                              type="number"
+                              min="1"
+                              max="15"
+                              value={seleccio.preguntes}
+                              onChange={(e) =>
+                                setSeleccions((prev) =>
+                                  prev.map((sel, idx) =>
+                                    idx === index
+                                      ? {
+                                          ...sel,
+                                          preguntes: parseInt(e.target.value),
+                                        }
+                                      : sel
+                                  )
+                                )
+                              }
+                              className={styles.selectedTopic}
+                            />
+                            <span> Dificultat: {seleccio.dificultat}</span>
+                            <button
+                              onClick={() =>
+                                setSeleccions((prev) =>
+                                  prev.filter((_, idx) => idx !== index)
+                                )
+                              }
+                              style={{ marginLeft: "10px" }}
+                            >
+                              <FaTrash />
+                            </button>
+                          </li>
+                        </div>
+                      </>
                     ))
                   ) : (
                     <p>No hi ha temes seleccionats</p>

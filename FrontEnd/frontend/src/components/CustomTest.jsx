@@ -10,6 +10,7 @@ import { FaInfo } from "react-icons/fa6";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 function CustomTest() {
+  axios.defaults.withCredentials = true;
   const navigate = useNavigate();
   const location = useLocation();
   const [preguntesTest, setPreguntesTest] = useState([]);

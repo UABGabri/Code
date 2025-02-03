@@ -10,6 +10,7 @@ import { FaPlus, FaMinus } from "react-icons/fa";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 function AddQuestion() {
+  axios.defaults.withCredentials = true;
   const location = useLocation();
   const { Id_User, Id_Assignatura, Role_User } = location.state;
   const [errors, setFormErrors] = useState("");

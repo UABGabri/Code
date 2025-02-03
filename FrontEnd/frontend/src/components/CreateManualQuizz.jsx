@@ -10,6 +10,7 @@ import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 function CreateManualQuizz() {
+  axios.defaults.withCredentials = true;
   const location = useLocation();
   const idTema = location.state?.id_tema;
   const idProfessor = location.state?.id_professor;
