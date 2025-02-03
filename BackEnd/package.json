@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "Web de preguntes d’examen per alumnes i professor\r Descripció\tEls alumnes volen que el professor pengi els exàmens anteriors \r al campus virtual per fer-se una idea del tipus d’examen que fa el professor, \r practicar i verificar sí el seu nivell de coneixements és correcte. El que es \r proposa en aquest TFG és que les preguntes de l’examen no siguin unidireccionals \r del professor als alumnes. La idea és que tant el professor, com els alumnes pugui \r proposar preguntes d’examen i després que la web generi exàmens de prova amb un \r contingut prou variat i amb diversos nivells de dificultat.",
+  "description": "Web de preguntes d’examen per alumnes i professor",
   "main": "index.js",
   "type": "module",
   "scripts": {
