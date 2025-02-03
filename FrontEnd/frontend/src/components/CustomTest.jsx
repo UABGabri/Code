@@ -150,7 +150,7 @@ function CustomTest() {
         params: { idTest },
       })
       .then(() => {
-        alert("Test deleted successfully.");
+        alert("Test eliminat.");
         navigate(-1);
       })
       .catch(() => alert("Error esborrant el test."));

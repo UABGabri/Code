@@ -150,45 +150,50 @@ function CreateQuizz() {
                 <h3>Resum de Temes Seleccionats</h3>
                 <ul className={styles.selectedTopics}>
                   {seleccions.length > 0 ? (
-                    seleccions.map((seleccio, index) => (
-                      <>
-                        <div>
-                          <li key={`${seleccio.id}-${index}`}>
+                    <ul className={styles.selectedTopics}>
+                      {seleccions.map((seleccio, index) => (
+                        <li
+                          key={`${seleccio.id}-${index}`}
+                          className={styles.listItem}
+                        >
+                          <span className={styles.topicName}>
                             {seleccio.nom_tema} - Preguntes:
-                            <input
-                              type="number"
-                              min="1"
-                              max="15"
-                              value={seleccio.preguntes}
-                              onChange={(e) =>
-                                setSeleccions((prev) =>
-                                  prev.map((sel, idx) =>
-                                    idx === index
-                                      ? {
-                                          ...sel,
-                                          preguntes: parseInt(e.target.value),
-                                        }
-                                      : sel
-                                  )
+                          </span>
+                          <input
+                            type="number"
+                            min="1"
+                            max="15"
+                            value={seleccio.preguntes}
+                            onChange={(e) =>
+                              setSeleccions((prev) =>
+                                prev.map((sel, idx) =>
+                                  idx === index
+                                    ? {
+                                        ...sel,
+                                        preguntes: parseInt(e.target.value),
+                                      }
+                                    : sel
                                 )
-                              }
-                              className={styles.selectedTopic}
-                            />
-                            <span> Dificultat: {seleccio.dificultat}</span>
-                            <button
-                              onClick={() =>
-                                setSeleccions((prev) =>
-                                  prev.filter((_, idx) => idx !== index)
-                                )
-                              }
-                              style={{ marginLeft: "10px" }}
-                            >
-                              <FaTrash />
-                            </button>
-                          </li>
-                        </div>
-                      </>
-                    ))
+                              )
+                            }
+                            className={styles.selectedTopic}
+                          />
+                          <span className={styles.difficulty}>
+                            Dificultat: {seleccio.dificultat}
+                          </span>
+                          <button
+                            onClick={() =>
+                              setSeleccions((prev) =>
+                                prev.filter((_, idx) => idx !== index)
+                              )
+                            }
+                            className={styles.deleteButton}
+                          >
+                            <FaTrash />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
                   ) : (
                     <p>No hi ha temes seleccionats</p>
                   )}

@@ -13,7 +13,6 @@ function AddQuestion() {
   axios.defaults.withCredentials = true;
   const location = useLocation();
   const { Id_User, Id_Assignatura, Role_User } = location.state;
-  const [errors, setFormErrors] = useState("");
   const navigate = useNavigate();
   const [temes, setTemes] = useState([]);
   const [selectedTema, setSelectedTema] = useState();
@@ -50,14 +49,13 @@ function AddQuestion() {
       const res = await axios.post(`${apiUrl}/addQuestion`, values);
 
       if (res.data.Status === "Failed") {
-        setFormErrors(res.data.Message || "No s'ha pogut afegir la pregunta.");
+        alert("Error al afegir la pregunta");
       } else {
         alert("Pregunta afegida correctament!");
         navigate(-1);
       }
     } catch (error) {
       console.error("Error a la sol·licitud:", error);
-      setFormErrors("Hi ha hagut un error en enviar la sol·licitud.");
     }
   };
 

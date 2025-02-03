@@ -16,7 +16,7 @@ const apiUrl = import.meta.env.VITE_API_URL;
 function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
   axios.defaults.withCredentials = true;
   const [questions, setQuestions] = useState([]);
-  const [editingQuestion, setEditingQuestion] = useState(null);
+
   const [selectedEditingQuestion, setSelectedEditingQuestion] = useState({});
   const [editedQuestion, setEditedQuestion] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -176,7 +176,6 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
 
   //Funció per cancel·lar la edició
   const handleCancel = () => {
-    setEditingQuestion(null);
     setEditedQuestion(false);
   };
 
