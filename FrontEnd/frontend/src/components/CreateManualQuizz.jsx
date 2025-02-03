@@ -86,6 +86,8 @@ function CreateManualQuizz() {
     const id_creador = idProfessor;
     const id_assignatura = idAssignatura;
 
+    duracio * 60;
+
     axios
       .post(`${apiUrl}/createTest`, {
         nom_test: nomTest,
@@ -257,9 +259,7 @@ function CreateManualQuizz() {
                     onChange={(e) => {
                       const inputValue = e.target.value;
 
-                      if (/^\d{0,3}$/.test(inputValue)) {
-                        setDuracio(inputValue * 60);
-                      }
+                      setDuracio(inputValue);
                     }}
                     className={styles.inputField}
                     placeholder="En minuts"
