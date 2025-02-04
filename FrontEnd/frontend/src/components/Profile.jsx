@@ -18,7 +18,8 @@ function Profile() {
   });
 
   const history = useNavigate();
-  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [confirmPassword, setConfirmPassword] = useState(" ");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   //Funció recuperació dels valors inicials de l'usuari
@@ -45,7 +46,7 @@ function Profile() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (values.password !== "") {
+    if (confirmPassword !== " ") {
       if (values.password !== confirmPassword) {
         alert("Si us plau, introdueix contrasenyes coincidents.");
         return;

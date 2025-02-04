@@ -38,7 +38,7 @@ function TestWithKey() {
           setAvaluatiu(true);
         }
 
-        setTime(parseInt(response.data.Preguntes[0].temps));
+        setTime(parseInt(response.data.Preguntes[0].temps * 60));
 
         setPreguntes(preguntasConContenido);
         setRespostesBarrejades(

@@ -48,7 +48,7 @@ function CustomTest() {
 
         setIntents(sortedPreguntes[0].intents);
         setTestName(sortedPreguntes[0].nom_test);
-        setDuration(sortedPreguntes[0].temps / 60);
+        setDuration(sortedPreguntes[0].temps);
         const aux = sortedPreguntes[0].data_final;
         const formattedDate = new Date(aux).toISOString().split("T")[0];
         setData(formattedDate);
