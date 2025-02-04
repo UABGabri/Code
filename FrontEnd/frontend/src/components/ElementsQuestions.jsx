@@ -31,6 +31,7 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
 
   const [selectedTopic, setSelectedTopic] = useState("");
   const [selectedFilterType, setSelectedFilterType] = useState("");
+  const [selectedDificulty, setSelectedDificulty] = useState("");
 
   //Funció de recuperació del número de preguntes en estat pendent de l'usuari per evitar més de tres preguntes sent alumne
   useEffect(() => {
@@ -97,42 +98,31 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
     }
   }, [Id_Assignatura, questions]); //mirar les dependències
 
-  const handleTopicChange = (e) => {
-    setSelectedTopic(e.target.value);
-    setCurrentPage(1);
-  };
-
   const handleFilterTypeChange = (e) => {
     setSelectedFilterType(e.target.value);
     setCurrentPage(1);
   };
 
+  const handleTopicChange = (e) => {
+    setSelectedTopic(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleDificultyChange = (e) => {
+    setSelectedDificulty(e.target.value);
+    setCurrentPage(1);
+  };
+
   const filteredQuestions = questions.filter((q) => {
-    if (selectedTopic === "" && selectedFilterType === "") {
-      return true;
-    }
+    const matchesTopic = selectedTopic === "" || q.nom_tema === selectedTopic;
+    const matchesDificulty =
+      selectedDificulty === "" || q.dificultat === selectedDificulty;
+    const matchesFilterType =
+      selectedFilterType === "" ||
+      (selectedFilterType === "banc" && q.estat === "acceptada") ||
+      (selectedFilterType === "pendent" && q.estat === "pendent");
 
-    if (selectedFilterType === "") {
-      return q.nom_tema === selectedTopic;
-    }
-
-    if (selectedFilterType === "banc") {
-      if (selectedTopic === "") {
-        return q.estat === "acceptada";
-      } else {
-        return q.estat === "acceptada" && q.nom_tema === selectedTopic;
-      }
-    }
-
-    if (selectedFilterType === "pendent") {
-      if (selectedTopic === "") {
-        return q.estat === "pendent";
-      }
-
-      return q.estat === "pendent" && q.nom_tema === selectedTopic;
-    }
-
-    return true;
+    return matchesTopic && matchesDificulty && matchesFilterType;
   });
 
   const totalPages = Math.ceil(filteredQuestions.length / itemsPerPage);
@@ -283,7 +273,6 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
               className={styles.filterInput}
             >
               <option value="">Tots els temes</option>
-
               {Array.from(new Set(questions.map((q) => q.nom_tema)))
                 .sort()
                 .map((tema) => (
@@ -291,6 +280,20 @@ function ElementsQuestions({ Id_User, Id_Assignatura, Role_User }) {
                     {tema}
                   </option>
                 ))}
+            </select>
+
+            <label style={{ marginLeft: "10px", marginRight: "10px" }}>
+              Filtrar Preguntes per Dificultat:{" "}
+            </label>
+            <select
+              value={selectedDificulty}
+              onChange={handleDificultyChange}
+              className={styles.filterInput}
+            >
+              <option value="">Totes les dificultats</option>
+              <option value="Fàcil">Fàcil</option>
+              <option value="Mitjà">Mitjà</option>
+              <option value="Difícil">Difícil</option>
             </select>
           </div>
         </>

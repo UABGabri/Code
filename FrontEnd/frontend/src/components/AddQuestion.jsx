@@ -150,7 +150,7 @@ function AddQuestion() {
             />
           </div>
 
-          {Role_User === "professor" && (
+          {Role_User === "professor" ? (
             <div className={styles.formGroup}>
               <label htmlFor="dificultat">Dificultat:</label>
               <select
@@ -167,6 +167,8 @@ function AddQuestion() {
                 <option value="Difícil">Difícil</option>
               </select>
             </div>
+          ) : (
+            <p> </p>
           )}
 
           <div className={styles.questionArea}>

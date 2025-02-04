@@ -87,7 +87,9 @@ function CreateManualQuizz() {
     const id_creador = idProfessor;
     const id_assignatura = idAssignatura;
 
-    duracio * 60;
+    const duracioMin = duracio * 60;
+
+    setDuracio(duracioMin);
 
     axios
       .post(`${apiUrl}/createTest`, {

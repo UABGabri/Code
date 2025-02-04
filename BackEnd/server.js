@@ -37,15 +37,6 @@ app.use(cors({
 
 app.use(cookieParser());  //Cookies
 
-/*
-const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "Ga21012002",
-    database: "web_examen_tfg"
-});
-*/
-
 
 
 const db = mysql.createConnection({
@@ -56,6 +47,14 @@ const db = mysql.createConnection({
     port: process.env.DB_PORT,
 }); 
 
+/*
+const db = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "Ga21012002",
+    database: "web_examen_tfg"
+});
+*/
 
 
 db.connect((err) => {
@@ -387,7 +386,7 @@ app.post('/accessSubject', async (req, res) =>{
 
     const { id_User, id_Subject, accessPassword, userRole } = req.body;
 
-    console.log(id_User, id_Subject, accessPassword, userRole)
+   
 
 
 
@@ -586,7 +585,7 @@ app.post('/recoverSubjects', (req, res) => {
     const id_User = req.body.idUser;
     const role_User = req.body.roleUser;
 
-    console.log(id_User, role_User)
+
 
     if(!id_User || !role_User)
         return res.json({Status:"Failed", message:"Manquen dades"})
@@ -943,7 +942,7 @@ app.delete('/deleteQuestion', (req,res)=>{
             console.error("Error en la consulta:", error);
             return res.json({ Status: "Failed" });
           } else {
-            console.log("Eliminat correctament")
+        
             return res.json(result); 
           }
     })
@@ -1205,7 +1204,7 @@ app.get("/checkProfessorInSubject", (req, res) => {
 
         const exists = result[0].count > 0;
 
-        console.log(exists)
+     
 
         if(exists === true)
             return res.json({ Status:"Success" });
@@ -1231,7 +1230,7 @@ app.get("/checkStudentInSubject", (req, res) => {
 
         const exists = result[0].count > 0;
 
-        console.log(exists)
+       
 
         if(exists === true)
             return res.json({ Status:"Success" });
@@ -1519,7 +1518,7 @@ app.get('/recoverQuestionsConcepts', (req, res) => {
       SELECT p.*
       FROM preguntes p
       INNER JOIN preguntes_conceptes cp ON p.id_pregunta = cp.id_pregunta
-      WHERE cp.id_concepte IN (?)`;
+      WHERE cp.id_concepte IN (?) AND p.estat = 'acceptada'`;
   
 
     db.query(query, [conceptesIds], (err, results) => {
@@ -1644,7 +1643,7 @@ app.get('/recoverRandomTestQuestions', async (req, res) => {
     const temes = req.query.temes;
     const conceptes = req.query.conceptes;
 
-   // console.log(temes, conceptes)
+
 
     const sql = `SELECT * FROM preguntes WHERE (tema_id IN (:temes) OR :temes IS NULL) AND (concepte_id IN (:conceptes) OR :conceptes IS NULL);`
 
@@ -1757,7 +1756,7 @@ app.put('/updateTestCustom', (req, res) =>{
     }
     
 
-    console.log(testName, data, minutes, tipus, clauAux, idTest, intents)
+
 
     const sql = 'UPDATE tests SET nom_test = ?, data_final = ?, temps = ?, tipus = ?, clau_acces = ?, intents = ? WHERE id_test = ? ';
 
@@ -1831,7 +1830,7 @@ app.get('/recoverPreguntesTema', (req, res) => {
             console.error("Error a la consulta:", error);
             return res.json({ error: "Error a la consulta." });
         }
-        //console.log("Preguntes retornades:", result);
+      
         return res.json(result);
     });
 });
@@ -2155,9 +2154,9 @@ app.get("/recoverPreguntaRandom", (req, res) => {
         return res.json({ status: "Error", message: "Id de tema no vàlid" });
     }
 
-    //console.log("Recuperant pregunta per al tema:", id_tema);
+ 
 
-    const sql = 'SELECT * FROM preguntes WHERE id_tema = ? ORDER BY RAND() LIMIT 1';
+    const sql = `SELECT * FROM preguntes WHERE id_tema = ? AND estat = 'acceptada' ORDER BY RAND() LIMIT 1`;
 
     db.query(sql, [id_tema], (err, result) => {
         if (err) {
